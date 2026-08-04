@@ -1,0 +1,30 @@
+# secrets + local DBs — never commit. The real .env is UNTRACKED (R10.1): prod secrets live only in
+# the box's local .env / secrets manager, so a `git reset --hard` on the box can never clobber them.
+# .env.example is the safe placeholder template and is the ONE tracked exception.
+.env
+.env.*
+!.env.example
+*.db
+*.db-*
+*.db-wal
+*.db-shm
+# Claude Code personal settings (never commit — machine-local permissions etc.)
+.claude/settings.local.json
+# python caches
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.hypothesis/
+# macOS
+.DS_Store
+# build artifacts / backups
+realify-mc.zip
+*.bak
+*.bak-*
+.venv
+
+# agency dev mail driver (P0.5)
+.mailbox/

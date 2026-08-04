@@ -1,0 +1,30 @@
+{
+ "briefing": {
+  "total": 53,
+  "new": 53,
+  "action": 30,
+  "opportunities": 2
+ },
+ "sources": [
+  {
+   "source": "keepa",
+   "last_ok": "2026-06-24T18:09:04+00:00",
+   "live": true
+  },
+  {
+   "source": "recalls",
+   "last_ok": "2026-06-24T18:09:04+00:00",
+   "live": true
+  },
+  {
+   "source": "news",
+   "last_ok": "2026-06-24T18:09:04+00:00",
+   "live": true
+  },
+  {
+   "source": "trends",
+   "last_ok": "2026-06-24T18:09:04+00:00",
+   "live": true
+  }
+ ]
+}

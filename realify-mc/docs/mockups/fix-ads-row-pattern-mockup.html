@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fix Ads — restored row pattern (mockup)</title>
+<style>
+:root{--paper:#EDEFF3;--ink:#15233B;--ink2:#33415C;--muted:#5C6B82;--faint:#8A97A8;--line:#DBE0E8;--line2:#E7EAF0;--competitive:#1E5FA8;--opportunity:#6B4FBB;--positive:#0E7C66;--critical:#B0541A;}
+body{font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--paper);margin:0;padding:32px;font-size:13px;line-height:1.45;}
+.wrap{max-width:840px;margin:0 auto;}
+.eyebrow{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+.row{display:grid;grid-template-columns:1fr 96px 96px 100px 20px;gap:12px;align-items:center;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;cursor:pointer;}
+.row:hover{border-color:var(--competitive);}
+.sub{color:var(--faint);font-size:11px;}
+.rt{text-align:right;font-weight:600;}
+.crit{color:var(--critical);}.pos{color:var(--positive);}
+.expanded{background:#fff;border:1.5px solid var(--competitive);border-radius:8px;margin-bottom:8px;overflow:hidden;}
+.exhead{background:#F4F7FB;border-bottom:1px solid var(--line2);}
+.body{padding:14px;}
+.sec{font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;margin:12px 0 6px;}
+.rec{border-left:3px solid var(--positive);padding:6px 10px;margin-bottom:6px;background:#F2F8F5;border-radius:0 6px 6px 0;}
+.adv{border-left:3px solid var(--opportunity);padding:6px 10px;margin-bottom:6px;background:#F5F3FA;border-radius:0 6px 6px 0;color:var(--ink2);}
+.muted{color:var(--muted);}
+.sim{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px;}
+.cell{border:1px solid var(--line);border-radius:6px;padding:8px;text-align:center;}
+.pill{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line);border-radius:4px;padding:1px 6px;}
+.btn{padding:7px 14px;border-radius:6px;font-weight:600;}
+.btn-p{background:var(--competitive);color:#fff;}
+.btn-s{background:#fff;border:1px solid var(--line);color:var(--ink);}
+</style></head>
+<body><div class="wrap">
+<div class="eyebrow">Fix Ads · Recoverable now</div>
+<div style="font-size:16px;font-weight:600;margin:2px 0;">41 SKUs overspending above break-even · ₹3,23,706 recoverable</div>
+<div class="sub" style="margin-bottom:16px;">Each row is clickable → opens the SKU's recommendation, explainability, simulation, and actions. Bulk “Apply to all / Export change set” remains a header control, but no longer replaces per-SKU drill-down.</div>
+
+<div class="row">
+  <div><div style="font-weight:600;">Trail-Grip Floor Mat (Set)</div><div class="sub">SKU-TGM-04 · 3 campaigns</div></div>
+  <div class="rt"><div class="crit">38% ▲</div><div class="sub">vs 24% BE</div></div>
+  <div class="rt crit">−₹6,410</div><div class="rt pos">₹4,900</div><div style="color:var(--faint);text-align:center;">›</div>
+</div>
+
+<div class="expanded">
+  <div class="row exhead" style="margin:0;border:0;">
+    <div><div style="font-weight:600;">Cabin Air Filter — Twin Pack</div><div class="sub">SKU-CAF-11 · 7 campaigns · coverage 92%</div></div>
+    <div class="rt"><div class="crit">41% ▲</div><div class="sub">vs 22% BE</div></div>
+    <div class="rt crit">−₹1,240</div><div class="rt pos">₹900</div><div style="color:var(--competitive);text-align:center;font-weight:700;">⌄</div>
+  </div>
+  <div class="body">
+    <span class="pill">Fidelity: keyword-level · CSV (derived)</span>
+
+    <div class="sec" style="color:var(--competitive);">Recommendation — Realify can apply</div>
+    <div class="rec"><b>Lower bid −30%</b> on targets “cabin filter oem”, “ac filter” in <b>Campaign A</b>. <span class="muted">Bid too high for the margin it returns.</span></div>
+    <div class="rec"><b>Add negative exact</b> “car perfume”, “dashboard clean” in <b>Campaign B</b>. <span class="muted">Spend with no conversions.</span></div>
+    <div class="rec"><b>Remove this SKU</b> from <b>Campaign E</b> (shared). <span class="muted">Dragging 4 healthy SKUs.</span></div>
+
+    <div class="sec" style="color:var(--opportunity);">Advisory — you do this yourself</div>
+    <div class="adv">Consider <b>splitting Campaign A</b> to isolate this SKU. <span class="muted">Structural change — Realify won’t auto-execute. See “How to”.</span></div>
+
+    <div class="sec" style="color:var(--muted);">Why</div>
+    <div style="color:var(--ink2);">Break-even ACOS is <b>22%</b> (contribution ÷ net settled revenue, from your COGS). This SKU runs at <b>41%</b>. Campaigns A &amp; B are <b>80% of its ad spend</b> and both sit above break-even. 8% of spend is on unmapped search terms and is excluded from the fix.</div>
+
+    <div class="sec" style="color:var(--muted);">Simulate — projected after applying</div>
+    <div class="sim">
+      <div class="cell"><div class="sub">30 DAY</div><div style="font-weight:700;" class="pos">+₹780</div><div class="sub">p ≈ 0.71</div></div>
+      <div class="cell"><div class="sub">60 DAY</div><div style="font-weight:700;" class="pos">+₹1,640</div><div class="sub">p ≈ 0.66</div></div>
+      <div class="cell"><div class="sub">90 DAY</div><div style="font-weight:700;" class="pos">+₹2,510</div><div class="sub">p ≈ 0.60</div></div>
+    </div>
+    <div class="crit" style="font-size:11px;">⚠ Tripwire: if units/week fall &gt;15% after the bid cut, auto-revert and flag.</div>
+
+    <div class="sec" style="color:var(--muted);">Action</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <span class="btn btn-p">Apply 3 changes</span>
+      <span class="btn btn-s">Preview</span>
+      <span class="btn btn-s">Open in Amazon ↗</span>
+      <span class="sub">Guardrails: max −30% bid · budget floor on · rollback ready</span>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div><div style="font-weight:600;">Wiper Blade 22” (Pair)</div><div class="sub">SKU-WB-22 · 2 campaigns · <span class="crit">no search-term data</span></div></div>
+  <div class="rt"><div class="crit">29% ▲</div><div class="sub">vs 19% BE</div></div>
+  <div class="rt crit">−₹520</div><div class="rt pos">₹410</div><div style="color:var(--faint);text-align:center;">›</div>
+</div>
+<div class="sub" style="margin-top:8px;">↑ Fidelity fallback in action: this SKU has no search-term data, so its detail will offer campaign-level levers only (bid-down + remove-ad); negative-keyword is hidden and the row is labeled — never silently dropped.</div>
+
+</div></body></html>

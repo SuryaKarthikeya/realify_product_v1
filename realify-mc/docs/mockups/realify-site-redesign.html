@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Realify — Site Redesign Mockups</title>
+<style>
+  :root{
+    --ink:#1A1A1A; --ink2:#242220; --paper:#F7F4EE; --card:#FFFFFF;
+    --terra:#C4785B; --terra-d:#A9603F; --slate:#5B7B94; --sage:#7A9E7E;
+    --line:#E4DDD0; --line-dk:#3A3631; --mut:#6E675C; --mut-dk:#A39B8D;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+    --serif:Georgia,"Times New Roman",serif;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#EDE8DE;color:var(--ink);font-family:var(--sans);font-size:15.5px;line-height:1.6}
+  /* shell */
+  #shell{display:flex;min-height:100vh}
+  #nav{width:240px;flex-shrink:0;background:var(--ink);color:#EDE7DB;padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto}
+  #nav h1{font-size:15px;margin:0 0 4px}
+  #nav .sub{font-size:11.5px;color:#9C9483;margin-bottom:18px}
+  #nav .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--terra);margin:16px 0 6px}
+  #nav button{display:block;width:100%;text-align:left;background:none;border:none;color:#CFC8BA;font-size:13px;padding:7px 10px;border-radius:8px;cursor:pointer;font-family:var(--sans)}
+  #nav button:hover{background:#2A2A2A;color:#fff}
+  #nav button.on{background:var(--terra);color:#fff;font-weight:600}
+  #stage{flex:1;padding:26px 30px 60px;max-width:1160px}
+  .annot{background:#FBF7EF;border:1px dashed var(--terra);border-radius:10px;padding:10px 14px;font-size:13px;color:#7A5A47;margin-bottom:16px}
+  .annot b{color:#9C4F30}
+  .screen{display:none}.screen.on{display:block}
+  .frame{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 2px 6px rgba(26,26,26,.08),0 18px 50px rgba(26,26,26,.10)}
+
+  /* ===== marketing design system ===== */
+  .m-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 40px;background:var(--paper);border-bottom:1px solid var(--line)}
+  .logo{font-family:var(--serif);font-weight:700;font-size:21px;letter-spacing:-.02em}
+  .logo .dot{color:var(--terra)}
+  .m-links{display:flex;gap:26px;font-size:14px}
+  .m-links a{color:var(--ink);text-decoration:none}
+  .m-links a.dim{color:var(--mut)}
+  .m-cta{display:flex;gap:10px;align-items:center}
+  .btn{display:inline-block;border-radius:9px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:var(--sans);text-decoration:none}
+  .btn.p{background:var(--terra);color:#fff}
+  .btn.p:hover{background:var(--terra-d)}
+  .btn.g{background:none;border:1.5px solid var(--ink);color:var(--ink)}
+  .btn.dark{background:var(--ink);color:#fff}
+  .btn.big{padding:14px 28px;font-size:15.5px}
+  .kick{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--terra);font-weight:600}
+  h2.d{font-family:var(--serif);font-weight:700;letter-spacing:-.015em;line-height:1.12;margin:12px 0 16px}
+  .lede{font-size:17.5px;color:var(--mut);max-width:60ch}
+  .sec{padding:64px 40px}
+  .sec.dark{background:var(--ink);color:#EDE7DB}
+  .sec.dark .lede{color:var(--mut-dk)}
+  .sec.dark h2.d{color:#F3EEE4}
+  .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+  .cards2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px}
+  .mcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+  .sec.dark .mcard{background:var(--ink2);border-color:var(--line-dk);color:#EDE7DB}
+  .mcard h4{margin:0 0 8px;font-size:16px}
+  .mcard p{margin:0;font-size:14px;color:var(--mut)}
+  .sec.dark .mcard p{color:var(--mut-dk)}
+  .mcard .ic{font-size:20px;margin-bottom:10px;display:block}
+  .statrow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .statrow:last-child{border-bottom:none}
+  .statrow b{font-family:var(--mono)}
+  .sec.dark .statrow{border-color:var(--line-dk)}
+  .pill{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;border-radius:100px;padding:3px 10px;background:#EFE7D9;color:#7A6A4F;margin-right:6px}
+  .sec.dark .pill{background:#33302A;color:#C9BFA9}
+  .foot{background:var(--ink);color:#9C9483;padding:40px;font-size:13px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:24px}
+  .foot a{color:#CFC8BA;text-decoration:none;display:block;margin:4px 0}
+  .foot h5{color:#EDE7DB;font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px}
+
+  /* forms */
+  .f-field{margin-bottom:16px}
+  .f-field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+  .f-field label .req{color:var(--terra)}
+  .f-field input,.f-field select,.f-field textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px;font-family:var(--sans);background:#fff;color:var(--ink)}
+  .f-field input:focus,.f-field select:focus{outline:none;border-color:var(--terra)}
+  .f-field .hint{font-size:12px;color:var(--mut);margin-top:5px}
+  .fcols{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1.5px solid var(--line);border-radius:100px;padding:8px 16px;font-size:14px;cursor:pointer;background:#fff;user-select:none}
+  .chip.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .steps-inline{display:flex;gap:0;margin:26px 0 6px}
+  .steps-inline .t{flex:1;font-size:13px;color:var(--mut);position:relative;padding-top:22px;text-align:center}
+  .steps-inline .t::before{content:"";position:absolute;top:5px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;background:#D8CFBC}
+  .steps-inline .t::after{content:"";position:absolute;top:10px;left:calc(50% + 9px);right:calc(-50% + 9px);height:2px;background:#E5DDCB}
+  .steps-inline .t:last-child::after{display:none}
+  .steps-inline .t.done::before{background:var(--sage)}
+  .steps-inline .t.now::before{background:var(--terra);box-shadow:0 0 0 4px #F3DCD0}
+  .steps-inline .t.now{color:var(--ink);font-weight:600}
+  .center{text-align:center}
+  .checkmark{width:56px;height:56px;border-radius:50%;background:var(--sage);color:#fff;font-size:26px;line-height:56px;text-align:center;margin:0 auto 18px}
+  .faq{border-bottom:1px solid var(--line);padding:16px 0}
+  .faq b{display:block;font-size:15px;margin-bottom:6px}
+  .faq p{margin:0;font-size:14px;color:var(--mut)}
+  .price-card{background:var(--card);border:2px solid var(--ink);border-radius:18px;padding:34px;max-width:420px;margin:30px auto 8px;text-align:center}
+  .price-card .amt{font-family:var(--serif);font-size:52px;font-weight:700}
+  .price-card .amt small{font-size:17px;color:var(--mut);font-family:var(--sans);font-weight:400}
+</style>
+</head>
+<body>
+<div id="shell">
+  <nav id="nav">
+    <h1>Realify · Site Redesign</h1>
+    <div class="sub">Head-of-design pass · v1<br>Truth-guarded copy throughout</div>
+    <div class="grp">The fix</div>
+    <button data-s="d1" class="on">1 · For Agencies — landing + apply</button>
+    <button data-s="d2">2 · Application received</button>
+    <div class="grp">The refresh</div>
+    <button data-s="d3">3 · Homepage</button>
+    <button data-s="d4">4 · Pricing</button>
+    <button data-s="d5">5 · Sign in</button>
+  </nav>
+  <main id="stage">
+
+  <!-- ============ 1. FOR AGENCIES ============ -->
+  <section class="screen on" id="d1">
+    <div class="annot"><b>The centerpiece.</b> /agencies/apply today is an unstyled form with zero context — the only page a prospective agency ever sees, and the least designed page on the site. This replaces it with a landing + form at /agencies (form anchored at #apply). <b>Every claim is truth-guarded</b>: consent/envelopes, $-ranked queue, verified report numbers, expiry semantics, per-client cost — all live features. Nothing about marketplace execution, benchmarking, or ROI multiples. Form restores the full field set from the intake spec (currently missing: book size, marketplaces, ad platforms, current tool, target start).</div>
+    <div class="frame">
+      <div class="m-nav">
+        <span class="logo">realify<span class="dot">.</span></span>
+        <div class="m-links"><a class="dim" href="#">Platform</a><a class="dim" href="#">Pricing</a><a href="#"><b>For Agencies</b></a><a class="dim" href="#">FAQ</a></div>
+        <div class="m-cta"><a class="btn g" href="#">Sign in</a><a class="btn p" href="#apply">Request access</a></div>
+      </div>
+
+      <div class="sec" style="padding-top:72px">
+        <span class="kick">Realify for Agencies · Pilot program</span>
+        <h2 class="d" style="font-size:44px;max-width:20ch">Run every client's profit decisions from one queue.</h2>
+        <p class="lede">One dollar-ranked stream of decisions across your whole book — with client-granted, revocable permissions, approval workflows your clients co-sign, and reports whose every number is machine-verified before it can send.</p>
+        <div style="margin-top:26px"><a class="btn p big" href="#apply">Request access →</a>
+        <span style="font-size:13px;color:var(--mut);margin-left:14px">Reviewed personally · reply within 2 business days · no card, no trial clock</span></div>
+      </div>
+
+      <div class="sec dark">
+        <span class="kick">Why agencies</span>
+        <h2 class="d" style="font-size:30px">Built around the two things agencies can't buy elsewhere.</h2>
+        <div class="cards2">
+          <div class="mcard">
+            <h4>Your clients grant access — and can see everything</h4>
+            <p>No shared logins, no credential spreadsheets. Each client approves a scoped permission envelope (down to the lens: ads, inventory, pricing…), sets their own approval ceilings, and gets a permanent log of every action your team takes. They can narrow or revoke any time — which is exactly why they say yes.</p>
+          </div>
+          <div class="mcard">
+            <h4>Numbers your clients can audit</h4>
+            <p>Every figure in a client report is checked against the computation engine before the report can send — a report with an unverifiable number is blocked, not delivered. When you present results, the arithmetic is defensible to the decimal.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <span class="kick">What you get</span>
+        <h2 class="d" style="font-size:30px">The working day, redesigned.</h2>
+        <div class="cards3">
+          <div class="mcard"><span class="ic">☰</span><h4>One decision queue</h4><p>Opportunities and risks across all clients in a single stream, ranked by monthly profit impact — with the driving signal and confidence attached to every item. USD and INR books rank together at locked daily FX.</p></div>
+          <div class="mcard"><span class="ic">✓</span><h4>Approvals with real rules</h4><p>Actions your client's envelope allows, you approve. Sensitive ones route for client co-sign — from their inbox, on their phone. Requests expire in 5 days: silence never executes anything.</p></div>
+          <div class="mcard"><span class="ic">↺</span><h4>An audit trail with undo</h4><p>Every action lands in a tamper-evident ledger your client can see, and executed changes carry one-click undo from snapshots.</p></div>
+          <div class="mcard"><span class="ic">📄</span><h4>Client-ready reports</h4><p>Generated per client, in their currency and format (₹ with Indian grouping for INR sellers), with your agency's branding — and the verification gate on every number.</p></div>
+          <div class="mcard"><span class="ic">💳</span><h4>Billing you can reconcile</h4><p>Pooled decision metering with per-client cost allocation — defend your own margins with a books-ready export. Your clients never receive an invoice from us.</p></div>
+          <div class="mcard"><span class="ic">⇪</span><h4>Start with CSVs, today</h4><p>No integration project required: onboard a client from their marketplace exports — auto-detected report types, guided column mapping. Data is tagged by source so you always know what you're looking at.</p></div>
+        </div>
+      </div>
+
+      <div class="sec dark">
+        <span class="kick">How the pilot works</span>
+        <div class="cards3">
+          <div class="mcard"><h4>1 · Apply below</h4><p>A human reads every application — expect a reply within 2 business days.</p></div>
+          <div class="mcard"><h4>2 · Pilot call</h4><p>30 minutes to scope your first clients and pilot terms. Pricing is agreed before anything starts — no card at signup, no trial clock.</p></div>
+          <div class="mcard"><h4>3 · First client live</h4><p>Your workspace is provisioned, your team invited, and your first client asked for consent — the queue populates from their data.</p></div>
+        </div>
+      </div>
+
+      <div class="sec" id="apply" style="max-width:820px">
+        <span class="kick">Request access</span>
+        <h2 class="d" style="font-size:30px">Tell us about your book.</h2>
+        <div class="fcols">
+          <div class="f-field"><label>Agency name <span class="req">*</span></label><input placeholder="BrightPeak Commerce"></div>
+          <div class="f-field"><label>Website <span class="req">*</span></label><input placeholder="brightpeak.co"></div>
+          <div class="f-field"><label>Your name <span class="req">*</span></label><input placeholder="Sarah Mitchell"></div>
+          <div class="f-field"><label>Work email <span class="req">*</span></label><input placeholder="sarah@brightpeak.co"><div class="hint">Must match your agency domain — this becomes the admin account.</div></div>
+        </div>
+        <div class="f-field"><label>Where is your agency based? <span class="req">*</span></label>
+          <div class="chips"><span class="chip sel">United States</span><span class="chip">India</span></div>
+          <div class="hint">Manage brands in either market from either country. Pricing is always in USD.</div></div>
+        <div class="f-field"><label>Brand accounts you manage <span class="req">*</span></label>
+          <div class="chips"><span class="chip">1–5</span><span class="chip sel">6–15</span><span class="chip">16–40</span><span class="chip">40+</span></div></div>
+        <div class="fcols">
+          <div class="f-field"><label>Account managers running those accounts <span class="req">*</span></label>
+            <select><option>1</option><option selected>2</option><option>3–5</option><option>6–10</option><option>10+</option></select></div>
+          <div class="f-field"><label>Hours/month your team spends on client reporting</label>
+            <select><option>&lt;10</option><option selected>10–40</option><option>40–100</option><option>100+</option></select></div>
+        </div>
+        <div class="f-field"><label>Marketplaces your clients sell on <span class="req">*</span></label>
+          <div class="chips"><span class="chip sel">Amazon US</span><span class="chip sel">Amazon IN</span><span class="chip">Walmart</span><span class="chip sel">Shopify</span><span class="chip">eBay</span><span class="chip sel">Flipkart</span><span class="chip">Shopzee</span></div></div>
+        <div class="f-field"><label>Ad platforms you run</label>
+          <div class="chips"><span class="chip sel">Amazon Ads</span><span class="chip sel">Google</span><span class="chip">Meta</span></div></div>
+        <div class="fcols">
+          <div class="f-field"><label>Current tool</label>
+            <select><option>Pacvue</option><option selected>Helium 10</option><option>Perpetua</option><option>Teikametrics</option><option>SellerStack</option><option>Spreadsheets</option><option>Other</option></select></div>
+          <div class="f-field"><label>Target start</label>
+            <select><option selected>Within 30 days</option><option>1–3 months</option><option>Exploring</option></select></div>
+        </div>
+        <div class="f-field"><label>Anything else?</label><textarea rows="2" placeholder="Context that helps us help you"></textarea></div>
+        <button class="btn p big" onclick="go('d2')">Request access →</button>
+        <div style="font-size:13px;color:var(--mut);margin-top:12px">No card. No trial clock. A human reads this.</div>
+      </div>
+
+      <div class="foot">
+        <div><span class="logo" style="color:#EDE7DB">realify<span class="dot">.</span></span><p style="max-width:34ch">Profit decisions for multichannel commerce — for the brands that sell, and the agencies that run them.</p></div>
+        <div><h5>Product</h5><a href="#">Platform</a><a href="#">Pricing</a><a href="#">For Agencies</a><a href="#">FAQ</a></div>
+        <div><h5>Legal</h5><a href="#">Terms</a><a href="#">Privacy</a><a href="#">Acceptable Use</a></div>
+        <div><h5>Contact</h5><a href="#">hello@realify.ai</a><a href="#">LinkedIn</a></div>
+      </div>
+    </div>
+    <div class="flownext" style="margin-top:18px"><button class="btn dark" onclick="go('d2')">Next: after submitting →</button></div>
+  </section>
+
+  <!-- ============ 2. CONFIRMATION ============ -->
+  <section class="screen" id="d2">
+    <div class="annot"><b>Same design system as the landing</b> — the R1 confirmation page exists functionally; this restyles it and keeps the required copy ("within 2 business days", "a human reads this") verbatim so the rendered-UI tests keep passing.</div>
+    <div class="frame">
+      <div class="m-nav">
+        <span class="logo">realify<span class="dot">.</span></span>
+        <div class="m-links"><a class="dim" href="#">Platform</a><a class="dim" href="#">Pricing</a><a href="#"><b>For Agencies</b></a></div>
+        <div class="m-cta"><a class="btn g" href="#">Sign in</a></div>
+      </div>
+      <div class="sec center" style="padding:80px 40px">
+        <div class="checkmark">✓</div>
+        <h2 class="d" style="font-size:34px">Request received, Sarah.</h2>
+        <p class="lede" style="margin:0 auto">A human reads this — expect a reply within 2 business days.</p>
+        <div class="steps-inline" style="max-width:640px;margin:34px auto 10px">
+          <div class="t done">Received<br><span style="font-family:var(--mono);font-size:11px">just now</span></div>
+          <div class="t now">In review</div>
+          <div class="t">Decision</div>
+          <div class="t">Workspace live</div>
+        </div>
+        <p style="font-size:13px;color:var(--mut);margin-top:26px">Reference <span style="font-family:var(--mono)">AG-OTJ43WX7</span> · a copy and your status link were emailed to sarah@brightpeak.co</p>
+        <a class="btn g" href="#" style="margin-top:8px">Track your request →</a>
+      </div>
+      <div class="foot">
+        <div><span class="logo" style="color:#EDE7DB">realify<span class="dot">.</span></span></div>
+        <div><h5>Product</h5><a href="#">Platform</a><a href="#">Pricing</a><a href="#">For Agencies</a></div>
+        <div><h5>Legal</h5><a href="#">Terms</a><a href="#">Privacy</a></div>
+        <div><h5>Contact</h5><a href="#">hello@realify.ai</a></div>
+      </div>
+    </div>
+    <div style="margin-top:18px"><button class="btn dark" onclick="go('d3')">Next: homepage refresh →</button></div>
+  </section>
+
+  <!-- ============ 3. HOMEPAGE ============ -->
+  <section class="screen" id="d3">
+    <div class="annot"><b>The homepage content is genuinely good — this is a refinement, not a rebuild.</b> Changes: (1) "For Agencies" joins the main nav — today it's only findable in the sign-in footer; (2) editorial serif display type + the charcoal/sand/terracotta system from Realify's own design language, replacing generic-SaaS styling; (3) illustrative metric cards get an "illustrative" tag — real numbers belong to signed-in users, and honesty is the brand; (4) an agencies band added near the foot; (5) logo served locally (today it hotlinks realify.ai's WordPress). All six capability sections keep their existing copy — it's accurate to the seller product and well written.</div>
+    <div class="frame">
+      <div class="m-nav">
+        <span class="logo">realify<span class="dot">.</span></span>
+        <div class="m-links"><a href="#"><b>Platform</b></a><a class="dim" href="#">Pricing</a><a class="dim" href="#">For Agencies</a><a class="dim" href="#">FAQ</a></div>
+        <div class="m-cta"><a class="btn g" href="#">Sign in</a><a class="btn p" href="#">Start free trial</a></div>
+      </div>
+      <div class="sec" style="padding-top:76px">
+        <span class="kick">Autonomous merchandising system</span>
+        <h2 class="d" style="font-size:46px;max-width:22ch">One platform. Six coordinated capabilities.</h2>
+        <p class="lede">Pricing, inventory, advertising, intelligence, forecasting, and execution on a single data layer — across every channel you sell on.</p>
+        <div style="margin-top:26px"><a class="btn p big" href="#">Start 30-day free trial</a> <a class="btn g big" href="#" style="margin-left:10px">Request demo</a></div>
+      </div>
+      <div class="sec dark">
+        <span class="kick">Capabilities</span>
+        <h2 class="d" style="font-size:30px">Everything your operations need. Nothing it doesn't.</h2>
+        <div class="cards2" style="align-items:start">
+          <div class="mcard">
+            <h4>Pricing <span class="pill">agent</span></h4>
+            <p>Defend margins and win the buy box on autopilot — within guardrails you set, with a full audit log per SKU.</p>
+            <div style="margin-top:14px">
+              <div class="statrow"><span>ASIN B08XYZ · Buy Box</span><b>$34.99 · Won</b></div>
+              <div class="statrow"><span>Your margin floor</span><b>$29.50 · Guardrail</b></div>
+              <div class="statrow"><span>Price actions today</span><b>14 · Auto</b></div>
+            </div>
+            <div style="margin-top:10px"><span class="pill">illustrative</span></div>
+          </div>
+          <div class="mcard">
+            <h4>Execution <span class="pill">command center</span></h4>
+            <p>Automation you can audit. Every action writes to a log and is reversible; high-impact decisions queue for your approval; the Execution Dial sets autonomy per capability.</p>
+            <div style="margin-top:14px">
+              <div class="statrow"><span>Actions executed (7d)</span><b>1,204</b></div>
+              <div class="statrow"><span>Pending your review</span><b>3</b></div>
+              <div class="statrow"><span>Rollbacks this month</span><b>0 · Clean</b></div>
+            </div>
+            <div style="margin-top:10px"><span class="pill">illustrative</span></div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--mut-dk);margin-top:14px">+ Inventory · Advertising · Intelligence · Forecasting — existing sections retained with current copy, restyled to this system.</p>
+      </div>
+      <div class="sec">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:30px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 34px">
+          <div>
+            <span class="kick">New · Pilot program</span>
+            <h3 style="font-family:var(--serif);font-size:24px;margin:8px 0 6px">Run client accounts? Realify for Agencies.</h3>
+            <p style="margin:0;color:var(--mut);font-size:14.5px;max-width:60ch">One decision queue across your whole book, client-granted permissions, and reports whose numbers verify themselves. In pilot with selected partners.</p>
+          </div>
+          <a class="btn dark big" href="#" onclick="go('d1');return false">Request access →</a>
+        </div>
+      </div>
+      <div class="foot">
+        <div><span class="logo" style="color:#EDE7DB">realify<span class="dot">.</span></span><p style="max-width:34ch">Profit decisions for multichannel commerce.</p></div>
+        <div><h5>Product</h5><a href="#">Platform</a><a href="#">Pricing</a><a href="#">For Agencies</a><a href="#">FAQ</a></div>
+        <div><h5>Legal</h5><a href="#">Terms</a><a href="#">Privacy</a><a href="#">Acceptable Use</a></div>
+        <div><h5>Contact</h5><a href="#">hello@realify.ai</a><a href="#">LinkedIn</a></div>
+      </div>
+    </div>
+    <div style="margin-top:18px"><button class="btn dark" onclick="go('d4')">Next: pricing refresh →</button></div>
+  </section>
+
+  <!-- ============ 4. PRICING ============ -->
+  <section class="screen" id="d4">
+    <div class="annot"><b>Content is honest and strong (flat $20, no GMV cut, real FAQ answers) — the issues are polish.</b> Changes: emoji section headers → typographic labels; stray "+" accordion artifacts fixed; the agencies band added ("agency pricing is scoped at the pilot call" — truthful, since wholesale pricing isn't public); serif display type; consistent footer with For Agencies link.</div>
+    <div class="frame">
+      <div class="m-nav">
+        <span class="logo">realify<span class="dot">.</span></span>
+        <div class="m-links"><a class="dim" href="#">Platform</a><a href="#"><b>Pricing</b></a><a class="dim" href="#">For Agencies</a><a class="dim" href="#">FAQ</a></div>
+        <div class="m-cta"><a class="btn g" href="#">Sign in</a><a class="btn p" href="#">Start free trial</a></div>
+      </div>
+      <div class="sec center" style="padding-top:70px">
+        <span class="kick">Simple pricing</span>
+        <h2 class="d" style="font-size:42px">Everything included. 30 days free.</h2>
+        <p class="lede" style="margin:0 auto">One plan. Every feature. No usage fees, no GMV cut, no ad-spend percentage.</p>
+        <div class="price-card">
+          <div style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)">Full access</div>
+          <div class="amt">$20<small> / month</small></div>
+          <p style="font-size:13.5px;color:var(--mut)">30-day free trial · card required at signup · charged only if you stay past day 31</p>
+          <a class="btn p big" href="#" style="display:block">Start free trial →</a>
+          <p style="font-size:12.5px;color:var(--mut);margin:10px 0 0">Cancel anytime. No questions. No fees.</p>
+        </div>
+      </div>
+      <div class="sec dark">
+        <span class="kick">What's included</span>
+        <h2 class="d" style="font-size:28px">Every feature. From day one.</h2>
+        <div class="cards3">
+          <div class="mcard"><h4>Market intelligence</h4><p>Competitor price monitoring · buy-box tracking · listing-change detection · promotion detection · share-of-voice.</p></div>
+          <div class="mcard"><h4>Autonomous agents</h4><p>Pricing agent within your floors/ceilings · instock agent drafting POs · margin-ROAS ads optimizer · SKU-level forecasting.</p></div>
+          <div class="mcard"><h4>Execution &amp; control</h4><p>Command Center approval queue · Execution Dial per agent · rule builder · full audit log · 1-click rollback.</p></div>
+        </div>
+        <p style="font-size:13px;color:var(--mut-dk);margin-top:14px">+ Data &amp; channels · Security &amp; compliance · Billing — existing lists retained, restyled without emoji headers.</p>
+      </div>
+      <div class="sec" style="max-width:760px">
+        <span class="kick">FAQ</span>
+        <div class="faq"><b>Is there really a 30-day free trial?</b><p>Yes — full access, your actual marketplace data, not a sandbox. Cancel any time before day 31 and you'll never be billed.</p></div>
+        <div class="faq"><b>Do you charge a percentage of GMV or ad spend?</b><p>No. $20/month is your total Realify cost — we never take a cut of revenue, ad spend, or managed GMV.</p></div>
+        <div class="faq"><b>Run an agency?</b><p>Realify for Agencies is a separate pilot program — client-granted permissions, a cross-client decision queue, and verified client reporting. Pricing is scoped at the pilot call. <a href="#" onclick="go('d1');return false" style="color:var(--terra)">Request access →</a></p></div>
+      </div>
+      <div class="foot">
+        <div><span class="logo" style="color:#EDE7DB">realify<span class="dot">.</span></span></div>
+        <div><h5>Product</h5><a href="#">Platform</a><a href="#">Pricing</a><a href="#">For Agencies</a><a href="#">FAQ</a></div>
+        <div><h5>Legal</h5><a href="#">Terms</a><a href="#">Privacy</a></div>
+        <div><h5>Contact</h5><a href="#">hello@realify.ai</a></div>
+      </div>
+    </div>
+    <div style="margin-top:18px"><button class="btn dark" onclick="go('d5')">Next: sign in →</button></div>
+  </section>
+
+  <!-- ============ 5. SIGN IN ============ -->
+  <section class="screen" id="d5">
+    <div class="annot"><b>Functional but has a real bug: "Forgot password?" links to /pricing.</b> Changes: fix that link to an actual reset flow (or a mailto until one exists — never a pricing page); same design system; the footer keeps its For Agencies link (only place it exists today — after this redesign it's everywhere).</div>
+    <div class="frame">
+      <div class="m-nav">
+        <span class="logo">realify<span class="dot">.</span></span>
+        <div class="m-links"><a class="dim" href="#">Platform</a><a class="dim" href="#">Pricing</a><a class="dim" href="#">For Agencies</a></div>
+        <div class="m-cta"><a class="btn p" href="#">Start free trial</a></div>
+      </div>
+      <div class="sec" style="display:flex;justify-content:center;padding:70px 40px">
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:36px;width:400px">
+          <h2 class="d" style="font-size:26px;margin-top:0">Welcome back</h2>
+          <p style="color:var(--mut);font-size:14px;margin-top:-8px">Sign in to your Realify account</p>
+          <button class="btn g" style="width:100%;margin:10px 0 14px">Continue with Google</button>
+          <div style="text-align:center;color:var(--mut);font-size:12px;margin-bottom:12px">— or —</div>
+          <div class="f-field"><label>Email address</label><input placeholder="you@company.com"></div>
+          <div class="f-field"><label>Password</label><input type="password" placeholder="••••••••••"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:16px">
+            <label><input type="checkbox"> Remember me</label>
+            <a href="#" style="color:var(--terra)">Forgot password?</a>
+          </div>
+          <button class="btn p" style="width:100%">Sign in</button>
+          <p style="font-size:13px;color:var(--mut);text-align:center;margin-top:16px">No account? <a href="#" style="color:var(--terra)">Start your free trial →</a></p>
+        </div>
+      </div>
+      <div class="foot">
+        <div><span class="logo" style="color:#EDE7DB">realify<span class="dot">.</span></span></div>
+        <div><h5>Product</h5><a href="#">Platform</a><a href="#">Pricing</a><a href="#">For Agencies</a></div>
+        <div><h5>Legal</h5><a href="#">Terms</a><a href="#">Privacy</a></div>
+        <div><h5>Contact</h5><a href="#">hello@realify.ai</a></div>
+      </div>
+    </div>
+    <div style="margin-top:18px"><button class="btn dark" onclick="go('d1')">↻ Back to the centerpiece</button></div>
+  </section>
+
+  </main>
+</div>
+<script>
+  function go(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+    document.getElementById(id).classList.add('on');
+    document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.s===id));
+    window.scrollTo({top:0});
+  }
+  document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
+</script>
+</body>
+</html>

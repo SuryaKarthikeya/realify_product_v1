@@ -1,0 +1,35 @@
+# CI harness for the agency (Postgres-only) test suite — agency-plan §1c-2.
+# Postgres 16 behind PgBouncer in TRANSACTION pooling mode (the mode P1's RLS design requires:
+# transaction-local `SET LOCAL app.brand_ids`, pooler-safe). Locally, when Docker is unavailable,
+# tools/agency_harness.sh reproduces this exact topology (ports 5433 direct / 6432 pooler).
+#
+# The `realify_app` role (NOSUPERUSER, NOBYPASSRLS — so RLS FORCE binds) and RLS policies are created
+# by the agency migration / `make test-agency` bootstrap, not here; this file only provides the engines.
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: realify_owner
+      POSTGRES_PASSWORD: realify
+      POSTGRES_DB: realify_agency
+    ports: ["5433:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U realify_owner -d realify_agency"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: realify_agency
+      AUTH_TYPE: scram-sha-256
+      POOL_MODE: transaction          # REQUIRED: session mode would break pooler-safe SET LOCAL
+      MAX_CLIENT_CONN: "200"
+      DEFAULT_POOL_SIZE: "20"
+    ports: ["6432:6432"]

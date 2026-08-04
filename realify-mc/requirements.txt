@@ -1,0 +1,17 @@
+# Core runtime needs only the Python stdlib (sqlite3, threading, json).
+# The following are required ONLY for live mode / the API server:
+keepa>=1.3            # live Keepa market data
+requests>=2.31        # live recalls / news fetches
+pytrends>=4.9         # live Google Trends (best-effort)
+anthropic>=0.40       # live L2 card narratives
+fastapi>=0.110        # API server (python run.py start)
+uvicorn>=0.27         # API server
+itsdangerous>=2.0       # Starlette SessionMiddleware (auth cookies)
+openpyxl>=3.1          # parse uploaded .xlsx store exports
+python-multipart>=0.0.9 # multipart file upload
+SQLAlchemy>=2.0        # DB engine seam (#005 1c) — engine/dialect/pooling for the Postgres swap
+alembic>=1.13          # schema migrations (#005 1c)
+psycopg[binary]>=3.1   # PostgreSQL driver (#005 1c) — used only when DATABASE_URL is a postgres URL
+stripe>=9.0            # Stripe billing (BETA app only — realify/beta/, run_beta.py)
+cryptography>=42.0     # agency envelope encryption (AES-256-GCM DEK/KEK) — agency-plan P1
+boto3>=1.34            # agency SES mail driver (realify/mail/ses.py) — lazy-imported

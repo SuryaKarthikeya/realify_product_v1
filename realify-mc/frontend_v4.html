@@ -1,0 +1,2162 @@
+<!-- Realify V4 SPA — parallel to frontend.html, served only when app_ui resolves 'v4' (flags.py).
+     Legacy frontend.html is untouched. DLS: cool/light, all-sans. Reuses existing APIs. -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Realify</title>
+<style>
+:root{
+  --bg:#F4F6F9; --panel:#FFFFFF; --inner:#F6F8FB; --soft:#EEF1F5;
+  --line:#E7EAF0; --line-2:#EEF0F5; --ink:#14161C; --ink-2:#3B4250; --muted:#6C7482; --faint:#99A1B0;
+  --accent:#2E68E6; --accent-bg:#EAF1FE; --accent-ink:#1E52C8;
+  --pos:#12925A; --pos-bg:#E6F5EC; --warn:#B9770A; --warn-bg:#FBF1DC; --crit:#D8403A; --crit-bg:#FBE9E8;
+  --btn:#171A22; --btn-ink:#FFFFFF; --r:14px; --r-sm:10px; --r-xs:8px;
+  --shadow:0 1px 2px rgba(18,28,48,.04),0 2px 6px rgba(18,28,48,.05);
+  --shadow-h:0 4px 14px rgba(18,28,48,.09);
+  --rail-w:212px; --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+:root[data-theme="dark"]{
+  --bg:#0E1014; --panel:#171A20; --inner:#1D2027; --soft:#14171D; --line:#282C34; --line-2:#22262D;
+  --ink:#EDEFF3; --ink-2:#C3C8D1; --muted:#8B93A1; --faint:#666E7C; --accent:#6C97F2; --accent-bg:#1A2740;
+  --accent-ink:#9DBAF8; --pos:#42C285; --pos-bg:#13291F; --warn:#E0A63F; --warn-bg:#2C2312;
+  --crit:#F0625C; --crit-bg:#301715; --btn:#EDEFF3; --btn-ink:#14161C;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.35); --shadow-h:0 6px 20px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;
+  font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums}
+a{color:var(--accent);text-decoration:none}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---- layout ---- */
+.app{display:flex;min-height:100vh}
+.rail{width:var(--rail-w);flex:none;border-right:1px solid var(--line);background:var(--panel);
+  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;transition:width .18s}
+.app.railmin .rail{width:60px}
+.rail .brand{display:flex;align-items:center;padding:18px 16px 14px}
+.rail .brand img{height:30px;width:auto;display:block;max-width:100%}
+.logo-white{display:none}                                   /* light mode: ink wordmark on white */
+:root[data-theme="dark"] .logo-ink{display:none}            /* dark mode: white wordmark */
+:root[data-theme="dark"] .logo-white{display:block}
+.app.railmin .brand img{display:none}                       /* collapsed rail is icon-only; wordmark won't fit */
+.app.railmin .nav-lbl,.app.railmin .navsub{display:none}
+.nav{display:flex;flex-direction:column;gap:2px;padding:8px}
+.nav .sec{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);padding:12px 10px 5px}
+.app.railmin .nav .sec{visibility:hidden}
+.navitem{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--r-sm);color:var(--ink-2);
+  cursor:pointer;font-size:14px;font-weight:500;border:none;background:none;width:100%;text-align:left}
+.navitem:hover{background:var(--inner)}
+.navitem.on{background:var(--accent-bg);color:var(--accent-ink);font-weight:600}
+.navitem .ic{width:19px;height:19px;flex:none;display:grid;place-items:center}
+.navitem .ic svg{width:18px;height:18px}
+.navsub{display:flex;flex-direction:column;margin:1px 0 3px 30px;gap:1px}
+.navsub button{text-align:left;border:none;background:none;color:var(--muted);font-size:12.5px;padding:5px 8px;border-radius:6px;cursor:pointer}
+.navsub button:hover{color:var(--ink)} .navsub button.on{color:var(--accent-ink);font-weight:600}
+.rail .foot{margin-top:auto;padding:8px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.rail .foot .row{display:flex;gap:6px;padding:6px 4px}
+.icobtn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 9px;color:var(--muted);cursor:pointer;font-size:12px}
+.icobtn:hover{color:var(--ink);border-color:var(--muted)}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.hdr{display:flex;align-items:center;gap:14px;padding:12px 22px;border-bottom:1px solid var(--line);
+  background:color-mix(in srgb,var(--panel) 80%,transparent);position:sticky;top:0;z-index:20;backdrop-filter:blur(8px)}
+.hdr .surface{font-size:15px;font-weight:650;letter-spacing:-.01em}
+.hdr .grow{flex:1}
+.omni-mini{flex:0 1 420px;display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--inner);
+  border-radius:999px;padding:7px 14px;color:var(--muted);cursor:text;font-size:13px}
+.omni-mini kbd{margin-left:auto;font-family:var(--mono);font-size:10.5px;border:1px solid var(--line);border-radius:5px;padding:1px 5px;background:var(--panel)}
+.hbtn{border:1px solid var(--line);background:var(--panel);border-radius:9px;padding:8px 11px;color:var(--muted);cursor:pointer;font-size:12.5px;display:inline-flex;align-items:center;gap:6px}
+.hbtn:hover{color:var(--ink);border-color:var(--muted)}
+.hbtn svg{width:15px;height:15px}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:600;font-size:13px;cursor:pointer;border:none}
+
+.surface-wrap{flex:1;overflow:auto}
+.pad{max-width:1000px;margin:0 auto;padding:26px 22px 80px}
+
+/* ---- right pane ---- */
+.pane{position:fixed;top:0;right:0;height:100vh;width:360px;max-width:92vw;background:var(--panel);
+  border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(18,28,48,.10);transform:translateX(100%);
+  transition:transform .2s;z-index:60;display:flex;flex-direction:column}
+.pane.show{transform:none}
+.pane .ph{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);font-weight:650}
+.pane .ph .x{margin-left:auto;border:none;background:none;font-size:20px;color:var(--muted);cursor:pointer}
+.pane .tabs{display:flex;gap:4px;padding:8px 10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.pane .tabs button{border:1px solid transparent;background:none;color:var(--muted);border-radius:999px;padding:5px 10px;font-size:12px;cursor:pointer}
+.pane .tabs button.on{background:var(--accent-bg);color:var(--accent-ink);font-weight:600}
+.pane .body{flex:1;overflow:auto;padding:14px 16px}
+.pane .empty{color:var(--faint);font-size:13px;text-align:center;padding:30px 10px}
+.pane .li{border:1px solid var(--line);border-radius:var(--r-sm);padding:11px 12px;margin-bottom:9px;font-size:13px}
+.pane .li .m{color:var(--muted);font-size:11.5px;margin-top:4px;font-family:var(--mono)}
+.scrim{position:fixed;inset:0;background:rgba(15,25,45,.28);z-index:55;display:none}
+.scrim.show{display:block}
+
+/* ---- Ask ---- */
+.ask-empty{max-width:720px;margin:0 auto;padding:6vh 20px 40px;text-align:center}
+.logo-assemble{margin:0 auto 22px;display:block}
+.logo-assemble img{height:44px;width:auto;display:block;margin:0 auto;animation:assemble .8s cubic-bezier(.2,.8,.2,1) both}
+.logo-assemble .logo-white{display:none}
+:root[data-theme="dark"] .logo-assemble .logo-ink{display:none}
+:root[data-theme="dark"] .logo-assemble .logo-white{display:block}
+@keyframes assemble{0%{opacity:0;transform:scale(.92) translateY(6px)}100%{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.logo-assemble img{animation:none}}
+.ask-head{font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.25;margin:0 0 8px;text-wrap:balance}
+.ask-head .hl{color:var(--accent)}
+.ask-dek{color:var(--muted);font-size:15px;margin:0 auto 26px;max-width:52ch}
+.ombox{border:1.5px solid var(--line);border-radius:16px;background:var(--panel);box-shadow:var(--shadow);
+  padding:4px;position:relative;overflow:hidden}
+.ombox.foc{border-color:var(--accent)}
+.ombox .usage{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);opacity:.7;transition:width .3s}
+.ombox textarea{width:100%;border:none;background:none;resize:none;font-family:inherit;font-size:15px;color:var(--ink);
+  padding:13px 15px 8px;outline:none;max-height:180px}
+.ombox .bar{display:flex;align-items:center;gap:8px;padding:6px 10px 8px}
+.ombox .catbtn{border:1px solid var(--line);background:var(--inner);border-radius:999px;padding:5px 11px;font-size:12.5px;color:var(--ink-2);cursor:pointer}
+.ombox .send{margin-left:auto;border:none;background:var(--btn);color:var(--btn-ink);border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:16px}
+.ombox .send:disabled{opacity:.4;cursor:not-allowed}
+.modelpick{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:5px 9px;font-size:12px;color:var(--muted);cursor:pointer}
+.usage-lbl{font-size:11px;color:var(--faint);font-family:var(--mono)}
+.cats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.cat{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:8px 15px;font-size:13px;font-weight:500;color:var(--ink-2);cursor:pointer}
+.cat:hover{border-color:var(--accent);color:var(--accent-ink)}
+.cat.on{background:var(--accent-bg);border-color:transparent;color:var(--accent-ink);font-weight:600}
+.qlist{max-width:560px;margin:16px auto 0;display:flex;flex-direction:column;gap:7px}
+.q{border:1px solid var(--line);background:var(--panel);border-radius:var(--r-sm);padding:11px 14px;font-size:13.5px;text-align:left;cursor:pointer;color:var(--ink)}
+.q:hover{background:var(--inner);border-color:var(--accent)}
+
+.chat{max-width:760px;margin:0 auto;padding:20px 20px 0}
+.turn{margin-bottom:22px}
+.turn.u .bub{background:var(--accent-bg);color:var(--accent-ink);border-radius:14px 14px 4px 14px;padding:11px 15px;font-size:14.5px;margin-left:auto;max-width:80%;width:fit-content}
+.turn.a .bub{font-size:14.5px;line-height:1.6;color:var(--ink)}
+.turn.a .tiles{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.tile{background:var(--inner);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:10px 13px;min-width:120px}
+.tile.acc{background:var(--accent-bg);border-color:transparent}
+.tile .tl{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:5px}
+.tile.acc .tl{color:var(--accent-ink)} .tile .tv{font-size:19px;font-weight:700;letter-spacing:-.02em}
+.tile.acc .tv{color:var(--accent-ink)}
+.cites{margin:10px 0;display:flex;flex-direction:column;gap:6px}
+.cite{border:1px solid var(--line);border-radius:var(--r-sm);padding:9px 12px;font-size:13px;display:flex;gap:8px;align-items:center}
+.cite .sev{width:8px;height:8px;border-radius:50%;flex:none}
+.turn .acts{display:flex;gap:6px;margin-top:12px}
+.aact{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.aact:hover{color:var(--ink);border-color:var(--muted)} .aact.on{color:var(--accent-ink);border-color:var(--accent)}
+.followups{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.fu{border:1px dashed var(--line);border-radius:999px;padding:6px 12px;font-size:12.5px;color:var(--ink-2);cursor:pointer;background:none}
+.fu:hover{border-style:solid;border-color:var(--accent);color:var(--accent-ink)}
+.chatdock{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 24%);padding:14px 20px 20px;max-width:760px;margin:0 auto}
+
+.placeholder{max-width:560px;margin:8vh auto;text-align:center;color:var(--muted)}
+.placeholder h2{font-size:20px;color:var(--ink);font-weight:650;margin-bottom:8px}
+.placeholder .badge{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--accent-ink);background:var(--accent-bg);border-radius:999px;padding:4px 11px;margin-bottom:14px}
+.menu{position:absolute;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:var(--shadow-h);
+  min-width:200px;padding:6px;z-index:70;font-size:13.5px}
+.menu button{display:block;width:100%;text-align:left;border:none;background:none;padding:9px 11px;border-radius:7px;color:var(--ink);cursor:pointer}
+.menu button:hover{background:var(--inner)}
+.menu .sep{height:1px;background:var(--line);margin:5px 0}
+.menu .who{padding:9px 11px;color:var(--muted);font-size:12px;line-height:1.4}
+
+/* ---- Intel ---- */
+.brief{background:var(--inner);border:1px solid var(--line);border-radius:var(--r);padding:14px 17px;margin-bottom:18px}
+.brief .k{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.brief h2{font-size:17px;font-weight:650;letter-spacing:-.01em;margin:6px 0 0;line-height:1.35}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}
+@media(max-width:820px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 13px;cursor:pointer;transition:.14s}
+.kpi:hover{border-color:var(--accent)} .kpi.on{border-color:var(--accent);background:var(--accent-bg)}
+.kpi .kl{font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.kpi .kv{font-size:21px;font-weight:700;letter-spacing:-.02em;margin-top:5px}
+.kpi .ks{font-size:11px;color:var(--muted);margin-top:3px}
+.kpi .ks.note{color:var(--warn)}
+.kwin{display:flex;gap:4px;margin-left:auto}
+.kwin button{border:1px solid var(--line);background:var(--panel);border-radius:7px;padding:4px 9px;font-size:11.5px;color:var(--muted);cursor:pointer}
+.kwin button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filters{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 12px;font-size:12.5px;color:var(--ink-2);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chip .fdot{width:8px;height:8px;border-radius:50%} .chip.on{background:var(--accent-bg);border-color:transparent;color:var(--accent-ink);font-weight:600}
+.feedcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:15px 17px;margin-bottom:12px;cursor:pointer;transition:.14s}
+.feedcard:hover{box-shadow:var(--shadow-h);transform:translateY(-1px)}
+.feedcard .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pill{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;white-space:nowrap}
+.pill.crit{color:var(--crit);background:var(--crit-bg)} .pill.act{color:var(--warn);background:var(--warn-bg)}
+.pill.opp{color:var(--pos);background:var(--pos-bg)} .pill.watch{color:var(--muted);background:var(--soft)}
+.lens{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.lens .dot{width:8px;height:8px;border-radius:50%}
+.feedcard .meta{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--faint);display:flex;gap:8px;align-items:center}
+.newpill{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--accent-ink);background:var(--accent-bg);border-radius:4px;padding:1px 5px}
+.feedcard .finding{font-size:15px;font-weight:500;line-height:1.4;margin-top:10px;letter-spacing:-.005em}
+.feedcard .exp{display:flex;gap:20px;align-items:flex-end;margin-top:11px}
+.feedcard .xl{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.feedcard .xv{font-weight:700;color:var(--ink-2);font-size:14px;margin-top:3px}
+.dots{display:flex;gap:3px;align-items:center;margin-top:5px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--line)} .dots i.f{background:var(--ink-2)}
+/* modal */
+.mbg{position:fixed;inset:0;background:rgba(15,25,45,.4);display:none;align-items:center;justify-content:center;z-index:90;padding:20px}
+.mbg.show{display:flex}
+.modal{background:var(--panel);border-radius:16px;max-width:560px;width:100%;max-height:88vh;overflow:auto;box-shadow:var(--shadow-h)}
+.modal .mh{display:flex;align-items:center;gap:10px;padding:16px 18px 0;flex-wrap:wrap}
+.modal .mx{margin-left:auto;border:none;background:none;font-size:22px;color:var(--muted);cursor:pointer}
+.modal .mt{padding:12px 18px 0;font-size:17px;font-weight:650;line-height:1.32;letter-spacing:-.01em}
+.modal .mb{padding:14px 18px}
+.sec-h{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:16px 0 8px;font-weight:600}
+/* at-risk chip with no action queued yet — amber, and the word "gap" carries it too (never colour alone) */
+.chip.gapchip{border-color:var(--warn);color:var(--warn)}
+.chip.gapchip.on{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)}
+/* signal-graph neighbourhood (#4) — the SVG is wide, so IT scrolls, never the page */
+.sgwrap{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--panel);padding:10px 11px}
+.sgscroll{overflow-x:auto;overflow-y:hidden;margin:0 -3px}
+.sghead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.sgfacts{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+/* the tone key — labelled and pushed right so it can't be mistaken for a verdict on the product */
+.sgkey{display:flex;align-items:center;gap:9px;margin-left:auto;padding-left:11px;border-left:1px solid var(--line);cursor:help}
+.sgkeyl{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.sgl{font-size:11px;color:var(--muted)} .sgl b{font-size:12px}
+.sgsec{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:10px 0 5px}
+.sglag{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);
+  padding:6px 9px;background:var(--inner);border-radius:var(--r-xs);margin-bottom:4px}
+.sglag b{color:var(--accent);cursor:help;font-size:13px}
+.sgmut{font-style:normal;font-size:10.5px;color:var(--warn);margin-left:auto;white-space:nowrap}
+.sgnote{font-size:11px;line-height:1.5;color:var(--faint);margin-top:9px}
+.sgmuted{font-size:12px;color:var(--muted);padding:6px 2px}
+.sgtab{margin-top:9px} .sgtab summary{font-size:11.5px;color:var(--accent-ink);cursor:pointer}
+.sgtab table{width:100%;border-collapse:collapse;margin-top:7px;font-size:11.5px}
+.sgtab th{text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;padding:4px 6px;border-bottom:1px solid var(--line)}
+.sgtab td{padding:4px 6px;border-bottom:1px solid var(--line-2);color:var(--ink-2);vertical-align:top}
+.box{border-radius:var(--r-sm);padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--ink-2)}
+.box.neutral{background:var(--inner);border:1px solid var(--line-2)}
+.mf{display:flex;gap:8px;padding:14px 18px 18px;border-top:1px solid var(--line-2);flex-wrap:wrap}
+.mbtn{border:1px solid var(--line);background:var(--panel);border-radius:9px;padding:9px 13px;font-size:13px;color:var(--muted);cursor:pointer}
+.mbtn.primary{background:var(--btn);color:var(--btn-ink);border-color:transparent;font-weight:600}
+.mbtn:hover{border-color:var(--muted)}
+.subnav{display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--line)}
+.subnav button{border:none;background:none;padding:9px 4px;margin-right:12px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.subnav button.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.emptyfeed{text-align:center;color:var(--faint);padding:40px;font-size:14px}
+.tiles{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.fx{display:none} :root[data-adexpl="1"] .fx{display:inline}
+.fxrev{display:block;margin:6px 0;background:var(--inner);border:1px solid var(--line-2);border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.5;color:var(--ink-2)}
+.fxrev code{font-family:var(--mono);font-size:11px;background:var(--panel);border:1px solid var(--line-2);border-radius:5px;padding:1px 5px}
+.fxrev .src{display:block;font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:4px}
+/* card modal: numbers grid, research, explain, ask */
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0}
+@media(max-width:520px){.mgrid{grid-template-columns:1fr 1fr}}
+.mcell{background:var(--inner);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:10px 12px}
+.mcell .mk{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:5px;line-height:1.3}
+.mcell .mv{font-size:16px;font-weight:700;letter-spacing:-.01em} .mv.pos{color:var(--pos)} .mv.neg{color:var(--crit)}
+.rzbtn{border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent-ink);border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.rzbtn:hover{filter:brightness(1.04)} .rzbtn[disabled]{opacity:.5;cursor:not-allowed;border-color:var(--line);background:var(--inner);color:var(--muted)}
+.rzchart{border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;margin:8px 0;background:var(--panel)}
+.rzchart .ct{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);display:flex;justify-content:space-between;margin-bottom:6px}
+.crow{display:grid;grid-template-columns:26px 1fr 68px 60px 48px;gap:8px;align-items:center;padding:8px 4px;border-top:1px solid var(--line-2);font-size:12.5px}
+.crow .rk{font-family:var(--mono);font-weight:700;color:var(--accent-ink)} .crow .ci{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crow .cm{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right} .crow .cs{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--pos);text-align:right}
+.theme{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--ink-2);padding:5px 0}
+.theme .tg{font-family:var(--mono);font-size:9.5px;padding:2px 7px;border-radius:999px;white-space:nowrap;flex:none}
+.tg.positive{background:var(--pos-bg);color:var(--pos)} .tg.mixed{background:var(--soft);color:var(--muted)} .tg.watch{background:var(--warn-bg);color:var(--warn)}
+.rzask{display:flex;gap:8px;margin-top:10px}
+.rzask input{flex:1;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:13px;background:var(--panel);color:var(--ink)}
+.rzask input:focus{outline:none;border-color:var(--accent)}
+.rzans{margin-top:10px;background:var(--inner);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:11px 13px;font-size:13px;line-height:1.55;color:var(--ink-2);white-space:pre-wrap}
+.rzans.think{color:var(--faint);font-family:var(--mono);font-size:12px}
+.xpanel{background:var(--inner);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:12px 14px;margin-top:8px;font-size:12.5px;line-height:1.5}
+.xpanel .xk{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin:10px 0 4px} .xpanel .xk:first-child{margin-top:0}
+.xpanel code{font-family:var(--mono);font-size:11.5px;background:var(--panel);border:1px solid var(--line-2);border-radius:5px;padding:1px 5px}
+@media(max-width:720px){.rail{position:fixed;z-index:80;transform:translateX(-100%)}.app.railopen .rail{transform:none}.omni-mini{display:none}}
+
+/* ================= ASK: conversation rail, markdown, agent trace ================= */
+.askwrap{display:flex;align-items:flex-start;min-height:calc(100vh - 58px)}
+.convbar{width:250px;flex:none;border-right:1px solid var(--line);background:var(--panel);
+  position:sticky;top:0;height:calc(100vh - 58px);display:flex;flex-direction:column}
+.convbar.hide{display:none}
+.convbar .cvhd{padding:12px 12px 8px}
+.newchat{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);
+  background:var(--inner);border-radius:var(--r-sm);padding:9px 12px;font-size:13px;font-weight:600;
+  color:var(--ink);cursor:pointer;font-family:inherit}
+.newchat:hover{border-color:var(--accent);color:var(--accent-ink)}
+.convsearch{display:block;margin:0 12px 6px;border:1px solid var(--line);background:var(--inner);border-radius:8px;
+  padding:7px 10px;font-size:12.5px;color:var(--ink);font-family:inherit;width:calc(100% - 24px)}
+.convsearch:focus{outline:none;border-color:var(--accent)}
+.convlist{flex:1;overflow:auto;padding:0 8px 12px}
+.convlist .grp{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);padding:12px 8px 5px}
+.convitem{display:flex;align-items:center;gap:6px;padding:8px 9px;border-radius:8px;cursor:pointer;color:var(--ink-2);font-size:13px}
+.convitem:hover{background:var(--inner)}
+.convitem.on{background:var(--accent-bg);color:var(--accent-ink);font-weight:600}
+.convitem .ct{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.convitem .cx{opacity:0;border:none;background:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:0 3px;border-radius:5px}
+.convitem:hover .cx{opacity:1} .convitem .cx:hover{color:var(--crit)}
+.askmain{flex:1;min-width:0;display:flex;flex-direction:column}
+.convtog{border:1px solid var(--line);background:var(--panel);border-radius:8px;color:var(--muted);cursor:pointer;padding:7px 9px;font-size:12px}
+
+/* markdown inside answer bubbles */
+.turn.a .bub h1,.turn.a .bub h2,.turn.a .bub h3,.turn.a .bub h4{margin:14px 0 7px;line-height:1.3;font-weight:680;font-size:1.03em}
+.turn.a .bub p{margin:8px 0} .turn.a .bub>:first-child{margin-top:0} .turn.a .bub>:last-child{margin-bottom:0}
+.turn.a .bub ul,.turn.a .bub ol{margin:8px 0;padding-left:22px} .turn.a .bub li{margin:3px 0}
+.turn.a .bub strong{font-weight:680;color:var(--ink)}
+.turn.a .bub code{background:var(--inner);border:1px solid var(--line-2);border-radius:5px;padding:1px 5px;font-family:var(--mono);font-size:.87em}
+.turn.a .bub hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+.turn.a .bub blockquote{margin:9px 0;padding:5px 12px;border-left:3px solid var(--line);color:var(--muted)}
+.turn.a .bub table{border-collapse:collapse;margin:10px 0;width:100%;font-size:.92em;display:block;overflow-x:auto}
+.turn.a .bub th,.turn.a .bub td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+.turn.a .bub thead th{background:var(--inner);font-weight:650}
+.codewrap{position:relative;margin:10px 0}
+.codewrap pre{background:var(--inner);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:11px 12px;
+  overflow-x:auto;margin:0;font-family:var(--mono);font-size:12px;line-height:1.55;color:var(--ink-2)}
+.codecopy{position:absolute;top:7px;right:7px;border:1px solid var(--line);background:var(--panel);border-radius:6px;
+  padding:3px 7px;font-size:11px;color:var(--muted);cursor:pointer;opacity:0;transition:opacity .15s;font-family:inherit}
+.codewrap:hover .codecopy{opacity:1} .codecopy:hover{color:var(--ink)}
+
+/* live status + streaming cursor */
+.statusline{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin:2px 0 9px}
+.statusline .sp{width:11px;height:11px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:aspin .7s linear infinite;flex:none}
+@keyframes aspin{to{transform:rotate(360deg)}}
+.curs{display:inline-block;width:7px;height:15px;background:var(--accent);vertical-align:-2px;margin-left:2px;animation:ablink 1s step-end infinite}
+@keyframes ablink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.statusline .sp,.curs{animation:none}}
+
+/* agent trace — the tool calls and the SQL the agent actually ran */
+.trace{border:1px solid var(--line);border-radius:var(--r-sm);margin:11px 0;background:var(--panel);overflow:hidden}
+.trace-hd{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;font-size:12.5px;color:var(--ink-2);user-select:none}
+.trace-hd:hover{background:var(--inner)}
+.trace-hd .cv{margin-left:auto;color:var(--faint);font-size:11px;transition:transform .15s}
+.trace.open .trace-hd .cv{transform:rotate(90deg)}
+.trace-bd{display:none;border-top:1px solid var(--line-2);padding:10px 12px}
+.trace.open .trace-bd{display:block}
+.tstep{font-size:12px;color:var(--muted);padding:3px 0}
+.tstep b{color:var(--ink-2);font-weight:600}
+.sqlblock{background:var(--inner);border:1px solid var(--line-2);border-radius:8px;padding:9px 10px;margin:7px 0 3px;
+  font-family:var(--mono);font-size:11.5px;line-height:1.5;color:var(--ink-2);overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+.tmeta{font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.04em}
+
+/* confidence badge — the grounding gate's verdict */
+.conf{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;
+  padding:5px 11px;font-size:11.5px;color:var(--muted);margin-top:10px}
+.conf .dot{width:7px;height:7px;border-radius:50%;flex:none}
+.conf b{color:var(--ink-2);font-weight:650}
+
+/* composer extras + jump-to-latest */
+.jumpb{position:sticky;bottom:6px;margin:0 auto;display:block;border:1px solid var(--line);background:var(--panel);
+  box-shadow:var(--shadow-h);border-radius:999px;padding:6px 13px;font-size:12px;color:var(--ink-2);cursor:pointer;z-index:5}
+.ombox .stop{margin-left:auto;border:none;background:var(--crit);color:#fff;border-radius:10px;padding:0 13px;height:34px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit}
+.ombox .icobtn{border:1px solid var(--line);background:var(--panel);border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:14px;color:var(--ink-2);flex:none}
+.ombox .icobtn:hover{border-color:var(--accent)}
+.ombox .icobtn.rec{background:var(--crit);border-color:var(--crit);color:#fff}
+.ombox .icobtn[aria-pressed="true"]{background:var(--accent-bg);border-color:transparent;color:var(--accent-ink)}
+@media (max-width:900px){.convbar{display:none}}
+</style>
+<!--BUSY_MODAL-->
+
+<div class="app" id="app">
+  <aside class="rail" id="rail">
+    <div class="brand">
+      <img class="logo-ink" src="/assets/Final-logo-full-Dark-V3.png" alt="Realify">
+      <img class="logo-white" src="/assets/Final-logo-full-white-V3.png" alt="Realify">
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="foot">
+      <nav class="nav" id="navfoot" style="padding:0"></nav>
+      <div class="row">
+        <button class="icobtn" id="themeBtn" title="Theme">◐</button>
+        <button class="icobtn" id="railToggle" title="Collapse">⟨⟩</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="hdr">
+      <button class="hbtn" id="railBurger" style="display:none">☰</button>
+      <div class="surface" id="surfaceName">Ask</div>
+      <div class="grow"></div>
+      <div class="omni-mini" id="omniMini">Search or ask… <kbd>⌘K</kbd></div>
+      <button class="hbtn" id="refreshBtn" title="Refresh data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 4v5h-5"/></svg>
+        <span id="freshLbl" class="usage-lbl">updated —</span></button>
+      <button class="hbtn" id="paneBtn" title="Rules, follow-ups, actions, history">☰ Panel</button>
+      <button class="avatar" id="avatarBtn">R</button>
+    </header>
+    <div class="surface-wrap"><div id="surface"></div></div>
+  </div>
+</div>
+
+<div id="modalHost"></div>
+<div class="scrim" id="scrim"></div>
+<aside class="pane" id="pane">
+  <div class="ph">Panel<button class="x" id="paneX">&times;</button></div>
+  <div class="tabs" id="paneTabs"></div>
+  <div class="body" id="paneBody"></div>
+</aside>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+let ME={}, MODELS=[], MODEL_ID=null, USAGE={pct:0,used:0,cap:100};
+
+const RAIL=[
+  {k:'ask',label:'Ask',ic:'M12 3a9 9 0 1 0 4.5 16.8L21 21l-1.2-4.5A9 9 0 0 0 12 3z'},
+  {k:'intel',label:'Intel',ic:'M4 18l5-6 4 4 7-9',sub:[['intelligence','Intelligence'],['risk','Why a SKU is at risk'],['catalog','Product Catalog'],['analyst','Category Analyst'],['channels','Channels']]},
+  {k:'ads',label:'Ads',ic:'M3 12h4l3-8 4 16 3-8h4'},
+  {k:'agents',label:'Agents',ic:'M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 19l-4.8 2.5.9-5.4L4.2 12.3l5.4-.8z',sub:[['roster','Your workforce'],['ledger','Autonomy Ledger'],['hire','Hire a specialist']]},
+];
+const FOOT=[
+  {k:'settings',label:'Settings',ic:'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.7-1L14.5 3h-5l-.3 2.4a7 7 0 0 0-1.7 1l-2.4-1-2 3.4L2.9 11a7 7 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.3 2.4h5l.3-2.4a7 7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.6a7 7 0 0 0 .1-1z'},
+  {k:'integrations',label:'Integrations',ic:'M10 3v4M14 3v4M6 7h12l-1 5a5 5 0 0 1-10 0z M12 17v4'},
+];
+let SURFACE='ask', SUB={intel:'intelligence',agents:'roster'};
+
+function icon(d){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`}
+
+function railItems(){
+  // forward features (Ask, Agents) appear only when their gate is on; Intel/Ads always present.
+  const feat=ME.features||{};
+  return RAIL.filter(r=>!( (r.k==='ask'&&feat.ask===false) || (r.k==='agents'&&feat.agents===false) ));
+}
+function renderRail(){
+  $('#nav').innerHTML = railItems().map(r=>{
+    const on = SURFACE===r.k?'on':'';
+    let h = `<button class="navitem ${on}" data-k="${r.k}"><span class="ic">${icon(r.ic)}</span><span class="nav-lbl">${r.label}</span></button>`;
+    if(r.sub && SURFACE===r.k) h += `<div class="navsub">`+r.sub.map(([sk,sl])=>`<button data-sub="${sk}" data-subk="${r.k}" class="${(SUB[r.k]===sk)?'on':''}">${sl}</button>`).join('')+`</div>`;
+    return h;
+  }).join('');
+  $('#navfoot').innerHTML = FOOT.map(r=>`<button class="navitem ${SURFACE===r.k?'on':''}" data-k="${r.k}"><span class="ic">${icon(r.ic)}</span><span class="nav-lbl">${r.label}</span></button>`).join('');
+  $$('#nav [data-k],#navfoot [data-k]').forEach(b=>b.onclick=()=>go(b.dataset.k));
+  $$('#nav [data-sub]').forEach(b=>b.onclick=()=>{SUB[b.dataset.subk]=b.dataset.sub; go(b.dataset.subk);});
+}
+function go(k){ SURFACE=k; $('#surfaceName').textContent = ({ask:'Ask',intel:'Intel',ads:'Ads',agents:'Agents',settings:'Settings',integrations:'Integrations'})[k]||k;
+  renderRail(); renderSurface(); if(innerWidth<=720) $('#app').classList.remove('railopen'); }
+
+function renderSurface(){
+  const el=$('#surface');
+  if(SURFACE==='ask') return renderAsk(el);
+  if(SURFACE==='intel') return renderIntel(el);
+  if(SURFACE==='ads') return renderAds(el);
+  if(SURFACE==='settings') return renderSettings(el);
+  if(SURFACE==='integrations') return renderIntegrations(el);
+  if(SURFACE==='agents') return renderAgents(el);
+  el.innerHTML = `<div class="placeholder"><h2>${esc(SURFACE)}</h2></div>`;
+}
+
+/* ============ AGENTS ============ */
+const AUT_COLOR={observe:'watch',suggest:'watch',assist:'act',act:'opp'};
+const STATE_COLOR={applied:'opp',awaiting:'act',handoff:'watch',held:'watch'};
+async function renderAgents(el){
+  const view=SUB.agents||'roster';
+  el.innerHTML=`<div class="pad" id="agPad"><div class="emptyfeed">Loading your workforce…</div></div>`;
+  const pad=$('#agPad');
+  if(view==='ledger') return agLedger(pad);
+  const d=await fetch('/api/agents').then(r=>r.json()).catch(()=>({agents:[],specialists:[]}));
+  if(view==='hire') return agHire(pad, d);
+  // roster
+  const agents=d.agents||[];
+  pad.innerHTML=`<div style="display:flex;align-items:center;margin-bottom:16px">
+      <div><div class="ask-head" style="font-size:22px;margin:0">Your workforce</div>
+      <div style="color:var(--muted);font-size:13.5px;margin-top:4px">AI specialists that watch your data and act within your guardrails. ${d.feature_on?'':'<span class="pill watch">Observe mode — acting is off until enabled</span>'}</div></div>
+      <button class="mbtn primary" id="hireBtn" style="margin-left:auto">＋ Hire a specialist</button></div>`;
+  if(!agents.length){
+    pad.innerHTML+=`<div class="emptyfeed">No specialists on your team yet.<br><br><button class="mbtn primary" id="hire2">Hire your first specialist →</button></div>`;
+    $('#hire2') && ($('#hire2').onclick=()=>{SUB.agents='hire';go('agents');});
+  } else {
+    pad.innerHTML+=agents.map(a=>{
+      const spec=(d.specialists||[]).find(s=>s.id===a.specialist)||{};
+      return `<div class="feedcard" data-agent="${a.id}"><div class="top">
+        <span class="lens"><span class="dot" style="background:var(--accent)"></span>${esc(a.name)}</span>
+        <span class="meta"><span class="pill ${AUT_COLOR[a.autonomy]||'watch'}">${esc(a.autonomy)}</span>
+          <span class="pill ${a.status==='active'?'opp':'watch'}">${esc(a.status)}</span></span></div>
+        <div style="color:var(--muted);font-size:13px;margin-top:9px">${esc(spec.tagline||'')}</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:8px">${a.task_count||0} task${a.task_count===1?'':'s'} · ${(a.guardrails||[]).length} guardrails</div></div>`;
+    }).join('');
+    $$('#agPad [data-agent]').forEach(c=>c.onclick=()=>openAgent(c.dataset.agent));
+  }
+  const hb=$('#hireBtn'); if(hb) hb.onclick=()=>{SUB.agents='hire';go('agents');};
+}
+function agHire(pad, d){
+  pad.innerHTML=`<div class="brief"><span class="k">Onboard a specialist</span><h2>Add a teammate to your workforce</h2></div>
+    <div style="color:var(--muted);font-size:13.5px;margin-bottom:16px">Each starts in <b>Observe</b> — it watches and recommends, and acts on nothing until you promote it. You set scope, autonomy, and guardrails after hiring.</div>
+    ${(d.specialists||[]).map(s=>`<div class="feedcard" data-spec="${s.id}"><div class="top">
+      <span class="lens">${esc(s.name)}</span>${s.flagship?'<span class="pill opp">Flagship</span>':''}
+      <span class="meta"><button class="mbtn primary" data-hire="${s.id}">Hire</button></span></div>
+      <div style="color:var(--muted);font-size:13px;margin-top:9px">${esc(s.tagline)}</div>
+      ${s.clocks?`<div style="font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:8px">Four clocks · Five signals · ITL-ARB-01</div>`:''}</div>`).join('')}`;
+  $$('#agPad [data-hire]').forEach(b=>b.onclick=async(e)=>{ e.stopPropagation();
+    b.textContent='Hiring…'; const r=await fetch('/api/agents',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({specialist:b.dataset.hire})}).then(x=>x.json());
+    if(r.ok){ SUB.agents='roster'; go('agents'); } else { b.textContent='Hire'; alert(r.error||'Failed'); } });
+}
+async function openAgent(id){
+  const r=await fetch('/api/agents/'+id).then(x=>x.json()); if(!r.ok) return; const a=r.agent, spec=a.spec||{};
+  let tab='overview';
+  const paint=()=>{
+    const tabs=['overview','instructions','guardrails','tasks','activity'];
+    const body=tab==='overview'?agOverview(a,spec):tab==='guardrails'?agGuard(a):tab==='tasks'?agTasks(a):tab==='instructions'?agInstr(a,spec):agActivity(a);
+    $('#modalHost').innerHTML=`<div class="mbg show" id="agModal"><div class="modal" style="max-width:620px">
+      <div class="mh"><span class="lens"><span class="dot" style="background:var(--accent)"></span>${esc(a.name)}</span>
+        <span class="pill ${AUT_COLOR[a.autonomy]||'watch'}">${esc(a.autonomy)}</span>
+        <button class="mx" data-x>&times;</button></div>
+      <div class="subnav" style="padding:0 18px;margin:8px 0 0">${tabs.map(t=>`<button class="${tab===t?'on':''}" data-tab="${t}">${t[0].toUpperCase()+t.slice(1)}</button>`).join('')}</div>
+      <div class="mb">${body}</div>
+      <div class="mf"><button class="mbtn" data-x2>Close</button><div style="flex:1"></div>
+        <button class="mbtn" id="pauseBtn">${a.status==='active'?'Pause':'Resume'}</button></div></div></div>`;
+    const host=$('#agModal'); const close=()=>host.remove();
+    host.querySelector('[data-x]').onclick=close; host.querySelector('[data-x2]').onclick=close;
+    host.onclick=e=>{ if(e.target===host) close(); };
+    host.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;paint();});
+    host.querySelector('#pauseBtn').onclick=()=>fetch('/api/agents/'+id+'/pause',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pause:a.status==='active'})}).then(()=>{close();renderAgents($('#surface'));});
+  };
+  paint();
+}
+function agOverview(a,spec){
+  return `<div style="color:var(--ink-2);font-size:14px;line-height:1.6">${esc(spec.tagline||'')}</div>
+    ${spec.clocks?`<div class="sec-h">Operating cadence — four clocks</div>${spec.clocks.map(c=>`<div class="cite"><span>${esc(c)}</span></div>`).join('')}`:''}
+    ${spec.signals?`<div class="sec-h">Signals watched</div><div style="display:flex;gap:6px;flex-wrap:wrap">${spec.signals.map(s=>`<span class="pill watch">${esc(s)}</span>`).join('')}</div>`:''}`;
+}
+function agInstr(a,spec){
+  return `<div class="sec-h" style="margin-top:0">Operating instructions</div>
+    <div class="box neutral">Maximize contribution margin while defending the Buy Box. Never price below the per-SKU floor. Defer to Inventory when cover &lt; 7 days. Cap any single change at 15%; write every move to the Autonomy Ledger. Escalate when confidence &lt; 0.6 or monthly impact &gt; ₹500.</div>
+    <div class="sec-h">Autonomy by lens</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill act">Margin · Assist</span><span class="pill watch">Sales · Suggest</span></div>`;
+}
+function agGuard(a){
+  return `<div class="sec-h" style="margin-top:0">Guardrails — enforced server-side</div>
+    <div style="color:var(--muted);font-size:12.5px;margin-bottom:10px">The agent literally cannot act outside these, whatever its autonomy.</div>
+    ${(a.guardrails||[]).map(g=>`<div class="cite"><span>${esc(g.label)}</span><b style="margin-left:auto">${esc(g.value==null?'—':(g.value===true?'On':g.value))}</b></div>`).join('')}`;
+}
+function agTasks(a){
+  return `<div class="sec-h" style="margin-top:0">Assigned tasks</div>
+    ${(a.tasks||[]).map(t=>`<div class="cite"><span>${esc(t.name)}</span><span class="meta" style="margin-left:auto;display:flex;gap:6px"><span class="pill watch">${esc(t.cadence)}</span><span class="pill ${AUT_COLOR[t.autonomy]||'watch'}">${esc(t.autonomy)}</span></span></div>`).join('')||'<div class="emptyfeed">No tasks yet.</div>'}`;
+}
+function agActivity(a){
+  return `<div class="sec-h" style="margin-top:0">Recent decisions</div>
+    ${(a.recent||[]).map(d=>ledRow(d)).join('')||'<div class="emptyfeed">No decisions logged yet.</div>'}`;
+}
+function ledRow(d){
+  return `<div class="cite"><span class="sev" style="background:var(--${STATE_COLOR[d.state]==='opp'?'pos':(STATE_COLOR[d.state]==='act'?'warn':'muted')})"></span>
+    <span><b style="font-family:var(--mono);font-size:10.5px;color:var(--faint)">${esc(d.signal||'')}</b> ${esc(d.action||'')}</span>
+    <span style="margin-left:auto;display:flex;gap:8px;align-items:center"><b>${esc(d.value_text||'')}</b><span class="pill ${STATE_COLOR[d.state]||'watch'}">${esc(d.state)}</span></span></div>`;
+}
+async function agLedger(pad){
+  const d=await fetch('/api/agents/ledger').then(r=>r.json()).catch(()=>({decisions:[]}));
+  const rows=d.decisions||[];
+  pad.innerHTML=`<div style="display:flex;align-items:center;margin-bottom:6px"><div class="ask-head" style="font-size:22px;margin:0">Autonomy Ledger</div>
+      <span class="pill ${d.intact?'opp':'crit'}" style="margin-left:12px">${d.intact?'Hash-chain intact ✓':'CHAIN BROKEN'}</span></div>
+    <div style="color:var(--muted);font-size:13px;margin-bottom:16px">Every automated decision — tamper-evident, signal-tagged, reversible.</div>
+    ${rows.length?rows.map(r=>ledRow(r)).join(''):'<div class="emptyfeed">No decisions yet. Your agents log here as they run.</div>'}`;
+}
+
+/* ============ INTEL ============ */
+const LENS={competitive:'#3B6FE0',demand:'#7A5AF5',opportunity:'#12925A',news:'#0E9AAB',buybox:'#3B6FE0'};
+let kpiWin=30, kpiFilter=null, famFilter='all', newOnly=false, FEED=[];
+function pillClass(sev){ return ({crit:'crit',act:'act',opp:'opp',watch:'watch'})[sev]||'watch'; }
+async function renderIntel(el){
+  el.innerHTML=`<div class="pad">
+    <div class="subnav" id="intelSub">
+      <button data-s="intelligence" class="${SUB.intel==='intelligence'?'on':''}">Intelligence</button>
+      <button data-s="risk" class="${SUB.intel==='risk'?'on':''}">Why a SKU is at risk</button>
+      <button data-s="catalog" class="${SUB.intel==='catalog'?'on':''}">Product Catalog</button>
+      <button data-s="analyst" class="${SUB.intel==='analyst'?'on':''}">Category Analyst</button>
+      <button data-s="channels" class="${SUB.intel==='channels'?'on':''}">Channels</button>
+    </div>
+    <div id="intelBody"></div></div>`;
+  $$('#intelSub button').forEach(b=>b.onclick=()=>{SUB.intel=b.dataset.s; renderIntel(el);});
+  const body=$('#intelBody');
+  if(SUB.intel==='intelligence') return renderIntelFeed(body);
+  // The SAME renderer Settings uses, not a copy: settingsCatalog fills the CAT_ROWS/CAT_SUM globals
+  // and paintCatalog wires openSkuDrawer(row, host) off whichever host it is handed, so the SKU drawer
+  // (and the signal-graph panel inside it) works identically here. A duplicate would drift.
+  if(SUB.intel==='catalog') return settingsCatalog(body);
+  if(SUB.intel==='risk') return renderRisk(body);
+  if(SUB.intel==='analyst') return renderAnalyst(body);
+  if(SUB.intel==='channels') return renderChannels(body);
+}
+
+/* ── WHY A SKU IS AT RISK — ported from the legacy shell into V4 ────────────────────────────────
+   /api/at-risk ranks SKUs on live signals (margin, rating, returns, velocity, competitor undercutting)
+   and flags PROACTIVE GAPS: at risk with no action queued yet. Clicking one calls /api/diagnose for the
+   conclusion, then renders the signal-graph neighbourhood underneath it as the evidence.
+
+   The V4 port is not a copy of the legacy markup. Legacy shows the diagnosis as prose plus a grouped
+   list because that shell has no CSS custom properties; here the same evidence goes through sgHTML(),
+   the SVG renderer the SKU drawer already uses — so the conclusion and the graph it came from sit
+   together, which is the whole point of building the neighbourhood view. */
+let RISK_ROWS=[];
+async function renderRisk(body){
+  body.innerHTML='<div class="emptyfeed">Ranking your catalog on live signals…</div>';
+  let d=null;
+  try{ d=await fetch('/api/at-risk?limit=10',{credentials:'same-origin'}).then(r=>r.json()); }catch(e){}
+  if(!d||!d.ok||!(d.at_risk||[]).length){
+    body.innerHTML=`<div class="emptyfeed">${esc((d&&d.error)||'No at-risk SKUs right now — nothing is tripping the signal thresholds.')}</div>`;
+    return;
+  }
+  RISK_ROWS=d.at_risk||[];
+  const gaps=(d.proactive_gaps||[]).length;
+  body.innerHTML=`
+    <div class="brief"><span class="k">Live risk readout</span>
+      <h2>Why a SKU is at risk${gaps?` — ${gaps} with no action queued`:''}</h2></div>
+    <div style="font-size:13px;color:var(--muted);margin:-4px 0 12px;line-height:1.55">
+      Ranked on live signals — margin, rating, returns, velocity and competitor undercutting — each with a
+      concrete next action. <b style="color:var(--warn)">Amber</b> means at risk with nothing queued yet.
+    </div>
+    <div class="filters" id="riskChips">${RISK_ROWS.map((r,i)=>{
+      const gap=(r.recs===0);
+      return `<button class="chip${gap?' gapchip':''}" data-rix="${i}" title="${esc(r.title||'')}">
+        <span style="font-family:var(--mono);font-size:11.5px">${esc(r.sku)}</span>
+        <span style="opacity:.7;margin-left:5px">risk ${r.risk_score||0}</span>
+        ${gap?'<span style="color:var(--warn);margin-left:5px">· gap</span>':''}</button>`;}).join('')}</div>
+    <div id="riskDetail"><div class="emptyfeed" style="padding:22px 0">Pick a SKU to see why it's flagged, what to do, and the graph the diagnosis came from.</div></div>`;
+  $$('#riskChips [data-rix]').forEach(c=>c.onclick=()=>riskDiagnose(RISK_ROWS[+c.dataset.rix], c));
+}
+async function riskDiagnose(row, chip){
+  const host=$('#riskDetail'); if(!host||!row) return;
+  $$('#riskChips .chip').forEach(c=>c.classList.remove('on')); if(chip) chip.classList.add('on');
+  host.innerHTML=`<div class="emptyfeed" style="padding:18px 0">Tracing ${esc(row.sku)} through the signal graph…</div>`;
+  let d=null;
+  try{ d=await fetch('/api/diagnose?sku='+encodeURIComponent(row.sku),{credentials:'same-origin'}).then(r=>r.json()); }catch(e){}
+  if(!host.isConnected) return;
+  if(!d||!d.ok){ host.innerHTML=`<div class="box neutral" style="color:var(--crit)">${esc((d&&d.error)||('No diagnosis for '+row.sku))}</div>`; return; }
+  const sym=_sym(), money=v=>v==null?'—':sym+Math.round(v).toLocaleString('en-IN');
+  const facts=[d.price!=null?'price '+money(d.price):'', d.margin!=null?'margin '+Math.round(d.margin)+'%':'',
+    d.buybox!=null?'Buy Box '+Math.round(d.buybox)+'%':'', d.category||'',
+    d.cohort_peers?d.cohort_peers+' cohort peers':''].filter(Boolean).join(' · ');
+  const rf=d.risk_factors||[], uc=d.undercutters||[];
+  host.innerHTML=`
+    <div class="feedcard" style="cursor:default">
+      <div class="top"><span class="pill ${rf.length?'act':'opp'}">${rf.length?'at risk':'healthy'}</span>
+        <span class="lens">${esc(d.title||d.sku)}</span></div>
+      ${facts?`<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px">${esc(facts)}</div>`:''}
+      ${rf.length?`<div class="sec-h">Why it's at risk</div>${rf.map(f=>`<div class="cite">
+          <span class="sev" style="background:${f.sev>=2?'var(--crit)':'var(--warn)'}"></span>
+          <span><b>${esc(f.label)}</b> <span style="color:var(--faint)">· ${esc(f.value)}</span></span></div>`).join('')}`
+        :`<div class="sec-h">Status</div><div class="cite"><span style="color:var(--pos)">No risk factors — this SKU looks healthy.</span></div>`}
+      ${uc.length?`<div class="sec-h">Competitors undercutting (${uc.length})</div>${uc.slice(0,5).map(u=>`<div class="cite">
+          <span><b>${esc(u.seller||'rival')}</b>${u.price!=null?' at '+money(u.price):''}</span>
+          ${u.gap!=null?`<b style="margin-left:auto;color:var(--crit)">${money(u.gap)} below you</b>`:''}</div>`).join('')}`:''}
+      ${d.action?`<div class="sec-h">Recommended action</div><div class="box" style="background:var(--pos-bg);font-size:13px">${esc(d.action)}</div>`:''}
+      <div class="sec-h">The evidence behind this — live signal graph</div>
+      <div id="riskGraph" class="sgwrap"><div class="sgmuted">Loading the neighbourhood…</div></div>
+    </div>`;
+  loadSkuGraph(row.sku, $('#riskGraph'));       // same SVG renderer the SKU drawer uses
+}
+async function renderIntelFeed(body){
+  body.innerHTML='<div class="emptyfeed">Loading your intelligence…</div>';
+  let brief={}, kpis={};
+  try{ brief=await fetch('/api/headline?surface=intelligence').then(r=>r.json()); }catch(e){}
+  try{ kpis=await fetch('/api/kpis?window='+kpiWin).then(r=>r.json()); }catch(e){}
+  const sym=ME.symbol||'₹';
+  const K=['revenue','margin','cash','inventory','ads'];
+  const kpiHTML=K.map(k=>{ const d=kpis[k]||{}; const on=kpiFilter===k?'on':'';
+    const val=(k==='margin'&&d.pct!=null)?`${sym}${(d.value||0).toLocaleString()}`:`${sym}${(d.value||0).toLocaleString()}`;
+    const sub=d.note?`<div class="ks note">${esc(d.note)}</div>`:`<div class="ks">${k==='margin'&&d.pct!=null?d.pct+'% margin':(k==='ads'&&d.tacos!=null?d.tacos+'% TACoS':(d.units!=null?d.units+' units':'&nbsp;'))}</div>`;
+    return `<div class="kpi ${on}" data-kpi="${k}"><div class="kl">${esc(d.label||k)}</div><div class="kv">${val}</div>${sub}</div>`;
+  }).join('');
+  body.innerHTML=`
+    <div class="brief"><span class="k">The Realify Brief</span><h2>${esc((brief.headline||brief.h1||'Tonight’s signals, ranked by what touches your revenue.'))}</h2></div>
+    <div style="display:flex;align-items:center;margin-bottom:10px"><span style="font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">Your performance — tap to filter</span>
+      <div class="kwin" id="kwin">${[60,30,7].map(w=>`<button data-w="${w}" class="${kpiWin===w?'on':''}">${w}d</button>`).join('')}</div></div>
+    <div class="kpis" id="kpiStrip">${kpiHTML}</div>
+    <div id="v4Plan"></div>
+    <div class="filters" id="filters">
+      <button class="chip ${famFilter==='all'?'on':''}" data-fam="all">All families</button>
+      ${['competitive','demand','opportunity','news'].map(f=>`<button class="chip ${famFilter===f?'on':''}" data-fam="${f}"><span class="fdot" style="background:${LENS[f]}"></span>${f[0].toUpperCase()+f.slice(1)}</button>`).join('')}
+      <button class="chip ${newOnly?'on':''}" data-new style="margin-left:6px">✦ New since yesterday</button>
+    </div>
+    <div id="feedList"></div>`;
+  $$('#kpiStrip .kpi').forEach(c=>c.onclick=()=>{ kpiFilter=kpiFilter===c.dataset.kpi?null:c.dataset.kpi; renderIntelFeed(body); });
+  $$('#kwin button').forEach(b=>b.onclick=()=>{ kpiWin=+b.dataset.w; renderIntelFeed(body); });
+  $$('#filters [data-fam]').forEach(b=>b.onclick=()=>{ famFilter=b.dataset.fam; renderIntelFeed(body); });
+  // Guarded: renderIntelFeed awaits two fetches before wiring, so navigating away mid-load (or a
+  // re-render replacing #filters underneath it) leaves this query null and throws
+  // "Cannot set properties of null". The $$ lines above are safe because forEach over an empty
+  // NodeList is a no-op — only this single-element lookup needed it. Reproduced on both local and
+  // staging by switching Intel sub-tabs while the feed was still loading.
+  const nf=$('#filters [data-new]'); if(nf) nf.onclick=()=>{ newOnly=!newOnly; renderIntelFeed(body); };
+  loadFeed();
+  renderFundedPlan();
+}
+
+/* ONE FUNDED REORDER PLAN (family #9, Cash) — the same allocator the classic Intelligence panel uses,
+   rendered in the V4 DLS. Independent of the feed: it loads async and stays silent on failure, so a slow
+   or absent allocator never blocks the signals below it. Shell-agnostic API: /api/reorder-plan +
+   /api/cash-budget. */
+async function renderFundedPlan(){
+  const host=$('#v4Plan'); if(!host) return;
+  let p=null, cb=null;
+  try{
+    const [pR,bR]=await Promise.all([
+      fetch('/api/reorder-plan',{credentials:'same-origin'}),
+      fetch('/api/cash-budget',{credentials:'same-origin'})]);
+    p=pR.ok?await pR.json():null; cb=bR.ok?await bR.json():null;
+  }catch(e){ host.innerHTML=''; return; }
+  if(!p||(!p.ok&&!p.needs_budget)){ host.innerHTML=''; return; }
+  const sym=ME.symbol||'₹';
+  const inr=v=>sym+Math.round(v||0).toLocaleString('en-IN');
+
+  if(p.needs_budget){
+    const sug=cb&&cb.suggested?cb.suggested:null;
+    host.innerHTML=`<div class="feedcard" style="cursor:default">
+      <div class="top"><span class="pill watch">cash</span>
+        <span class="lens">Fund your reorders — one plan, not many separate asks</span></div>
+      <div class="finding" style="margin-top:8px;color:var(--ink-2);font-size:13.5px;line-height:1.55">
+        Each reorder suggestion is sized on its own, so together they can ask for more cash than you have.
+        Tell us your inventory budget and we'll spread it across SKUs to protect the most profit.</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:11px">
+        <label style="font-size:12.5px;color:var(--muted)">Inventory budget ${sym}</label>
+        <input id="v4Cash" type="number" min="1" step="1000" value="${sug||''}"
+          style="width:160px;padding:8px 10px;border:1px solid var(--line);background:var(--inner);
+                 border-radius:9px;font-size:13px;color:var(--ink);font-family:inherit">
+        <button class="mbtn primary" id="v4CashSave">Build the plan</button>
+        ${sug?`<span style="font-size:11.5px;color:var(--faint)">suggested ${inr(sug)} — the cost of replacing what you sold last month</span>`:''}
+      </div></div>`;
+    const b=$('#v4CashSave');
+    if(b) b.onclick=async()=>{
+      const v=parseFloat(($('#v4Cash')||{}).value); if(!v||v<=0) return;
+      b.disabled=true; b.textContent='Building…';
+      try{ await fetch('/api/cash-budget',{method:'POST',credentials:'same-origin',
+            headers:{'Content-Type':'application/json'},body:JSON.stringify({value:v})});
+        renderFundedPlan();
+      }catch(e){ b.disabled=false; b.textContent='Build the plan'; }
+    };
+    return;
+  }
+
+  const v=p.vs_rule||{}, lines=p.plan||[];
+  const tone=d=>d>0?'var(--pos)':(d<0?'var(--warn)':'var(--faint)');
+  host.innerHTML=`<div class="feedcard" style="cursor:default">
+    <div class="top"><span class="pill opp">cash</span>
+      <span class="lens">Your funded reorder plan</span>
+      <span class="meta"><span class="pill watch" title="${esc(p.basis||'')}">${inr(p.cash_committed)} of ${inr(p.cash_budget)}</span>
+        <span class="pill watch">${p.horizon_days}-day cover</span></span></div>
+    ${(v.improvement_pct!=null&&v.improvement>0)?`<div class="finding" style="margin-top:8px;font-size:13.5px;line-height:1.55">
+      Spreading the money across SKUs instead of funding them one at a time cuts worst-case lost margin by
+      <b>${inr(v.improvement)} (${v.improvement_pct}%)</b> — same budget.</div>`:''}
+    <div style="overflow-x:auto;margin-top:10px">
+    <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+      <thead><tr>
+        ${['SKU','Order','Cash','On hand',p.horizon_days+'-day demand','vs one-at-a-time'].map((h,i)=>
+          `<th style="text-align:${i?'right':'left'};padding:6px 8px;border-bottom:1px solid var(--line);
+             font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+             color:var(--faint);font-weight:600;white-space:nowrap">${esc(h)}</th>`).join('')}
+      </tr></thead><tbody>
+      ${lines.map(l=>`<tr>
+        <td style="padding:7px 8px;border-bottom:1px solid var(--line-2)">
+          <span style="font-family:var(--mono);font-size:11.5px">${esc(l.internal_sku)}</span>
+          <div style="font-size:11px;color:var(--faint)">${esc((l.title||'').slice(0,46))}</div></td>
+        <td style="text-align:right;padding:7px 8px;border-bottom:1px solid var(--line-2);font-variant-numeric:tabular-nums"><b>${l.order_qty}</b></td>
+        <td style="text-align:right;padding:7px 8px;border-bottom:1px solid var(--line-2);font-variant-numeric:tabular-nums">${inr(l.cash)}</td>
+        <td style="text-align:right;padding:7px 8px;border-bottom:1px solid var(--line-2);font-variant-numeric:tabular-nums">${l.stock_on_hand}</td>
+        <td style="text-align:right;padding:7px 8px;border-bottom:1px solid var(--line-2);font-variant-numeric:tabular-nums">${l.mean_demand_horizon}</td>
+        <td style="text-align:right;padding:7px 8px;border-bottom:1px solid var(--line-2);font-variant-numeric:tabular-nums;color:${tone(l.delta_vs_rule)}">${l.delta_vs_rule>0?'+':''}${l.delta_vs_rule}</td>
+      </tr>`).join('')}
+      </tbody></table></div>
+    ${p.unconstrained_ask>p.cash_budget?`<div style="font-size:11.5px;color:var(--faint);margin-top:8px">
+      Fully covering ${p.horizon_days} days would need ${inr(p.unconstrained_ask)} — ${(p.unconstrained_ask/p.cash_budget).toFixed(1)}× this budget.
+      The plan spends what you have where it protects the most margin.</div>`:''}
+    ${(p.excluded_loss_making||[]).length?`<div style="font-size:11.5px;color:var(--warn);margin-top:6px">
+      Left out ${p.excluded_loss_making.length} SKU(s) that sell but lose money per unit — restocking them destroys margin.</div>`:''}
+    ${(p.caveats||[]).length?`<details style="margin-top:9px">
+      <summary style="cursor:pointer;font-size:11.5px;color:var(--muted)">What this plan does not know</summary>
+      <ul style="margin:6px 0 0;padding-left:18px;font-size:11.5px;color:var(--muted);line-height:1.6">
+        ${p.caveats.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></details>`:''}
+    <div style="margin-top:10px"><button class="mbtn" id="v4CashEdit">Change budget</button></div>
+  </div>`;
+  const e=$('#v4CashEdit');
+  if(e) e.onclick=async()=>{
+    const val=parseFloat(prompt('Inventory cash budget ('+sym+'):', p.cash_budget));
+    if(!val||val<=0) return;
+    await fetch('/api/cash-budget',{method:'POST',credentials:'same-origin',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify({value:val})});
+    renderFundedPlan();
+  };
+}
+async function loadFeed(){
+  const list=$('#feedList'); if(!list) return; list.innerHTML='<div class="emptyfeed">Loading…</div>';
+  let d=[]; try{ d=await fetch(`/api/feed?family=${famFilter}&new_only=${newOnly}`).then(r=>r.json()); }catch(e){}
+  FEED=Array.isArray(d)?d:(d.cards||d.feed||[]);
+  // KPI filter maps to card group
+  const GMAP={revenue:['Sales','Pricing & Buy Box'],margin:['Margin'],cash:['Cash'],inventory:['Inventory'],ads:['Ads']};
+  let rows=FEED;
+  if(kpiFilter&&GMAP[kpiFilter]) rows=rows.filter(c=>GMAP[kpiFilter].includes(c.group));
+  if(!rows.length){ list.innerHTML='<div class="emptyfeed">Nothing matches that filter. Clear it to see more.</div>'; return; }
+  list.innerHTML=rows.map((c,i)=>{
+    const fc=LENS[c.family]||'var(--muted)'; const act=c.action_kind==='execute';
+    return `<div class="feedcard" data-ix="${i}" data-cardpos="${FEED.indexOf(c)}">
+      <div class="top">
+        <span class="pill ${pillClass(c.severity)}">${esc(c.sev_label||c.severity||'')}</span>
+        <span class="lens"><span class="dot" style="background:${fc}"></span>${esc(c.type_name||c.family||'')}</span>
+        <span class="meta">${c.is_new?'<span class="newpill">NEW</span>':''}<span>${esc(c.category||'')}</span></span>
+      </div>
+      <div class="finding">${c.finding||''}</div>
+      <div class="exp">
+        <div><div class="xl">${esc(c.exposure_label||'Exposure')}</div><div class="xv">${esc(c.exposure_val||'—')}</div></div>
+        <div><div class="xl">Confidence</div><div class="dots">${[1,2,3,4].map(n=>`<i class="${(c.confidence||0)>=n?'f':''}"></i>`).join('')}</div></div>
+      </div></div>`;
+  }).join('');
+  $$('#feedList .feedcard').forEach(el=>el.onclick=()=>openCard(FEED[+el.dataset.cardpos]));
+}
+function _sym(){ return ME.symbol||'₹'; }
+/* Permission for the HELD ads model comes from the SERVER (features.ads_preview = the ads_preview flag
+   AND account_type=='tester', or a per-tenant grant) — never from isTester(), which is TRUE for the demo
+   tenant (tenant_kind='internal') and would put unvalidated ad numbers on stage. */
+function _adsPreviewOn(){ return !!(ME.features||{}).ads_preview; }
+function _spark(series,color){
+  const pts=(series||[]).map(p=>typeof p==='object'?(p.v!=null?p.v:p.value):p).filter(v=>v!=null);
+  if(pts.length<2) return '';
+  const W=260,H=54,pad=4,max=Math.max(...pts),min=Math.min(...pts),rng=(max-min)||1,step=(W-2*pad)/(pts.length-1);
+  const xy=pts.map((v,i)=>[pad+i*step,H-pad-((v-min)/rng)*(H-2*pad)]);
+  return `<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline points="${xy.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round"/><circle cx="${xy[xy.length-1][0].toFixed(1)}" cy="${xy[xy.length-1][1].toFixed(1)}" r="2.4" fill="${color}"/></svg>`;
+}
+function openCard(c){
+  if(!c) return; const fc=LENS[c.family]||'var(--muted)'; const act=c.action_kind==='execute';
+  const dbid=c.dbid!=null?c.dbid:c.id;
+  const srcs=(c.sources||[]).map(s=>typeof s==='string'?s:(s.name||'')).filter(Boolean);
+  const minis=(c.minis||[]);   // each = [key, valueString, colorClass]
+  const canRz=dbid!=null;
+  const canSim=canRz && c.family!=='news' && !['C7','C8','C9'].includes(c.card_type||c.type);
+  $('#modalHost').innerHTML=`<div class="mbg show" id="cardModal"><div class="modal" style="max-width:600px">
+    <div class="mh"><span class="pill ${pillClass(c.severity)}">${esc(c.sev_label||c.severity||'')}</span>
+      <span class="lens"><span class="dot" style="background:${fc}"></span>${esc(c.type_name||'')}</span>
+      <button class="mx" data-x>&times;</button></div>
+    <div class="mt">${c.finding||''}</div>
+    <div class="mb">
+      <div class="sec-h" style="margin-top:8px;display:flex;align-items:center;gap:8px">Why this matters to you
+        <button class="aact" data-explain style="padding:3px 8px;font-size:11px">ⓘ Explainability</button></div>
+      <div class="box neutral" id="whyBox">${c.why||'—'}</div>
+      <div id="explHost"></div>
+      ${minis.length?`<div class="sec-h">The numbers</div><div class="mgrid">${minis.map(m=>`<div class="mcell"><div class="mk">${esc(m[0]||'')}</div><div class="mv ${m[2]||''}">${esc(m[1]||'')}</div></div>`).join('')}</div>`:''}
+      <div class="sec-h">Exposure &amp; confidence</div>
+      <div class="tiles"><div class="tile acc"><div class="tl">${esc(c.exposure_label||'Exposure')}</div><div class="tv">${esc(c.exposure_val||'—')}</div></div>
+        <div class="tile"><div class="tl">Confidence</div><div class="tv">${esc(c.conf_label||((c.confidence||0)+'/4'))}</div></div></div>
+      ${srcs.length?`<div class="sec-h">Source</div><div style="display:flex;gap:6px;flex-wrap:wrap">${srcs.map(s=>`<span class="pill watch">${esc(s)}</span>`).join('')}</div>`:''}
+      <div class="sec-h">Research further</div>
+      <div id="rzHost"><button class="rzbtn" data-research ${canRz?'':'disabled title="Live only"'}>🔎 Research further</button></div>
+    </div>
+    <div class="mf">
+      ${canRz?`<button class="mbtn" data-amazon>View on Amazon</button>`:''}
+      <button class="mbtn" data-watch>★ Follow-up</button>
+      <button class="mbtn" data-dismiss>Dismiss</button>
+      ${canSim?`<button class="mbtn" data-sim>Simulate</button>`:''}
+      <div style="flex:1"></div>
+      <button class="mbtn primary" data-act>${esc(c.action||'Open')}</button>
+    </div></div></div>`;
+  const host=$('#cardModal'); const close=()=>host.remove();
+  host.querySelector('[data-x]').onclick=close;
+  host.onclick=e=>{ if(e.target===host) close(); };
+  // lazy L2 "why" upgrade
+  if(canRz) fetch(`/api/card/${dbid}/why`).then(r=>r.json()).then(j=>{ if(j&&j.l2&&j.why) $('#whyBox').textContent=j.why; }).catch(()=>{});
+  // explainability (ⓘ)
+  host.querySelector('[data-explain]').onclick=(e)=>{
+    const h=$('#explHost'); if(h.dataset.open){ h.innerHTML=''; h.dataset.open=''; e.target.classList.remove('on'); return; }
+    e.target.classList.add('on'); h.dataset.open='1'; h.innerHTML='<div class="xpanel">Deriving…</div>';
+    if(canRz) fetch(`/api/card/${dbid}/explain`).then(r=>r.json()).then(x=>h.innerHTML=explainHTML(x)).catch(()=>h.innerHTML='<div class="xpanel">Explanation unavailable.</div>');
+    else h.innerHTML='<div class="xpanel">Live only.</div>';
+  };
+  // research further
+  host.querySelector('[data-research]').onclick=()=>runResearch(dbid);
+  // actions
+  host.querySelector('[data-watch]').onclick=(e)=>{ if(canRz) fetch(`/api/card/${dbid}/watch`,{method:'POST'}); e.target.textContent='★ Saved'; e.target.classList.add('primary'); };
+  host.querySelector('[data-dismiss]').onclick=()=>{ if(canRz) fetch(`/api/card/${dbid}/dismiss?done=false`,{method:'POST'}); close(); loadFeed(); };
+  const am=host.querySelector('[data-amazon]'); if(am) am.onclick=()=>{ fetch(`/api/card/${dbid}/clickout?kind=amazon`).then(r=>r.json()).then(j=>{ const u=(j.destination||{}).url; if(u) window.open(u,'_blank'); }).catch(()=>{}); };
+  const sb=host.querySelector('[data-sim]'); if(sb) sb.onclick=()=>{ if(typeof openAdModal==='function'){} ; simCard(dbid); };
+  host.querySelector('[data-act]').onclick=()=>{ if(canRz&&act) fetch(`/api/card/${dbid}/action`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).then(()=>{close();loadFeed();}); else if(canRz&&c.action_kind==='watch') { fetch(`/api/card/${dbid}/watch`,{method:'POST'}); close(); } else if(canRz) { runResearch(dbid); } else close(); };
+}
+function explainHTML(x){
+  if(!x||x.error) return '<div class="xpanel">Explanation unavailable.</div>';
+  const l1=x.l1||{}, ibs=l1.inputs_by_source||{};
+  const bucket=(t,arr)=>arr&&arr.length?`<div class="xk">${t}</div>${arr.map(i=>`<div>${esc(typeof i==='string'?i:(i.label||i.name||JSON.stringify(i)))}</div>`).join('')}`:'';
+  let h='<div class="xpanel">';
+  if(l1.rule) h+=`<div class="xk">Rule</div>${esc(l1.rule.name||l1.rule.id||'')} <span style="color:var(--faint)">(${esc(l1.rule.family||l1.rule.group||'')})</span>`;
+  if(l1.formula) h+=`<div class="xk">Formula</div><code>${esc(l1.formula)}</code>`;
+  h+=bucket('Your data',ibs.own_seller)+bucket('Market',ibs.keepa_market)+bucket('News & other',ibs.news_other);
+  const preds=((x.model||{}).predictions)||[];
+  if(preds.length) h+=`<div class="xk">Model</div>${preds.map(p=>`<div>${esc(p.label||p.kind||'')}: <b>${esc(p.value!=null?p.value+(p.unit||''):'—')}</b> <span style="color:var(--faint)">(${esc(p.confidence||'')})</span></div>`).join('')}`;
+  const l2=x.l2||{}; if(l2.l2_invoked&&l2.l2_response) h+=`<div class="xk">Analyst (L2)</div><div style="color:var(--muted)">${esc(l2.l2_response)}</div>`;
+  return h+'</div>';
+}
+async function runResearch(dbid){
+  const host=$('#rzHost'); if(!host) return; host.innerHTML='<div class="xpanel">Researching your market…</div>';
+  let d={}; try{ const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),30000);
+    d=await fetch(`/api/card/${dbid}/research`,{signal:ctl.signal}).then(r=>r.json()); clearTimeout(t); }
+  catch(e){ host.innerHTML='<div class="xpanel">Market fetch timed out. <button class="rzbtn" data-research>Retry</button></div>'; host.querySelector('[data-research]').onclick=()=>runResearch(dbid); return; }
+  const sym=_sym(); let h='';
+  if(d.market_status&&d.market_status!=='ok') h+=`<div class="box" style="background:var(--warn-bg);border:1px solid transparent;margin-bottom:10px">Market data ${esc(d.market_status)}. <button class="rzbtn" data-retry style="margin-left:8px">↻ Retry</button></div>`;
+  const cs=d.chart_summary||{};
+  if(d.chart&&d.chart.price) h+=`<div class="rzchart"><div class="ct"><span>Price</span><span>${cs.price_change_pct!=null?(cs.price_change_pct>0?'+':'')+cs.price_change_pct+'%':''}</span></div>${_spark(d.chart.price,'var(--accent)')}</div>`;
+  if(d.chart&&d.chart.bsr) h+=`<div class="rzchart"><div class="ct"><span>BSR (rank)</span><span>${cs.bsr_now!=null?'now '+cs.bsr_now:''}</span></div>${_spark(d.chart.bsr,'var(--warn)')}</div>`;
+  if(d.competitors&&d.competitors.length){ h+=`<div class="sec-h">Competitors — ${esc(d.segment||'segment')}</div>`+d.competitors.slice(0,8).map(c=>`<div class="crow"><span class="rk">#${c.rank||''}</span><span class="ci">${esc(c.title||'')}</span><span class="cm">${sym}${c.price!=null?Math.round(c.price):'—'}</span><span class="cm">${c.reviews!=null?c.reviews+' rev':''}</span><span class="cs">${c.opp_score!=null?c.opp_score:''}</span></div>`).join('')+`<button class="rzbtn" data-sourcing style="margin-top:10px">＋ Add these to sourcing list</button>`; }
+  if(d.review_themes&&d.review_themes.length) h+=`<div class="sec-h">Review themes</div>`+d.review_themes.map(t=>`<div class="theme"><span class="tg ${t.sentiment||'mixed'}">${esc(t.sentiment||'')}</span><span><b>${esc(t.theme||'')}</b> — ${esc(t.note||'')}</span></div>`).join('');
+  if(d.trend&&d.trend.related&&d.trend.related.length) h+=`<div class="sec-h">Rising searches</div>`+d.trend.related.map(r=>`<div class="theme"><span>${esc(typeof r==='string'?r:(r.query||r.title||''))}</span></div>`).join('');
+  if(d.brief) h+=`<div class="sec-h">Realify's read — what to do</div><div class="box neutral">${esc(d.brief)}</div>`;
+  h+=`<div class="sec-h">Ask about this</div><div class="rzask"><input id="rzAskI" placeholder="Ask a follow-up about this signal…"><button class="mbtn primary" data-ask>Ask</button></div><div id="rzAns"></div>`;
+  host.innerHTML=h;
+  const rt=host.querySelector('[data-retry]'); if(rt) rt.onclick=()=>runResearch(dbid);
+  const src=host.querySelector('[data-sourcing]'); if(src) src.onclick=(e)=>{ fetch(`/api/card/${dbid}/sourcing`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({picks:(d.competitors||[]).slice(0,8)})}); e.target.textContent='✓ Added to sourcing'; };
+  const askBtn=host.querySelector('[data-ask]'), askI=host.querySelector('#rzAskI');
+  const doAsk=()=>{ const q=askI.value.trim(); if(!q) return; const ans=$('#rzAns'); ans.innerHTML='<div class="rzans think">Thinking…</div>';
+    fetch(`/api/card/${dbid}/ask`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})}).then(r=>r.json()).then(j=>ans.innerHTML=`<div class="rzans">${esc(j.answer||'No answer.')}</div>`).catch(()=>ans.innerHTML='<div class="rzans">Could not answer.</div>'); };
+  askBtn.onclick=doAsk; askI.addEventListener('keydown',e=>{ if(e.key==='Enter') doAsk(); });
+}
+function simCard(dbid){
+  // card-level projection: reuse the cmaa simulate seam (card_id)
+  const h=$('#rzHost')||document.body;
+  fetch('/api/cmaa/simulate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({card_id:dbid})}).then(r=>r.json()).then(s=>{
+    const host=$('#rzHost'); if(!host) return;
+    const cells=(s.projection||s.horizons||[]);
+    host.innerHTML=`<div class="sec-h">Simulation — scenario, not a guarantee</div><div class="box neutral">${s.ok===false?esc(s.missing||s.error||'Can’t simulate this signal.'):(cells.length?'Projection ready below.':esc(JSON.stringify(s).slice(0,200)))}</div>`;
+  }).catch(()=>{});
+}
+async function renderAnalyst(body){
+  body.innerHTML='<div class="emptyfeed">Loading your Category Analyst memo…</div>';
+  try{ const d=await fetch('/api/category-analyst').then(r=>r.json());
+    const memo=d.memo||d.synthesis||d.headline||'';
+    body.innerHTML=`<div class="brief"><span class="k">Overnight memo</span><h2>${esc(d.title||'Your Category Analyst')}</h2></div>
+      <div class="box neutral" style="white-space:pre-wrap">${esc(typeof memo==='string'?memo:JSON.stringify(d,null,1))}</div>`;
+  }catch(e){ body.innerHTML='<div class="emptyfeed">No memo yet.</div>'; }
+}
+async function renderChannels(body){
+  body.innerHTML='<div class="emptyfeed">Loading channels…</div>';
+  try{ const d=await fetch('/api/channels/cross').then(r=>r.json());
+    const rows=d.channels||d.rows||[];
+    body.innerHTML=`<div class="brief"><span class="k">Cross-channel</span><h2>Price &amp; margin across your channels</h2></div>`+
+      (rows.length?`<div>${rows.map(r=>`<div class="feedcard"><div class="top"><span class="lens">${esc(r.channel||r.name||'Channel')}</span><span class="meta">${esc(r.units!=null?r.units+' units':'')}</span></div></div>`).join('')}</div>`
+      :'<div class="emptyfeed">No cross-channel data yet. Connect a channel in Integrations.</div>');
+  }catch(e){ body.innerHTML='<div class="emptyfeed">No channel data yet.</div>'; }
+}
+
+/* ============ ADS (Profit & Ads) ============ */
+const QUAD={'SCALE':{l:'Scale',c:'opp'},'MAINTAIN':{l:'Maintain',c:'watch'},'FIX MARGIN':{l:'Fix margin',c:'act'},'CUT/DIVEST':{l:'Cut / divest',c:'crit'}};
+let adsCohort='ALL', adsData=null, adExpl=false;
+async function renderAds(el){
+  el.innerHTML=`<div class="pad" id="adsPad"><div class="emptyfeed">Loading Profit &amp; Ads…</div></div>`;
+  let cov={}; try{ cov=await fetch('/api/ads/coverage').then(r=>r.json()); }catch(e){}
+  try{ adsData=await fetch('/api/cmaa').then(r=>r.json()); }catch(e){ adsData={ok:false}; }
+  const pad=$('#adsPad'); const sym=ME.symbol||'₹';
+  if(!adsData||adsData.ok===false){ pad.innerHTML='<div class="emptyfeed">Profit &amp; Ads is unavailable.</div>'; return; }
+  const skus=adsData.skus||[];
+  // coverage banner
+  const covState=cov.reason||(cov.ok?'RENDERED_OK':'');
+  let banner='';
+  if(adsData.sample||covState==='NO_ENTITY_DATA'){
+    banner=`<div class="box" style="background:var(--accent-bg);border:1px solid transparent;margin-bottom:16px">
+      <b>Connect your ad data for campaign-level recommendations.</b> Upload a Sponsored Products Advertised-Product report in Integrations — this view then shows exactly which campaigns to cut or scale, per SKU. Below is your margin-vs-spend from the data you have.</div>`;
+  } else if(cov.coverage_pct!=null){
+    banner=`<div class="box neutral" style="margin-bottom:16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+      <span><span class="xl" style="font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">Coverage</span> <b>${Math.round(cov.coverage_pct)}%</b></span>
+      ${cov.fidelity?`<span class="pill watch">${esc(cov.fidelity)}</span>`:''}
+      ${cov.unmapped_spend?`<span style="color:var(--muted);font-size:12.5px">${sym}${Math.round(cov.unmapped_spend).toLocaleString()} unmapped spend</span>`:''}
+    </div>`;
+  }
+  // aggregate
+  const agg=adsData.summary||{};
+  // cohort counts
+  const counts={}; skus.forEach(s=>{counts[s.quadrant]=(counts[s.quadrant]||0)+1;});
+  const cohorts=['ALL'].concat(Object.keys(QUAD).filter(q=>counts[q]));
+  pad.innerHTML=`
+    <div class="brief"><span class="k">Profit &amp; Ads</span><h2>Ad spend vs margin — every advertised SKU, ranked by what it's costing you.</h2></div>
+    ${banner}
+    <div class="filters" id="adsCohorts">${cohorts.map(q=>`<button class="chip ${adsCohort===q?'on':''}" data-coh="${q}">${q==='ALL'?'All SKUs':QUAD[q]?.l||q} ${q!=='ALL'&&counts[q]?`· ${counts[q]}`:''}</button>`).join('')}
+      <label class="chip" style="margin-left:auto;cursor:pointer"><input type="checkbox" id="adExpl" ${adExpl?'checked':''} style="margin-right:6px">ƒ Explainability</label></div>
+    ${_adsPreviewOn()?`<div class="box" style="border:1px solid var(--warn);background:var(--warn-bg);margin-bottom:16px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--warn);margin-bottom:7px">Held ads model · internal only</div>
+      <div style="font-size:12.5px;color:var(--ink-2);line-height:1.55;margin-bottom:10px">The ads model is <b>not validated</b> — sales predict ad spend as strongly as spend predicts sales, so its direction is unidentified. Inspect it here; never quote it to a seller.</div>
+      <button class="mbtn" data-adspeek>Inspect held model</button>
+      <button class="mbtn" data-adsbudget style="margin-left:6px">Reallocate the budget (CVaR)</button>
+      <div id="adsPeek"></div><div id="adsBudget"></div></div>`:''}
+    <div id="adsList"></div>`;
+  $$('#adsCohorts [data-coh]').forEach(b=>b.onclick=()=>{adsCohort=b.dataset.coh; renderAds(el);});
+  const pk=$('[data-adspeek]'); if(pk) pk.onclick=()=>adsPeek(pk);
+  const bg=$('[data-adsbudget]'); if(bg) bg.onclick=()=>adsBudget(bg);
+  $('#adExpl').onchange=(e)=>{adExpl=e.target.checked; document.documentElement.dataset.adexpl=adExpl?'1':'';};
+  document.documentElement.dataset.adexpl=adExpl?'1':'';
+  const list=$('#adsList');
+  let rows=skus.filter(s=>s.judged!==false);
+  if(adsCohort!=='ALL') rows=rows.filter(s=>s.quadrant===adsCohort);
+  rows.sort((a,b)=>(a.cmaa||0)-(b.cmaa||0));
+  if(!rows.length){ list.innerHTML='<div class="emptyfeed">No SKUs in this cohort.</div>'; return; }
+  list.innerHTML=rows.map((s,i)=>{
+    const q=QUAD[s.quadrant]||{l:s.quadrant,c:'watch'}; const cmaa=s.cmaa||0;
+    const be=s.breakeven_acos, ac=s.actual_acos;
+    return `<div class="feedcard" data-adix="${skus.indexOf(s)}">
+      <div class="top"><span class="pill ${q.c}">${esc(q.l)}</span>
+        <span class="lens">${esc(s.title||s.sku)}</span>
+        <span class="meta">${esc(s.sku||'')}</span></div>
+      <div class="exp">
+        <div><div class="xl">ACoS vs break-even</div><div class="xv">${ac!=null?Math.round(ac)+'%':'—'} <span style="color:var(--muted);font-weight:500">/ ${be!=null?Math.round(be)+'%':'—'}</span></div></div>
+        <div><div class="xl">CMAA / mo</div><div class="xv" style="color:${cmaa<0?'var(--crit)':'var(--pos)'}">${sym}${Math.round(cmaa).toLocaleString()}</div></div>
+        ${s.above_breakeven?`<div><div class="xl">Above break-even</div><div class="xv">${sym}${Math.round(s.above_breakeven).toLocaleString()}</div></div>`:''}
+        ${s.scale_upside?`<div><div class="xl">Scale upside</div><div class="xv" style="color:var(--pos)">${sym}${Math.round(s.scale_upside).toLocaleString()}</div></div>`:''}
+      </div></div>`;
+  }).join('');
+  $$('#adsList .feedcard').forEach(c=>c.onclick=()=>openAdModal(skus[+c.dataset.adix]));
+}
+const FAM_LEVER={BID_DOWN:'Lower bid',NEGATIVE_KEYWORD:'Add negative keyword',REMOVE_PRODUCT_AD:'Remove product ad',BUDGET_DOWN_PAUSE:'Cut / pause budget',CAMPAIGN_SPLIT:'Split campaign',SCALE_WINNER:'Scale winner'};
+function _fx(id){ return id?`<span class="fx" data-fx="${esc(id)}" style="color:var(--accent-ink);font-family:var(--mono);font-size:10px;cursor:help" title="formula: ${esc(id)}">ƒ</span>`:''; }
+function _famActCard(a,i){
+  const sym=_sym(); const lever=FAM_LEVER[a.lever_id]||a.lever_id||'Action'; const camp=(a.target_ref||{}).campaign;
+  const gain=a.est_impact!=null?`<b style="color:var(--pos)">+${sym}${Math.round(a.est_impact).toLocaleString()}/mo</b> ${_fx(a.formula_id)}`:'';
+  const canAmazon=a.deep_link&&camp;
+  return `<div class="feedcard" style="cursor:default;margin-bottom:10px" data-act-i="${i}">
+    <div class="top"><span class="lens">${esc(lever)}${camp?` · ${esc(camp)}`:''}</span><span class="meta">${gain}</span></div>
+    <div style="color:var(--muted);font-size:13px;margin-top:8px">${esc(a.rationale||'')}</div>
+    <div id="whyA${i}" style="display:none"></div>
+    <div id="simA${i}" style="display:none;margin-top:10px"></div>
+    <div class="mf" style="border:none;padding:12px 0 0;gap:6px">
+      <button class="mbtn primary" data-apply="${i}">Apply this change</button>
+      <button class="mbtn" data-preview="${i}">Preview</button>
+      ${canAmazon?`<a class="mbtn" href="${esc(a.deep_link)}" target="_blank">Open in Amazon</a>`:`<span class="mbtn" style="opacity:.5;cursor:not-allowed" title="No live campaign link">Open in Amazon</span>`}
+      <button class="mbtn" data-why="${i}">Why</button>
+      <button class="mbtn" data-sim="${i}">Simulate</button>
+    </div></div>`;
+}
+function _famSimbox(rec,i){
+  const be=(rec.problem||{}).break_even_acos; const sym=_sym();
+  const hz=(rec.simulate||{}).horizons||[];
+  return `<div class="box neutral"><div style="font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Simulate — adjust &amp; re-run</div>
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+      <label style="font-size:12px">Bid change <input type="range" class="simbid" min="10" max="50" step="5" value="30"> <span class="simbidv">−30%</span></label>
+      <label style="font-size:12px">Target ACoS <input type="number" class="simtac" value="${be!=null?Math.round(be):22}" style="width:56px;border:1px solid var(--line);border-radius:6px;padding:3px 6px;background:var(--panel);color:var(--ink)">%</label>
+      <button class="mbtn" data-resim="${i}">Re-simulate</button></div>
+    <div class="tiles simcells">${hz.map(h=>`<div class="tile"><div class="tl">${h.days}d</div><div class="tv" style="font-size:15px">+${sym}${Math.round(h.delta||0).toLocaleString()}</div><div style="font-size:11px;color:var(--faint)">p≈${Math.round((h.prob||0)*100)}%</div></div>`).join('')||'<span style="color:var(--faint);font-size:12px">No projection.</span>'}</div>
+    <div style="font-size:11.5px;color:var(--muted);margin-top:8px">Tripwire: units/wk drop &gt;15% → auto-revert ${_fx((rec.simulate||{}).tripwire_formula_id)}</div></div>`;
+}
+/* The held ads model's response, fetched ONCE per page life and reused by every SKU modal — the
+   allocator block-bootstraps each SKU and solves four LPs, so re-running it per modal open would be
+   wasteful and would make the pop-up feel slow. Null when the gate is off or the call fails. */
+let ADPLAN=null, ADPLAN_TRIED=false;
+async function adPlanOnce(){
+  if(ADPLAN_TRIED) return ADPLAN;
+  ADPLAN_TRIED=true;
+  if(!_adsPreviewOn()) return null;                 // gated: no seller ever sees these figures
+  try{ const d=await fetch('/api/ad-budget-plan?alpha=0.9',{credentials:'same-origin'}).then(r=>r.json());
+       ADPLAN=(d&&d.ok)?d:null; }catch(e){ ADPLAN=null; }
+  return ADPLAN;
+}
+/* What the model actually says about THIS SKU, shown with the two flags that discredit it rather than
+   the number alone. Renders nothing at all when the gate is off. */
+function adModelHTML(sku, plan){
+  if(!plan) return '';
+  const sym=_sym(), inr=v=>sym+Math.round(v||0).toLocaleString('en-IN');
+  const r=(plan.rows||[]).find(x=>x.sku===sku);
+  const held=(plan.held||[]).find(x=>x.sku===sku);
+  const head=`<div class="sec-h" style="color:var(--warn)">Held ads model — internal only, not validated</div>`;
+  if(!r){
+    return head+`<div class="box" style="border:1px solid var(--warn);background:var(--warn-bg);font-size:12.5px;line-height:1.55">
+      ${held?`<b>No response could be estimated for this SKU.</b> ${esc(held.reason)}.
+        Its ${inr(held.spend_day)}/day is left untouched and sits outside the plan — a data limit, not a
+        judgement about this product.`
+       :`<b>This SKU is not in the model's window.</b> It carries no daily ad spend in the period the
+         model was fitted on, so there is nothing to estimate.`}</div>`;
+  }
+  const rng=r.response_range||[];
+  const warn=(t)=>`<div style="color:var(--crit);font-size:12px;margin-top:7px;line-height:1.5">${t}</div>`;
+  return head+`<div class="box" style="border:1px solid var(--warn);background:var(--warn-bg)">
+    <div class="tiles" style="margin-bottom:2px">
+      <div class="tile"><div class="tl">Margin per ${sym}1 of ads</div>
+        <div class="tv" style="font-size:17px;color:${r.implausible_return?'var(--crit)':'var(--ink)'}">${sym}${r.return_per_rupee.toFixed(2)}</div></div>
+      <div class="tile"><div class="tl">Units per ${sym}1/day</div>
+        <div class="tv" style="font-size:17px">${r.response_med.toFixed(4)}</div></div>
+      <div class="tile"><div class="tl">Model skill vs naive</div>
+        <div class="tv" style="font-size:17px;color:${r.model_worse_than_baseline?'var(--crit)':'var(--pos)'}">${r.holdout_skill==null?'—':(r.holdout_skill>0?'+':'')+r.holdout_skill.toFixed(2)}</div></div>
+      <div class="tile acc"><div class="tl">CVaR plan / day</div>
+        <div class="tv" style="font-size:17px">${inr(r.proposed_day)}</div></div>
+    </div>
+    <div style="font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.6">
+      Now ${inr(r.current_day)}/day → plan <b>${inr(r.proposed_day)}</b>/day
+      (${r.delta_day>=0?'+':'−'}${inr(Math.abs(r.delta_day))})${r.capped?' · at its 2× cap':''} ·
+      90% response range ${rng.length?`${rng[0]} to ${rng[1]}`:'—'} · ${plan.scenarios} bootstrap scenarios
+    </div>
+    ${r.model_worse_than_baseline?warn(`<b>Our model predicts this SKU WORSE than a naive baseline</b> (skill ${r.holdout_skill.toFixed(2)}). The response estimate is the least reliable kind: precise-looking and possibly of the wrong thing.`):''}
+    ${r.implausible_return?warn(`<b>${sym}${r.return_per_rupee.toFixed(2)} per ${sym}1 is implausibly high.</b> Read it as evidence FOR reverse causation — the regression crediting ads with demand that was already there — not as a great ad account.`):''}
+    <div style="font-size:11.5px;color:var(--warn);margin-top:9px;line-height:1.55">
+      <b>Direction is not identified.</b> Yesterday's demand predicts today's ad spend as strongly as spend
+      predicts sales, so every figure here is conditional on the forward direction being the true one.
+      Do not quote it to a seller.
+    </div></div>`;
+}
+
+async function openAdModal(s){
+  if(!s) return; const sym=_sym(); const q=QUAD[s.quadrant]||{l:s.quadrant,c:'watch'};
+  const basicRec=s.recommendation||{}; const steps=basicRec.steps||[];
+  // full campaign-level rec for this SKU (the deep Fix-Ads payload)
+  let rec=null; try{ const rr=await fetch('/api/ads/recommendations').then(r=>r.json()); rec=(rr.recommendations||[]).find(x=>x.sku===s.sku)||null; }catch(e){}
+  const plan=await adPlanOnce();
+  const P=(rec&&rec.problem)||{}; const actions=(rec&&rec.actions)||[];
+  const actionable=actions.filter(a=>a.action_class==='REALIFY_ACTIONABLE');
+  const advisory=actions.filter(a=>a.action_class==='ADVISORY_ONLY');
+  const totalGain=actionable.reduce((n,a)=>n+(a.est_impact||0),0);
+  const metric=(lbl,val,ff,cls)=>`<div class="tile ${cls||''}"><div class="tl">${esc(lbl)} ${_fx(ff)}</div><div class="tv" style="font-size:17px">${val}</div></div>`;
+  $('#modalHost').innerHTML=`<div class="mbg show ${adExpl?'adx':''}" id="adModal"><div class="modal" style="max-width:640px">
+    <div class="mh"><span class="pill ${q.c}">${esc(q.l)}</span><span class="lens">${esc(s.title||s.sku)}</span>
+      <label style="margin-left:8px;font-size:11px;color:var(--muted);cursor:pointer"><input type="checkbox" id="mExpl" ${adExpl?'checked':''}> ƒ Explainability</label>
+      <button class="mx" data-x>&times;</button></div>
+    <div class="mt">${esc(basicRec.headline||'Margin vs ad spend')}</div>
+    <div class="mb">
+      <div class="sec-h">Metrics</div>
+      <div class="tiles">
+        ${metric('ACoS',(P.current_acos_for_sku!=null?Math.round(P.current_acos_for_sku)+'%':(s.actual_acos!=null?Math.round(s.actual_acos)+'%':'—')),'acos')}
+        ${metric('Break-even ACoS',(P.break_even_acos!=null?Math.round(P.break_even_acos)+'%':(s.breakeven_acos!=null?Math.round(s.breakeven_acos)+'%':'—')),'break_even_acos')}
+        ${metric('CMAA / mo',sym+Math.round((P.cmaa_now!=null?P.cmaa_now:s.cmaa)||0).toLocaleString(),'cmaa','acc')}
+        ${rec?metric('Recoverable / mo',sym+Math.round(rec.est_recovery_monthly||0).toLocaleString(),'recoverable','acc'):''}
+      </div>
+      ${rec?`<div style="font-size:11.5px;color:var(--muted);margin-top:6px">Fidelity: <b>${esc(rec.fidelity_label||rec.fidelity||'')}</b>${(rec.confidence&&rec.confidence.coverage_pct!=null)?` · coverage ${Math.round(rec.confidence.coverage_pct)}%`:''} ${_fx((rec.formulas||{}).ad_coverage&&(rec.formulas.ad_coverage.formula_id))}</div>`:''}
+      ${!rec&&steps.length?`<div class="sec-h">Recommended plan</div><div class="box" style="background:var(--pos-bg)">${steps.map(x=>`<div style="margin-bottom:6px">• ${esc(x)}</div>`).join('')}</div>`:''}
+      ${rec?`<div class="sec-h">Recommendations — each acts on its own</div>${actionable.length?actionable.map((a,i)=>_famActCard(a,i)).join(''):'<div class="box neutral" style="color:var(--muted)">No one-click changes for this SKU right now.</div>'}`:''}
+      ${advisory.length?`<div class="sec-h">Advisory — you do this yourself</div>${advisory.map(a=>`<div class="feedcard" style="cursor:default;margin-bottom:8px"><div class="top"><span class="lens">${esc(FAM_LEVER[a.lever_id]||a.lever_id||'Advisory')}</span><span class="pill watch">advisory</span></div><div style="color:var(--muted);font-size:13px;margin-top:8px">${esc(a.rationale||'')}</div>${a.change&&a.change.value?`<div class="box neutral" style="margin-top:8px;font-size:12.5px">${esc(typeof a.change.value==='string'?a.change.value:JSON.stringify(a.change.value))}</div>`:''}</div>`).join('')}`:''}
+      ${!rec?`<div class="sec-h">Simulate</div>${_famSimbox({problem:{break_even_acos:s.breakeven_acos},simulate:{}},'x')}`:''}
+      ${adModelHTML(s.sku, plan)}
+    </div>
+    <div class="mf" style="flex-wrap:wrap">
+      <button class="mbtn" data-x2>Close</button>
+      ${rec&&actionable.length?`<span style="font-size:12.5px;color:var(--muted);align-self:center">Projected if all applied: <b style="color:var(--pos)">+${sym}${Math.round(totalGain).toLocaleString()}/mo</b> ${_fx(rec.combined_formula_id)}</span>`:''}
+      <div style="flex:1"></div>
+      ${rec&&actionable.length?`<button class="mbtn" data-export>Export</button><button class="mbtn primary" data-applyall>Apply all ${actionable.length}</button>`:(s.acted?'<span class="pill opp" style="align-self:center">Applied ✓</span>':`<button class="mbtn primary" data-basicapply>Apply this plan</button>`)}
+    </div>
+    ${rec&&rec.guardrails?`<div style="padding:0 18px 16px;font-size:11.5px;color:var(--faint)">Guardrails: ${esc(rec.guardrails)}</div>`:''}
+  </div></div>`;
+  const host=$('#adModal'); const close=()=>host.remove();
+  host.querySelector('[data-x]').onclick=close; host.querySelector('[data-x2]').onclick=close;
+  host.onclick=e=>{ if(e.target===host) close(); };
+  $('#mExpl').onchange=(e)=>{ adExpl=e.target.checked; document.documentElement.dataset.adexpl=adExpl?'1':''; openAdModal(s); };
+  document.documentElement.dataset.adexpl=adExpl?'1':'';
+  // ƒ reveal
+  host.querySelectorAll('.fx').forEach(f=>f.onclick=(e)=>{ e.stopPropagation(); const id=f.dataset.fx; const fm=(rec&&rec.formulas)||{};
+    const t=Object.values(fm).find(x=>x&&x.formula_id===id);
+    // toggle an INLINE reveal right after the ƒ tag (no popup)
+    let rev=f.nextElementSibling; if(rev&&rev.classList.contains('fxrev')){ rev.remove(); return; }
+    rev=document.createElement('div'); rev.className='fxrev';
+    rev.innerHTML=t?`<code>${esc(t.expression||'')}</code>${t.substituted?` = <b>${esc(t.substituted)}</b>`:''}<span class="src">${esc(t.source||id)}</span>`:`<span class="src">formula: ${esc(id)}</span>`;
+    f.parentNode.insertBefore(rev, f.nextSibling); });
+  // per-action controls
+  actionable.forEach((a,i)=>{
+    const q1=sel=>host.querySelector(sel);
+    q1(`[data-why="${i}"]`).onclick=()=>{ const w=$('#whyA'+i); if(w.style.display==='none'){ w.style.display='block'; const wy=rec.why||{};
+      w.innerHTML=`<div class="xpanel">Break-even ACoS <b>${wy.break_even_acos!=null?Math.round(wy.break_even_acos)+'%':'—'}</b> · current <b>${wy.current_acos!=null?Math.round(wy.current_acos)+'%':'—'}</b>. ${esc(wy.derivation||'')} ${esc(wy.campaigns_note||'')} ${esc(wy.unmapped_note||'')}</div>`; } else w.style.display='none'; };
+    q1(`[data-sim="${i}"]`).onclick=()=>{ const sb=$('#simA'+i); if(sb.style.display==='none'){ sb.style.display='block'; sb.innerHTML=_famSimbox(rec,i); wireSim(host,rec,i); } else sb.style.display='none'; };
+    q1(`[data-preview="${i}"]`).onclick=()=>famPreview(host,rec,[a]);
+    q1(`[data-apply="${i}"]`).onclick=()=>famPreview(host,rec,[a],true);
+  });
+  const xall=host.querySelector('[data-export]'); if(xall) xall.onclick=()=>famExport(rec,actionable);
+  const aall=host.querySelector('[data-applyall]'); if(aall) aall.onclick=()=>famPreview(host,rec,actionable,true);
+  const ba=host.querySelector('[data-basicapply]'); if(ba) ba.onclick=()=>{ fetch('/api/cmaa/action',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sku:s.sku,action:'apply'})}).then(()=>{close();renderAds($('#surface'));}); };
+  if(!rec) wireSim(host,{problem:{break_even_acos:s.breakeven_acos},simulate:{}},'x',s.sku);
+}
+function wireSim(host,rec,i,skuOverride){
+  const box=host.querySelector(i==='x'?'.mb':('#simA'+i)); if(!box) return;
+  const bid=box.querySelector('.simbid'), lbl=box.querySelector('.simbidv'), tac=box.querySelector('.simtac'), btn=box.querySelector(`[data-resim="${i}"]`), cells=box.querySelector('.simcells');
+  if(bid) bid.oninput=()=>lbl.textContent='−'+bid.value+'%';
+  if(btn) btn.onclick=async()=>{ const sku=skuOverride||rec.sku; const sym=_sym();
+    const url=`/api/ads/simulate?sku=${encodeURIComponent(sku)}&bid=${bid?bid.value:30}${tac&&tac.value?'&target_acos='+tac.value:''}`;
+    cells.innerHTML='<span style="color:var(--faint);font-size:12px">Simulating…</span>';
+    try{ const r=await fetch(url).then(x=>x.json()); const hz=(r.simulate||{}).horizons||[];
+      cells.innerHTML=hz.map(h=>`<div class="tile"><div class="tl">${h.days}d</div><div class="tv" style="font-size:15px">+${sym}${Math.round(h.delta||0).toLocaleString()}</div><div style="font-size:11px;color:var(--faint)">p≈${Math.round((h.prob||0)*100)}%</div></div>`).join('')||('<span style="color:var(--faint);font-size:12px">'+(r.error||'No projection.')+'</span>'); }
+    catch(e){ cells.innerHTML='<span style="color:var(--crit);font-size:12px">Simulation unavailable.</span>'; } };
+}
+function famPreview(host,rec,acts,apply){
+  const sym=_sym(); const rows=acts.map(a=>({lever:FAM_LEVER[a.lever_id]||a.lever_id,campaign:(a.target_ref||{}).campaign||'',change:a.change?(typeof a.change.value==='string'?a.change.value:JSON.stringify(a.change.value)):'',impact:a.est_impact}));
+  const body=`<div class="modal" style="max-width:520px"><div class="mh"><span class="lens">${apply?'Apply — preview':'Preview'} (instruction only)</span><button class="mx" data-px>&times;</button></div>
+    <div class="mb"><div style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Realify has no live Amazon write — this is the exact change to make (or export).</div>
+    ${rows.map(r=>`<div class="cite"><span><b>${esc(r.lever)}</b>${r.campaign?' · '+esc(r.campaign):''}<div style="color:var(--muted);font-size:12px">${esc(r.change)}</div></span>${r.impact!=null?`<b style="margin-left:auto;color:var(--pos)">+${sym}${Math.round(r.impact).toLocaleString()}/mo</b>`:''}</div>`).join('')}
+    ${rec.guardrails?`<div style="font-size:11.5px;color:var(--faint);margin-top:10px">Guardrails: ${esc(rec.guardrails)}</div>`:''}</div>
+    <div class="mf"><button class="mbtn" data-px2>Close</button><div style="flex:1"></div><button class="mbtn primary" data-pexport>Export CSV</button></div></div>`;
+  const h=document.createElement('div'); h.className='mbg show'; h.style.zIndex='95'; h.innerHTML=body; document.body.appendChild(h);
+  const cl=()=>h.remove(); h.querySelector('[data-px]').onclick=cl; h.querySelector('[data-px2]').onclick=cl; h.onclick=e=>{ if(e.target===h) cl(); };
+  h.querySelector('[data-pexport]').onclick=()=>famExport(rec,acts);
+}
+function famExport(rec,acts){
+  const sym=_sym(); const head='sku,lever,campaign,ad_group,change,est_impact_monthly';
+  const lines=acts.map(a=>[rec?rec.sku:'',FAM_LEVER[a.lever_id]||a.lever_id,(a.target_ref||{}).campaign||'',(a.target_ref||{}).ad_group||'',a.change?(typeof a.change.value==='string'?a.change.value:JSON.stringify(a.change.value)):'',a.est_impact||0].map(x=>`"${String(x).replace(/"/g,'""')}"`).join(','));
+  const blob=new Blob([head+'\n'+lines.join('\n')],{type:'text/csv'}); const u=URL.createObjectURL(blob);
+  const link=document.createElement('a'); link.href=u; link.download=`fixads_${rec?rec.sku:'export'}.csv`; link.click(); URL.revokeObjectURL(u);
+}
+
+/* ============ SETTINGS ============ */
+const card=(inner)=>`<div class="feedcard" style="cursor:default">${inner}</div>`;
+function roleBadges(){
+  const b=[]; if(ME.account_type==='tester') b.push('Realify tester');
+  if(ME.is_staff) b.push('Realify admin'); if(ME.role==='owner') b.push('Brand owner'); else if(ME.role) b.push('Brand '+ME.role);
+  return b.map(x=>`<span class="pill watch">${esc(x)}</span>`).join(' ');
+}
+const isTester=()=>ME.account_type==='tester'||['sandbox','internal'].includes(ME.tenant_kind);
+async function renderSettings(el){
+  el.innerHTML=`<div class="pad">
+    <div class="subnav" id="setSub">
+      <button data-s="account" class="on">Account</button>
+      <button data-s="catalog">Product Catalog</button>
+      <button data-s="models">Intelligence models</button>
+      ${isTester()?'<button data-s="tester">Tester tools</button>':''}
+    </div>
+    <div id="setBody"></div></div>`;
+  let tab='account';
+  const paint=()=>{ $$('#setSub button').forEach(b=>b.classList.toggle('on',b.dataset.s===tab));
+    const b=$('#setBody');
+    if(tab==='account') settingsAccount(b);
+    else if(tab==='catalog') settingsCatalog(b);
+    else if(tab==='models') settingsModels(b);
+    else if(tab==='tester') settingsTester(b);
+  };
+  $$('#setSub button').forEach(x=>x.onclick=()=>{tab=x.dataset.s;paint();});
+  paint();
+}
+function settingsAccount(b){
+  const av=ME.avatar?`<img src="${ME.avatar}" style="width:56px;height:56px;border-radius:50%;object-fit:cover">`:`<div class="avatar" style="width:56px;height:56px;font-size:22px">${(ME.name||'R')[0].toUpperCase()}</div>`;
+  b.innerHTML=`
+    ${card(`<div style="display:flex;gap:16px;align-items:center">${av}
+      <div><div style="font-weight:650;font-size:16px">${esc(ME.name||'You')}</div>
+        <div style="color:var(--muted);font-size:13px">${esc(ME.email||'')}</div>
+        <div style="margin-top:6px">${roleBadges()}</div></div>
+      <label class="mbtn" style="margin-left:auto;cursor:pointer">Upload photo<input type="file" id="avFile" accept="image/*" style="display:none"></label></div>`)}
+    <div id="agencyLinkCard"></div>
+    ${ME.is_staff?card(`<div class="sec-h" style="margin-top:0">Realify operator</div><a class="mbtn" href="/ops" target="_blank">Open Operator Console →</a>`):''}
+    ${card(`<div class="sec-h" style="margin-top:0">Team &amp; invites</div>
+      <div style="color:var(--muted);font-size:12.5px;margin-bottom:10px">Everyone you invite joins this organization and shares its data. Invites generate an email you send yourself.</div>
+      <div id="membersList" style="margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><input id="invEmail" type="email" placeholder="teammate@email.com" style="flex:1;min-width:180px;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:13px;background:var(--panel);color:var(--ink)">
+        <select id="invRole" style="border:1px solid var(--line);border-radius:9px;padding:9px 10px;background:var(--panel);color:var(--ink)"><option value="member">Member</option><option value="owner">Owner</option></select>
+        <button class="mbtn primary" id="invBtn">Create invite</button></div>
+      <div id="invOut" style="display:none;margin-top:10px"><textarea id="invBody" readonly style="width:100%;height:90px;border:1px solid var(--line);border-radius:8px;padding:8px;font-size:11.5px;font-family:var(--mono);background:var(--inner);color:var(--ink)"></textarea><button class="mbtn" id="invCopy" style="margin-top:6px">Copy invite</button></div>`)}
+    ${card(`<div class="sec-h" style="margin-top:0">Plan &amp; billing</div><div style="color:var(--muted);font-size:13px;margin-bottom:10px">Manage your subscription, card, and invoices.</div><a class="mbtn" id="billingBtn" href="/api/billing/portal">Manage plan →</a>`)}
+    ${card(`<div class="sec-h" style="margin-top:0">Your reports &amp; COGS</div>
+      <div style="color:var(--muted);font-size:12.5px;margin-bottom:10px">Add or replace channel reports anytime, or update COGS to refresh margins.</div>
+      <a class="mbtn primary" href="/?add-data=1">Add / replace reports</a>
+      <a class="mbtn" href="/api/cogs/template" style="margin-left:6px">COGS template</a>
+      <label class="mbtn" style="margin-left:6px;cursor:pointer">Upload COGS<input type="file" id="cogsFile" accept=".csv,.xlsx,.xlsm" style="display:none"></label>
+      <span id="cogsStat" style="font-size:12px;color:var(--muted);margin-left:8px"></span>`)}
+    ${card(`<div class="sec-h" style="margin-top:0">Change password</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;max-width:420px">
+        <input type="password" id="pwCur" placeholder="Current password" style="flex:1;min-width:160px;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:13px;background:var(--panel);color:var(--ink)">
+        <input type="password" id="pwNew" placeholder="New password" style="flex:1;min-width:160px;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:13px;background:var(--panel);color:var(--ink)">
+        <button class="mbtn primary" id="pwBtn">Update</button></div>
+      <div id="pwMsg" style="font-size:12.5px;margin-top:8px;color:var(--muted)"></div>`)}
+    ${card(`<div class="sec-h" style="margin-top:0">Session</div><button class="mbtn" id="logout2">Log out</button></div>`)}
+    ${card(`<div class="sec-h" style="margin-top:0;color:var(--crit)">Danger zone</div><div style="color:var(--muted);font-size:13px;margin-bottom:10px">Permanently delete this account and its data.</div><button class="mbtn" id="delBtn" style="color:var(--crit);border-color:var(--crit)">Delete account</button>`)}`;
+  $('#avFile').onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
+    rd.onload=()=>fetch('/api/account/avatar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({avatar:rd.result})}).then(r=>r.json()).then(d=>{ if(d.ok){ME.avatar=rd.result; $('#avatarBtn').textContent=''; settingsAccount(b);} else alert(d.error||'Failed');}); rd.readAsDataURL(f); };
+  $('#pwBtn').onclick=async()=>{ const m=$('#pwMsg'); m.style.color='var(--muted)'; m.textContent='Updating…';
+    const r=await fetch('/api/account/password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({current:$('#pwCur').value,new:$('#pwNew').value})}).then(x=>x.json());
+    if(r.ok){ m.style.color='var(--pos)'; m.textContent='Password updated.'; $('#pwCur').value='';$('#pwNew').value=''; } else { m.style.color='var(--crit)'; m.textContent=r.error||'Failed.'; } };
+  $('#logout2').onclick=()=>fetch('/api/logout',{method:'POST'}).then(()=>location.href='/');
+  $('#delBtn').onclick=()=>{ const t=prompt('Type your account name to permanently delete:'); if(t) fetch('/api/account/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirm:t})}).then(r=>r.json()).then(d=>{ if(d.ok) location.href='/'; else alert(d.error||'Failed'); }); };
+  // team & invites
+  loadMembers();
+  $('#invBtn').onclick=async()=>{ const em=$('#invEmail').value.trim(); if(!em) return;
+    const r=await fetch('/api/invites',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,role:$('#invRole').value})}).then(x=>x.json());
+    if(r.ok){ $('#invOut').style.display='block'; $('#invBody').value=(r.subject?'Subject: '+r.subject+'\n\n':'')+(r.body||r.link||''); $('#invEmail').value=''; loadMembers(); }
+    else alert(r.error||'Could not create invite.'); };
+  $('#invCopy').onclick=()=>{ navigator.clipboard.writeText($('#invBody').value); $('#invCopy').textContent='Copied ✓'; };
+  // cogs upload
+  $('#cogsFile').onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const st=$('#cogsStat'); st.textContent='Uploading '+f.name+'…';
+    const fd=new FormData(); fd.append('cogs',f,f.name);
+    fetch('/api/cogs/upload',{method:'POST',body:fd}).then(r=>r.json()).then(d=>{ st.style.color=d.ok?'var(--pos)':'var(--crit)'; st.textContent=d.ok?`Applied ${d.applied||0}${d.rejected?(' · '+d.rejected+' rejected'):''}`:(d.error||'Failed'); }); };
+  // agency console link (if this session is an agency operator)
+  fetch('/api/scope').then(r=>r.json()).then(sc=>{ if(sc&&(sc.agency_scope||sc.agency)) $('#agencyLinkCard').innerHTML=card(`<div class="sec-h" style="margin-top:0">Agency</div><div style="color:var(--muted);font-size:13px;margin-bottom:10px">Operating as ${esc(sc.agency||'your agency')}${sc.envelope?' · '+esc(sc.envelope):''}.</div><a class="mbtn primary" href="/agency/console">← Back to agency console</a>`); }).catch(()=>{});
+}
+async function loadMembers(){
+  const el=$('#membersList'); if(!el) return;
+  try{ const d=await fetch('/api/members').then(r=>r.json());
+    const mem=d.members||[]; const pend=(d.invites||[]).filter(i=>i.status==='pending');
+    el.innerHTML=mem.map(m=>`<div class="cite"><span>${esc(m.email)}</span><span class="pill watch" style="margin-left:auto">${esc(m.role||'member')}</span></div>`).join('')+
+      (pend.length?`<div style="font-size:11px;color:var(--faint);margin:8px 0 4px">Pending invites</div>`+pend.map(i=>`<div class="cite"><span>${esc(i.email)}</span><button class="aact" data-revoke="${i.id}" style="margin-left:auto;padding:3px 8px;font-size:11px">Revoke</button></div>`).join(''):'');
+    el.querySelectorAll('[data-revoke]').forEach(b=>b.onclick=()=>fetch(`/api/invites/${b.dataset.revoke}/revoke`,{method:'POST'}).then(()=>loadMembers()));
+  }catch(e){ el.innerHTML='<div style="color:var(--faint);font-size:12px">—</div>'; }
+}
+let CAT_ROWS=[], CAT_SUM={}, catQuery='';
+async function settingsCatalog(b){
+  b.innerHTML='<div class="emptyfeed">Loading catalog…</div>';
+  let d={}; try{ d=await fetch('/api/skus').then(r=>r.json()); }catch(e){}
+  CAT_ROWS=d.skus||d.rows||(Array.isArray(d)?d:[]); CAT_SUM=d.summary||{};
+  paintCatalog(b);
+}
+function _health(c){ return ({green:'var(--pos)',yellow:'var(--warn)',red:'var(--crit)'})[c]||'var(--line)'; }
+function paintCatalog(b){
+  const sym=_sym(); const sm=CAT_SUM;
+  const q=catQuery.toLowerCase();
+  const rows=CAT_ROWS.filter(r=>!q||(r.sku||'').toLowerCase().includes(q)||(r.title||'').toLowerCase().includes(q));
+  b.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+      <div class="sec-h" style="margin:0">Product Catalog</div>
+      <div style="color:var(--muted);font-size:12.5px">${sm.skus!=null?sm.skus+' SKUs · avg '+ (sm.avg_completeness||0) +'/7 fields · '+(sm.missing_cogs||0)+' missing COGS':''}</div>
+      <button class="mbtn" id="catCsv" style="margin-left:auto">⭳ Export CSV</button>
+      <a class="mbtn primary" href="/?add-data=1">＋ Add / replace reports</a></div>
+    <input id="catSearch" placeholder="Search SKU or title…" value="${esc(catQuery)}" style="width:100%;max-width:320px;border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:13px;margin-bottom:12px;background:var(--panel);color:var(--ink)">
+    <div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">
+    <thead><tr style="text-align:left;color:var(--faint);font-size:11px;text-transform:uppercase;letter-spacing:.05em">
+      <th style="padding:8px 8px 8px 4px"></th><th>SKU</th><th>Title</th><th style="text-align:right">Price</th><th style="text-align:right">COGS</th><th style="text-align:right">Margin</th><th style="text-align:right">Units/mo</th><th style="text-align:right">Buy Box</th></tr></thead>
+    <tbody>${rows.slice(0,300).map((r,i)=>`<tr data-skurow="${CAT_ROWS.indexOf(r)}" style="border-top:1px solid var(--line-2);cursor:pointer">
+      <td style="padding:8px 8px 8px 4px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${_health((r._catalog_derived||{}).health||r.health)}" title="${esc((r._catalog_derived||{}).health_reason||r.health_reason||'')}"></span></td>
+      <td style="font-family:var(--mono);font-size:12px">${esc(r.sku||r.internal_sku||r.asin||'')} ›</td>
+      <td>${r.title?esc(r.title.slice(0,44)):'<span style=\"color:var(--warn)\">⚠ Missing title</span>'}</td>
+      <td style="text-align:right">${r.price!=null?sym+Math.round(r.price):'—'}</td>
+      <td style="text-align:right">${r.cogs!=null?sym+Math.round(r.cogs):'—'}</td>
+      <td style="text-align:right;color:${r.net_margin_pct==null?'var(--faint)':(r.net_margin_pct<0?'var(--crit)':(r.net_margin_pct<15?'var(--warn)':'var(--pos)'))}">${r.net_margin_pct!=null?Math.round(r.net_margin_pct)+'%':'—'}</td>
+      <td style="text-align:right">${r.units_month!=null?r.units_month:'—'}</td>
+      <td style="text-align:right">${r.buybox_pct!=null?Math.round(r.buybox_pct)+'%':'—'}</td></tr>`).join('')||'<tr><td colspan="8" style="padding:16px;color:var(--faint)">No SKUs yet. Add reports to build your catalog.</td></tr>'}</tbody></table></div>`;
+  const srch=$('#catSearch'); srch.oninput=()=>{ catQuery=srch.value; const pos=srch.selectionStart; paintCatalog(b); const s2=$('#catSearch'); s2.focus(); s2.setSelectionRange(pos,pos); };
+  $('#catCsv').onclick=()=>{ fetch('/api/skus/export',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({skus:[]})}).then(r=>r.blob()).then(bl=>{ const u=URL.createObjectURL(bl); const a=document.createElement('a'); a.href=u; a.download='realify-catalog.csv'; a.click(); URL.revokeObjectURL(u); }); };
+  b.querySelectorAll('[data-skurow]').forEach(tr=>tr.onclick=()=>openSkuDrawer(CAT_ROWS[+tr.dataset.skurow], b));
+}
+function openSkuDrawer(s, catBody){
+  if(!s) return; const sym=_sym(); const dv=s._catalog_derived||{};
+  const money=v=>v!=null?sym+Math.round(v).toLocaleString():'—';
+  const gap=(dv.act_acos!=null&&dv.be_acos!=null)?(dv.act_acos>dv.be_acos?`<span class="pill act">▲ ${Math.round(dv.act_acos-dv.be_acos)}% over break-even</span>`:`<span class="pill opp">▼ under break-even ✓</span>`):`<span class="pill watch">No ad data yet</span>`;
+  const mgap=(s.margin_gap!=null)?(s.margin_gap<0?`<span class="pill crit">▼ ${Math.abs(Math.round(s.margin_gap))}% margin leakage</span>`:`<span class="pill opp">on plan</span>`):`<span class="pill watch">Need cost inputs</span>`;
+  const compl=s.completeness||{}; const missing=(compl.missing||[]);
+  $('#modalHost').innerHTML=`<div class="mbg show" id="skuModal"><div class="modal" style="max-width:820px">
+    <div class="mh"><span class="lens">${esc(s.title||s.title_override||'⚠ Missing title')}</span><span class="meta" style="font-family:var(--mono);font-size:11px;color:var(--faint)">${esc(s.sku||s.internal_sku||'')}</span><button class="mx" data-x>&times;</button></div>
+    <div class="mb">
+      <div class="tiles"><div class="tile"><div class="tl">Price</div><div class="tv">${money(s.price)}</div></div>
+        <div class="tile"><div class="tl">COGS</div><div class="tv">${money(s.cogs)}</div></div>
+        <div class="tile acc"><div class="tl">Margin</div><div class="tv">${s.net_margin_pct!=null?Math.round(s.net_margin_pct)+'%':'—'}</div></div>
+        <div class="tile"><div class="tl">Units/mo</div><div class="tv">${s.units_month!=null?s.units_month:'—'}</div></div></div>
+
+      <div class="sec-h">Cost structure</div>
+      <div class="cite"><span>Referral / unit ${(s.referral_est!=null&&s.referral_est!==s.referral_fee)?'<span style="color:var(--faint);font-size:11px">(est '+money(s.referral_est)+')</span>':''}</span><b style="margin-left:auto">${money(s.referral_fee)}</b></div>
+      <div class="cite"><span>FBA / unit ${(s.fba_est!=null&&s.fba_est!==s.fba_fee)?'<span style="color:var(--faint);font-size:11px">(est '+money(s.fba_est)+')</span>':''}</span><b style="margin-left:auto">${money(s.fba_fee)}</b></div>
+      <div class="cite"><span>COGS / unit</span><span style="margin-left:auto;display:flex;gap:6px;align-items:center"><b id="cogsView">${money(s.cogs)}</b><button class="aact" id="cogsEdit" style="padding:3px 8px;font-size:11px">✎ Edit</button></span></div>
+      ${s.cogs_suggested!=null?`<div class="cite" id="aiCogs" style="cursor:pointer;background:var(--accent-bg);border-color:transparent"><span>✨ AI COGS suggestion: <b>${money(s.cogs_suggested)}</b> <span style="color:var(--muted);font-size:11px">${esc(s.cogs_suggested_conf||'')} · tap to accept</span></span></div>`:''}
+      ${s.replacement_units?`<div class="cite"><span>Free replacements</span><b style="margin-left:auto">${s.replacement_units}</b></div>`:''}
+
+      <div class="sec-h">Ads profitability</div>
+      <div class="tiles"><div class="tile"><div class="tl">Break-even ACoS</div><div class="tv">${dv.be_acos!=null?Math.round(dv.be_acos)+'%':'—'}</div></div>
+        <div class="tile"><div class="tl">Actual ACoS</div><div class="tv" style="color:${(dv.act_acos!=null&&dv.be_acos!=null&&dv.act_acos>dv.be_acos)?'var(--crit)':'var(--ink)'}">${dv.act_acos!=null?Math.round(dv.act_acos)+'%':'—'}</div></div></div>
+      <div style="margin-top:8px">${gap}</div>
+
+      <div class="sec-h">Margin reality</div>
+      <div class="tiles"><div class="tile"><div class="tl">Est. at launch (modeled)</div><div class="tv">${dv.est_margin!=null?Math.round(dv.est_margin)+'%':'—'}</div></div>
+        <div class="tile"><div class="tl">Actual (settled)</div><div class="tv">${dv.act_margin!=null?Math.round(dv.act_margin)+'%':'—'}</div></div></div>
+      <div style="margin-top:8px">${mgap}</div>
+
+      <div class="sec-h">Strategy &amp; labels</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <label style="font-size:12px;color:var(--muted)">Lifecycle<br><select id="skLc" style="margin-top:4px;border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:var(--panel);color:var(--ink)">${['','launch','clearance','seasonal','discontinued'].map(v=>`<option value="${v}" ${s.lifecycle_flag===v?'selected':''}>${v||'—'}</option>`).join('')}</select></label>
+        <label style="font-size:12px;color:var(--muted)">Optimize for<br><select id="skOf" style="margin-top:4px;border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:var(--panel);color:var(--ink)">${[['','—'],['cash','Cash Flow'],['margin','Margin'],['growth','Growth']].map(([v,l])=>`<option value="${v}" ${s.optimize_for===v?'selected':''}>${l}</option>`).join('')}</select></label>
+      </div>
+
+      ${missing.length?`<div class="sec-h">Completeness — what's missing</div>${missing.map(m=>`<div class="cite"><span class="sev" style="background:var(--line)"></span><span>Add <b>${esc(m.field)}</b> — unlocks ${esc(m.unlocks||'')}</span></div>`).join('')}`:''}
+
+      <div class="sec-h">Signal graph — the evidence behind the diagnosis</div>
+      <div id="skGraph" class="sgwrap"><div class="sgmuted">Loading the neighbourhood…</div></div>
+    </div>
+    <div class="mf"><button class="mbtn" data-x2>Close</button><div id="skSaved" style="align-self:center;color:var(--pos);font-size:12px"></div></div>
+  </div></div>`;
+  const host=$('#skuModal'); const close=()=>host.remove();
+  host.querySelector('[data-x]').onclick=close; host.querySelector('[data-x2]').onclick=close;
+  host.onclick=e=>{ if(e.target===host) close(); };
+  const flash=()=>{ const f=$('#skSaved'); f.textContent='✓ Saved'; setTimeout(()=>f.textContent='',1500); };
+  const save=(field,value,reopen)=>fetch('/api/skus/edit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sku:s.sku,field,value})}).then(r=>r.json()).then(()=>{ flash(); if(reopen){ settingsCatalog(catBody).then(()=>{ const fresh=CAT_ROWS.find(r=>r.sku===s.sku); if(fresh) openSkuDrawer(fresh,catBody); }); } });
+  $('#cogsEdit').onclick=()=>{ const v=$('#cogsView'); v.innerHTML=`<input id="cogsInp" type="number" value="${s.cogs!=null?s.cogs:''}" style="width:90px;border:1px solid var(--accent);border-radius:6px;padding:3px 6px;background:var(--panel);color:var(--ink)"> <button class="aact" id="cogsSave" style="padding:3px 8px">Save</button>`; $('#cogsSave').onclick=()=>save('cogs',$('#cogsInp').value,true); };
+  const ai=$('#aiCogs'); if(ai) ai.onclick=()=>save('cogs',s.cogs_suggested,true);
+  $('#skLc').onchange=(e)=>save('lifecycle_flag',e.target.value,false);
+  $('#skOf').onchange=(e)=>save('optimize_for',e.target.value,false);
+  loadSkuGraph(s.sku||s.internal_sku);
+}
+
+/* ── SIGNAL-GRAPH NEIGHBOURHOOD (#4) ────────────────────────────────────────────────────────────
+   /api/diagnose returns a CONCLUSION; this renders the EVIDENCE it reasoned over — one hop around
+   the SKU in Neo4j. Built because the graph and the card engine can disagree with no way to see why:
+   the graph called SKU-B0BHSZQG3P bullish while the rules engine flagged 19.3 days of cover. The
+   neighbourhood shows the cause — the graph's only signal there is "Days of cover 15.58 → 19.3 (+24%)"
+   marked GOOD, because it reasons on deltas (cover rose) while the card engine reasons on levels
+   (19.3 days is still thin). Visible beats arguable.
+
+   WHY A TIDY TREE RATHER THAN A NODE CLOUD. The obvious radial force layout is wrong for this data:
+   the median SKU has 30 same-category peer edges, so a circle is a hairball in which the two signals
+   that matter are invisible. The server already collapses peers to one counted node; here the survivors
+   are laid out in fixed, grouped rows — deterministic coordinates, zero collisions at any node count,
+   and the grouping carries the meaning the edge labels otherwise would.
+
+   COLOUR IS NOT LOAD-BEARING. The DLS status tokens --crit and --warn measure ΔE 13.4 for NORMAL
+   vision (3.8 deutan) — genuinely hard to separate. Repainting the app's palette is out of scope, so
+   every node carries a glyph AND states its own direction in text ("Rating 4.29 → 4 (-7%)"), and the
+   table view below repeats it all. Colour is confirmation, never the only channel. */
+const SG_GROUPS=[
+  {key:'why', label:'Why it moved',
+   kinds:['Signal','MarketSignal','BuyBoxLoss','StockoutRisk','NegativeFeedbackCluster','Competitor']},
+  {key:'act', label:'What we forecast and advised', kinds:['Prediction','Recommendation']},
+  {key:'peer',label:'Your own catalogue', kinds:[]},
+  {key:'ctx', label:'Context', kinds:['Channel','Category','Tenant','Marketplace','Listing','Seller',
+                                      'MetricAnomaly','RootCause','Outcome']},
+];
+const SG_TONE={bad:{c:'var(--crit)',g:'▼',w:'adverse'}, watch:{c:'var(--warn)',g:'◆',w:'needs a look'},
+               good:{c:'var(--pos)',g:'▲',w:'improving'}};
+function sgTone(n){ return SG_TONE[n.tone]||{c:(n.structural?'var(--faint)':'var(--accent)'),
+                                             g:(n.structural?'·':'○'), w:(n.structural?'context':'neutral')}; }
+function sgGroupOf(n){
+  if(n.aggregate||n.peer) return 'peer';
+  return (SG_GROUPS.find(g=>g.kinds.includes(n.kind))||{key:'ctx'}).key;
+}
+function sgWrap(s,per,max){                       // SVG text does not wrap; split by words, hard-cap
+  const out=[]; let line='';
+  for(const w of String(s||'').split(/\s+/)){
+    if((line+' '+w).trim().length>per){ if(line) out.push(line); line=w; if(out.length>=max) break; }
+    else line=(line?line+' ':'')+w;
+  }
+  if(line&&out.length<max) out.push(line);
+  if(out.length===max&&String(s).length>out.join(' ').length) out[max-1]=out[max-1].slice(0,per-1)+'…';
+  return out;
+}
+/* Structural nodes of one kind carry almost nothing individually — five "sold on <channel>" rows are
+   five rows saying "you sell on five channels", and they push the signals that matter off-screen. Same
+   argument as the server-side peer collapse, applied client-side because these arrive individually. */
+function sgCollapse(nodes){
+  const out=[], bucket={};
+  for(const n of nodes){
+    if(!n.structural){ out.push(n); continue; }
+    (bucket[n.kind]=bucket[n.kind]||[]).push(n);
+  }
+  for(const [kind,ns] of Object.entries(bucket)){
+    if(ns.length<3){ out.push(...ns); continue; }
+    const names=ns.map(n=>n.title);
+    out.push({...ns[0], id:ns[0].id, count:ns.length, collapsed:names,
+              title:`${ns.length} ${ns[0].label.toLowerCase()}s — ${names.slice(0,3).join(', ')}`
+                    +(names.length>3?` +${names.length-3}`:'')});
+  }
+  return out;
+}
+function sgSVG(d){
+  const nodes=sgCollapse((d.nodes||[]).filter(n=>!n.self)), self=(d.nodes||[]).find(n=>n.self)||{};
+  const byId={}; (d.edges||[]).forEach(e=>{ const k=e.from==='self'?e.to:e.from; byId[k]=e; });
+  const W=760, RX=322, RW=430, RH=27, GAP=5;
+  let y=16; const rows=[];
+  for(const g of SG_GROUPS){
+    const ns=nodes.filter(n=>sgGroupOf(n)===g.key);
+    if(!ns.length) continue;
+    rows.push({hdr:g.label, y:y+11}); y+=25;
+    for(const n of ns){ rows.push({n, y}); y+=RH+GAP; }
+    y+=7;
+  }
+  const H=Math.max(y+8, 200), cy=Math.round(H/2), FX=8, FW=270;
+  const st=sgWrap(self.title,32,3);
+  // 3 stats, rounded, and hard-capped to the card width — at 10.5px mono, 270px holds ~46 chars.
+  // Left unbounded this line ran past the card edge and clipped a number mid-digit ("· 92.2").
+  const props=sgWrap(Object.entries(self.props||{}).slice(0,3)
+    .map(([k,v])=>`${k==='price'?'₹':''}${Math.round(Number(v)*10)/10}${/_pct$/.test(k)?'%':''} `
+                 +`${k.replace(/_pct$/,'').replace(/_/g,' ')}`).join(' · '), 44, 1);
+  // Natural width, NOT width:100% — a 760-unit viewBox squeezed into the 560px drawer scaled every
+  // label to ~66% and letterboxed dead space above and below. It renders at true size and .sgscroll
+  // takes the overflow, per "wide content scrolls in its own container, the page never does".
+  let svg=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img"
+      aria-label="Signal graph neighbourhood for ${esc(d.sku||'')}: ${nodes.length} neighbours">`;
+  // focus card
+  const fh=Math.max(58, 26+st.length*15+(props.length?18:0));
+  svg+=`<rect x="${FX}" y="${cy-fh/2}" width="${FW}" height="${fh}" rx="11" fill="var(--accent-bg)"
+      stroke="var(--accent)" stroke-width="1.5"/>`;
+  st.forEach((l,i)=>{ svg+=`<text x="${FX+13}" y="${cy-fh/2+21+i*15}" font-size="12.5" font-weight="600"
+      fill="var(--accent-ink)">${esc(l)}</text>`; });
+  if(props.length) svg+=`<text x="${FX+13}" y="${cy-fh/2+23+st.length*15}" font-size="10.5"
+      font-family="var(--mono)" fill="var(--muted)">${esc(props[0])}</text>`;
+  // edges first so node cards sit on top
+  for(const r of rows){
+    if(!r.n) continue;
+    const y2=r.y+RH/2, x1=FX+FW, x2=RX, e=byId[r.n.id]||{};
+    svg+=`<path d="M${x1} ${cy} C${x1+62} ${cy}, ${x2-62} ${y2}, ${x2} ${y2}" fill="none"
+        stroke="${r.n.structural?'var(--line)':'var(--line)'}" stroke-width="${r.n.structural?1:1.6}"
+        ${r.n.structural?'stroke-dasharray="3 3"':''} opacity="${r.n.structural?.7:1}"/>`;
+    if(!e.undirected&&!r.n.structural)                            // arrowhead only where direction is real
+      svg+=`<circle cx="${x2-4}" cy="${y2}" r="2.6" fill="var(--line)"/>`;
+  }
+  // group headers + node cards
+  for(const r of rows){
+    if(r.hdr){ svg+=`<text x="${RX}" y="${r.y}" font-size="9.5" font-family="var(--mono)"
+        letter-spacing="1.1" fill="var(--faint)">${esc(r.hdr.toUpperCase())}</text>`; continue; }
+    const n=r.n, t=sgTone(n), e=byId[n.id]||{};
+    const cnt=(n.count>1&&!n.aggregate&&!n.collapsed)?` ×${n.count}`:'';   // title already states it
+    const rel=esc(e.label||''), lbl=sgWrap(n.title+cnt,44,1)[0]||'';
+    svg+=`<g><title>${esc(n.label)} — ${esc(n.title)}${cnt}${e.label?`\n${esc(e.label)} this product`:''}`
+       +`${t.w?`\n${esc(t.w)}`:''}${n.aggregate?`\n${d.summary.flagged_peers} of ${n.count} carry adverse signals`:''}`
+       +`${n.collapsed?`\n${esc(n.collapsed.join(', '))}`:''}</title>`
+       +`<rect x="${RX}" y="${r.y}" width="${RW}" height="${RH}" rx="8" fill="${n.structural?'transparent':'var(--inner)'}"
+          stroke="${n.structural?'var(--line-2)':'var(--line)'}"/>`
+       +`<text x="${RX+11}" y="${r.y+18}" font-size="11.5" font-weight="700" fill="${t.c}">${t.g}</text>`
+       +`<text x="${RX+27}" y="${r.y+18}" font-size="12" fill="${n.structural?'var(--muted)':'var(--ink-2)'}">${esc(lbl)}</text>`
+       +`<text x="${RX+RW-11}" y="${r.y+18}" font-size="9.5" font-family="var(--mono)" text-anchor="end"
+          fill="var(--faint)">${rel}</text></g>`;
+  }
+  return svg+'</svg>';
+}
+function sgHTML(d){
+  const s=d.summary||{}, nodes=(d.nodes||[]).filter(n=>!n.self);
+  const facts=[`${s.neighbours} neighbours`, s.adverse_signals?`${s.adverse_signals} adverse`:null,
+    s.signals?`${s.signals} signal${s.signals===1?'':'s'}`:null, s.forecasts?`${s.forecasts} forecasts`:null,
+    s.peers?`${s.peers} peers`:null, s.competitors?`${s.competitors} rival`:null].filter(Boolean);
+  // LABELLED, and pushed away from the counts. Unlabelled tone chips sat immediately after
+  // "9 neighbours · 1 signal · 14 forecasts", so "▲ improving" read as a VERDICT on the SKU — which
+  // is badly wrong beside an "AT RISK" pill in the risk tab. It only ever means "this tone appears
+  // below at least once".
+  const tones=['bad','watch','good'].filter(k=>nodes.some(n=>n.tone===k));
+  const legend=tones.length?`<span class="sgkey" title="A key to the marks used below — not a verdict on this product.">
+    <span class="sgkeyl">legend</span>${tones.map(k=>
+      `<span class="sgl"><b style="color:${SG_TONE[k].c}">${SG_TONE[k].g}</b> ${SG_TONE[k].w}</span>`).join('')}</span>`:'';
+  const lag=(d.lead_lag||[]).length?`<div class="sgsec">Learned lead-lag</div>`
+    +d.lead_lag.map(L=>`<div class="sglag"><span>${esc(L.from)}</span>
+      <b title="${L.mutual?'Both directions are present in the graph, so this is correlation with an arbitrary direction — not a lead.':'This signal has historically preceded the next.'}">${L.mutual?'⇄':'⇒'}</b>
+      <span>${esc(L.to)}</span>${L.mutual?'<em class="sgmut">both directions — correlation, not a lead</em>':''}</div>`).join(''):'';
+  const table=`<details class="sgtab"><summary>View as a table</summary><table>
+    <thead><tr><th>Type</th><th>Detail</th><th>Link</th><th>State</th></tr></thead><tbody>
+    ${nodes.map(n=>{ const e=(d.edges||[]).find(x=>x.from===n.id||x.to===n.id)||{};
+      return `<tr><td>${esc(n.label)}</td><td>${esc(n.title)}${n.count>1&&!n.aggregate?` ×${n.count}`:''}</td>
+        <td>${esc(e.label||'')}</td><td>${esc(sgTone(n).w)}</td></tr>`; }).join('')}</tbody></table></details>`;
+  return `<div class="sghead"><span class="sgfacts">${esc(facts.join(' · '))}</span>${legend}</div>
+    <div class="sgscroll">${sgSVG(d)}</div>${lag}${table}
+    <div class="sgnote">${esc(d.note||'')}</div>`;
+}
+async function loadSkuGraph(sku, hostEl){
+  const host=hostEl||$('#skGraph'); if(!host||!sku) return;
+  let d=null;
+  try{ d=await fetch('/api/sku-graph?sku='+encodeURIComponent(sku),{credentials:'same-origin'}).then(r=>r.json()); }
+  catch(e){ d=null; }
+  if(!host.isConnected) return;                       // drawer closed while we were fetching
+  if(!d||!d.ok){ host.innerHTML=`<div class="sgmuted">${esc((d&&d.error)||'Signal graph unavailable right now.')}</div>`; return; }
+  host.innerHTML=sgHTML(d);
+}
+async function settingsModels(b){
+  b.innerHTML='<div class="emptyfeed">Loading models…</div>';
+  // RIA 11-domain status panel (registry). Uses /api/models where available; shows the domain catalog + status.
+  // 4th element = the ACTUAL reason a domain is held. A blanket "awaiting production data" was
+  // wrong for Ads: the production data HAS landed (real daily Sponsored-Products spend) — what
+  // fails is out-of-sample validation, which is a different and more honest thing to say.
+  const DOMAINS=[
+    ['Inventory','chronos-2','live'],['Pricing & Buy Box','LightGBM','live'],['Sales','chronos','live'],
+    ['Opportunity / Content','Qwen2.5-VL','live'],['Competitive','signal graph','live'],['News / External','Gemma','live'],
+    ['Risk — Rating','drift forecast','live'],['Margin','rule','rule'],['Cash','rule','rule'],
+    ['Demand — covariates','Moirai','held','Awaiting per-SKU price history — covariates added only +2.2% vs univariate, below the 5% bar.'],
+    ['Ads','EconML DML (held)','held','EconML Double ML is now the active estimator: ~+3.5 units/day per extra ₹1,000/day (95% range +2.0 to +5.1). It halved the naive estimate and removed almost all forecast damage (-60% → -1%). Still held for customers on two counts: it does not yet IMPROVE forecasts (-1% vs a +5% bar), and the reverse test says sales drive spend just as strongly — so we cannot say which way the arrow points. A bid/budget change log fixes the direction problem.']];
+  // The held ads model can be INSPECTED internally. Permission comes from the SERVER
+  // (features.ads_preview = flag AND account_type=='tester'); never from isTester(), which is TRUE
+  // for the demo tenant (tenant_kind='internal') and would expose unvalidated numbers on stage.
+  const adsPreview = !!(ME.features||{}).ads_preview;
+  let dis=[]; try{ const m=await fetch('/api/models').then(r=>r.json()); dis=m.disabled||[]; }catch(e){}
+  const badge={live:['Live','opp'],rule:['Rule','watch'],held:['Held','act']};
+  b.innerHTML=`<div class="sec-h" style="margin-top:0">Intelligence models — 11 feed domains</div>
+    <div style="color:var(--muted);font-size:13px;margin-bottom:12px">What powers your cards, Ask, and Agents. ${isTester()?'Toggle a model to test coverage.':'Status shown; enable/disable is available to Realify testers.'}</div>
+    ${DOMAINS.map(([name,tech,st,why])=>{ const [bl,bc]=badge[st];
+      const reason = why || 'Awaiting production data — no fabricated numbers until it lands.';
+      const canPeek = (name==='Ads' && adsPreview);
+      return `<div class="feedcard" style="cursor:default;padding:12px 15px"><div class="top">
+        <span class="lens">${esc(name)}</span><span class="meta"><span class="pill watch">${esc(tech)}</span> <span class="pill ${bc}">${bl}</span></span></div>
+        ${st==='held'?`<div style="font-size:12px;color:var(--warn);margin-top:6px;line-height:1.5">${esc(reason)}</div>`:''}
+        ${canPeek?`<div style="margin-top:10px;font-size:12px;color:var(--muted)">
+          The interactive model surface now lives on the <b>Ads</b> page, next to the spend it is about —
+          <button class="mbtn" data-goads style="padding:3px 9px;font-size:11.5px">Open Ads</button></div>`:''}</div>`;
+    }).join('')}`;
+  const ga=$('[data-goads]'); if(ga) ga.onclick=()=>go('ads');
+}
+
+/* CVaR AD-BUDGET REALLOCATION (#6) — behind the SAME double lock as the held ads model it rests on.
+   Renders three things, in this order deliberately:
+     1. why none of it is actionable (direction is not identified),
+     2. what the RISK LEVEL does to the decision — the honest headline, because expected-value
+        optimisation puts the whole budget on one SKU and a tail-aware one refuses to,
+     3. the per-SKU plan, with the two flags that discredit individual lines.
+   Tables, not charts: four risk rows and six SKUs are read faster as numbers, and a chart would lend
+   unearned authority to figures whose causal direction we cannot establish. */
+async function adsBudget(btn){
+  const host=$('#adsBudget'); if(!host) return;
+  btn.disabled=true; btn.textContent='Solving…';
+  host.innerHTML='<div style="font-size:12.5px;color:var(--muted);margin-top:10px">Block-bootstrapping each SKU\'s response, then solving the CVaR programme at four risk levels…</div>';
+  let d={};
+  try{ d=await fetch('/api/ad-budget-plan?alpha=0.9',{credentials:'same-origin'}).then(r=>r.json()); }
+  catch(e){ host.innerHTML='<div style="color:var(--crit);font-size:12.5px;margin-top:8px">Could not reach the allocator.</div>';
+            btn.disabled=false; btn.textContent='Reallocate the budget (CVaR)'; return; }
+  btn.disabled=false; btn.textContent='Re-run';
+  const cav=(d.caveats||[]).map(c=>`<li style="margin-bottom:5px">${esc(c)}</li>`).join('');
+  if(!d.ok){ host.innerHTML=`<div style="color:var(--crit);font-size:12.5px;margin:8px 0">${esc(d.error||'No plan.')}</div>
+    ${cav?`<ul style="font-size:11.5px;color:var(--warn);line-height:1.5;padding-left:18px">${cav}</ul>`:''}`; return; }
+  const sym=_sym(), inr=v=>sym+Math.round(v||0).toLocaleString('en-IN');
+  const c=d.compare||{}, dw=d.data_window||{};
+  const maxAbs=Math.max(...(d.rows||[]).map(r=>Math.abs(r.delta_day)),1);
+  const bar=v=>{ const w=Math.round(46*Math.abs(v)/maxAbs);       // diverging: blue up / red down,
+    const col=v>=0?'var(--accent)':'var(--crit)';                 // the CVD-validated pair, not red/green
+    return `<span style="display:inline-block;width:100px;text-align:${v>=0?'left':'right'};direction:${v>=0?'ltr':'rtl'}">
+      <span style="display:inline-block;height:8px;width:${w}px;background:${col};border-radius:2px"></span></span>`; };
+  host.innerHTML=`
+    <div style="border:1px solid var(--crit);background:var(--crit-bg);border-radius:10px;padding:11px 13px;margin:12px 0;font-size:12.5px;line-height:1.55">
+      <b>NOT ACTIONABLE — the direction is not identified.</b> Yesterday's demand predicts today's ad
+      <i>spend</i> as strongly as spend predicts sales, so we cannot tell whether ads cause sales or
+      sales cause ads. Every number below is conditional on the forward direction being the true one.
+      Do not send this to a seller.
+    </div>
+    <div class="sec-h">What the risk level does to the decision</div>
+    <div style="font-size:12.5px;color:var(--muted);margin-bottom:7px">Same ${inr(d.budget_day)}/day.
+      At the far left the optimiser maximises the <i>average</i> outcome; moving right it protects the
+      <i>bad</i> outcomes instead. This is the finding — it changes where the money goes far more than
+      any per-SKU distrust adjustment does.</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+      <thead><tr>${['Risk level','Spent','Held back','SKUs funded','Biggest share','Average/day','Worst-10%/day']
+        .map((h,i)=>`<th style="text-align:${i?'right':'left'};padding:6px 8px;border-bottom:1px solid var(--line);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em">${h}</th>`).join('')}</tr></thead>
+      <tbody>${(d.risk_curve||[]).map(r=>{ const on=Math.abs(r.alpha-d.alpha)<1e-9;
+        return `<tr style="border-bottom:1px solid var(--line-2);${on?'background:var(--accent-bg)':''}">
+          <td style="padding:6px 8px">${r.alpha===0?'Expected value':'α = '+r.alpha}${on?' <b>← shown below</b>':''}</td>
+          <td style="padding:6px 8px;text-align:right">${inr(r.spent_day)}</td>
+          <td style="padding:6px 8px;text-align:right;color:${r.unspent_day>1?'var(--warn)':'var(--faint)'}">${r.unspent_day>1?inr(r.unspent_day):'—'}</td>
+          <td style="padding:6px 8px;text-align:right">${r.skus_funded}</td>
+          <td style="padding:6px 8px;text-align:right">${r.top_share_pct}%</td>
+          <td style="padding:6px 8px;text-align:right">${inr(r.expected)}</td>
+          <td style="padding:6px 8px;text-align:right"><b>${inr(r.tail)}</b></td></tr>`; }).join('')}</tbody>
+    </table>
+    <div class="sec-h">The plan at risk level ${d.alpha} — ${d.scenarios} bootstrap scenarios</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+      <thead><tr>${['SKU','Now','Proposed','Change','','Margin/₹1 of ads','Model skill']
+        .map((h,i)=>`<th style="text-align:${i&&i<6?'right':'left'};padding:6px 8px;border-bottom:1px solid var(--line);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em">${h}</th>`).join('')}</tr></thead>
+      <tbody>${(d.rows||[]).map(r=>`<tr style="border-bottom:1px solid var(--line-2)">
+        <td style="padding:6px 8px;font-family:var(--mono);font-size:11.5px" title="${esc(r.title||'')}">${esc(r.sku)}</td>
+        <td style="padding:6px 8px;text-align:right">${inr(r.current_day)}</td>
+        <td style="padding:6px 8px;text-align:right"><b>${inr(r.proposed_day)}</b>${r.capped?' <span style="color:var(--faint);font-size:10.5px">cap</span>':''}</td>
+        <td style="padding:6px 8px;text-align:right;color:${r.delta_day>=0?'var(--accent-ink)':'var(--crit)'}">${r.delta_day>=0?'+':'−'}${inr(Math.abs(r.delta_day))}</td>
+        <td style="padding:2px 0">${bar(r.delta_day)}</td>
+        <td style="padding:6px 8px;text-align:right">${sym}${r.return_per_rupee.toFixed(2)}${r.implausible_return?' <span style="color:var(--crit)" title="Above ₹3 of margin per ₹1 of spend. This is the fingerprint of reverse causation — the regression crediting ads with demand that was already there — not a great ad account.">⚠</span>':''}</td>
+        <td style="padding:6px 8px">${r.holdout_skill==null?'<span style="color:var(--faint)">—</span>'
+          :`<span style="color:${r.model_worse_than_baseline?'var(--crit)':'var(--pos)'}">${r.holdout_skill>0?'+':''}${r.holdout_skill.toFixed(2)}</span>`
+          }${r.model_worse_than_baseline?' <span style="font-size:10.5px;color:var(--crit)">worse than baseline</span>':''}</td></tr>`).join('')}</tbody>
+    </table>
+    ${(d.held||[]).length?`<div class="sec-h">Left out of the budget</div>
+      ${d.held.map(h=>`<div class="cite"><span>${esc(h.sku)} — ${esc(h.reason)}</span><b style="margin-left:auto">${inr(h.spend_day)}/day</b></div>`).join('')}
+      <div style="font-size:11.5px;color:var(--warn);margin-top:6px">${dw.ad_days_lost_to_stale_transactions||0} of ${dw.ad_days_available||0} ad-days are unusable because the transaction data ends earlier — that, not these products, is why they are excluded.</div>`:''}
+    ${(d.distrust_changed_allocation&&!d.distrust_changed_allocation.changed)?`<div style="font-size:11.5px;color:var(--muted);margin-top:10px">${esc(d.distrust_changed_allocation.note)}</div>`:''}
+    <ul style="font-size:11.5px;color:var(--warn);line-height:1.55;padding-left:18px;margin-top:12px">${cav}</ul>`;
+}
+/* Internal inspection of the HELD ads model. Renders each SKU's association ALONGSIDE the
+   held-out score that disqualifies it — the API returns them together and this never splits them. */
+async function adsPeek(btn){
+  const host=$('#adsPeek'); if(!host) return;
+  btn.disabled=true; btn.textContent='Running…';
+  host.innerHTML='<div style="font-size:12.5px;color:var(--muted);margin-top:10px">Fitting per-SKU response and scoring it on unseen days…</div>';
+  const skus=['SKU-B0DM28PRG7','SKU-B0CWPD2GYG','SKU-B09RFZLVKY','SKU-B0DM29298S','SKU-B0GVHS8BNZ','SKU-B0FL8148V2'];
+  let d={};
+  try{ d=await fetch('/api/run-model',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({domain:'ads',skus})}).then(r=>r.json()); }
+  catch(e){ host.innerHTML='<div style="color:var(--crit);font-size:12.5px">Could not reach the model runner.</div>'; btn.disabled=false; btn.textContent='Inspect held model (internal)'; return; }
+  btn.disabled=false; btn.textContent='Re-run';
+  if(d.error){ host.innerHTML=`<div style="color:var(--crit);font-size:12.5px;margin-top:8px">${esc(d.error)}</div>`; return; }
+  const rows=(d.results||[]).filter(r=>r&&r.ok&&r.run);
+  const get=(r,label)=>{ const o=(r.run.output||[]).find(x=>x.l===label); return o?o.v:'—'; };
+  host.innerHTML=`
+    <div style="border:1px solid var(--crit);background:var(--crit-bg);border-radius:10px;padding:11px 13px;margin:12px 0;font-size:12.5px;line-height:1.55">
+      <b>NOT VALIDATED — internal inspection only.</b> The left column is what the past looks like; the
+      right column is whether it predicted days it had never seen. Negative means the ad term made the
+      forecast <b>worse</b> than ignoring ad spend. Do not quote these to a seller or put them in a deck.
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+      <thead><tr>
+        <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)">SKU</th>
+        <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)">Units per ₹1 <span style="color:var(--muted);font-weight:400">(in-sample)</span></th>
+        <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)">Correlation</th>
+        <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)">Held-out skill</th>
+        <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)">Error w/o → w/ ads</th>
+      </tr></thead>
+      <tbody>${rows.map(r=>{
+        const sk=String(get(r,'Held-out skill (the gate)'));
+        const bad=sk.trim().startsWith('-');
+        return `<tr>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--line-2);font-family:var(--mono);font-size:11.5px">${esc(r.sku)}</td>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--line-2);text-align:right;font-variant-numeric:tabular-nums">${esc(get(r,'Association (units per ₹1)'))}</td>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--line-2);text-align:right;font-variant-numeric:tabular-nums">${esc(get(r,'In-sample correlation'))}</td>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--line-2);text-align:right;font-variant-numeric:tabular-nums;font-weight:650;color:${bad?'var(--crit)':'var(--pos)'}">${esc(sk)}</td>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--line-2);text-align:right;color:var(--muted);font-variant-numeric:tabular-nums">${esc(get(r,'Error without ads / with ads'))}</td>
+        </tr>`;}).join('')||'<tr><td colspan="5" style="padding:10px;color:var(--muted)">No SKU had enough ad history to fit.</td></tr>'}</tbody>
+    </table>
+    <div style="font-size:11.5px;color:var(--muted);margin-top:9px;line-height:1.5">
+      Window 1 Apr – 31 May 2026 (the overlap where real ad spend and real orders both exist).
+      Re-check the gate with <span style="font-family:var(--mono)">python -m ria_forecast.ads_uplift_probe</span>.
+    </div>`;
+}
+
+async function settingsTester(b){
+  b.innerHTML=`
+    ${card(`<div class="sec-h" style="margin-top:0">Resynthesize data</div><div style="color:var(--muted);font-size:13px;margin-bottom:10px">Rebuild this tester account's synthetic world.</div><button class="mbtn" id="resynthBtn">Resynthesize</button> <span id="resynthMsg" style="font-size:12.5px;color:var(--muted)"></span>`)}
+    ${card(`<div class="sec-h" style="margin-top:0">Refresh market data</div><button class="mbtn" id="refreshMktBtn">Refresh market data</button>`)}
+    ${card(`<div class="sec-h" style="margin-top:0">Wipe &amp; re-onboard</div><div style="color:var(--muted);font-size:13px;margin-bottom:10px">Delete all data and start over.</div><button class="mbtn" id="wipeBtn" style="color:var(--crit);border-color:var(--crit)">Wipe &amp; re-onboard</button>`)}`;
+  $('#resynthBtn').onclick=()=>{ $('#resynthMsg').textContent='Resynthesizing…'; fetch('/api/settings/resynthesize',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).then(r=>r.json()).then(d=>$('#resynthMsg').textContent=d.ok?'Started — refresh shortly.':(d.error||'Failed')); };
+  $('#refreshMktBtn').onclick=(e)=>{ e.target.textContent='Refreshing…'; fetch('/api/settings/refresh_market',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).then(()=>e.target.textContent='Refresh market data'); };
+  $('#wipeBtn').onclick=()=>{ if(confirm('Wipe all data and re-onboard?')) fetch('/api/wipe',{method:'POST'}).then(r=>r.json()).then(d=>location.href=(d.redirect||'/')); };
+}
+
+/* ============ INTEGRATIONS ============ */
+async function renderIntegrations(el){
+  el.innerHTML=`<div class="pad" id="intPad"><div class="emptyfeed">Loading integrations…</div></div>`;
+  let reports={}, compl={};
+  try{ reports=await fetch('/api/ingest/reports').then(r=>r.json()); }catch(e){}
+  try{ compl=await fetch('/api/data/completeness').then(r=>r.json()); }catch(e){}
+  const SOURCES=[['Amazon','SP-API + reports','live'],['Shopify','CSV','live'],['TikTok Shop','OAuth','soon'],['Walmart','OAuth','soon']];
+  const pad=$('#intPad');
+  pad.innerHTML=`<div class="brief"><span class="k">Integrations</span><h2>Connect your data — the same uploader you onboarded with.</h2></div>
+    <div class="sec-h" style="margin-top:0">Connect / upload</div>
+    <div class="box" style="background:var(--accent-bg);border:1px solid transparent;margin-bottom:16px">
+      <b>Add or replace reports (CSV).</b> Uses the same recognizer + full pipeline as onboarding — drop any Amazon/Shopify report and it's classified, ingested, and your ads graph rebuilt.
+      <div style="margin-top:10px"><a class="mbtn primary" href="/?add-data=1">Open uploader →</a>
+      <a class="mbtn" href="/api/cogs/template" style="margin-left:6px">Download COGS template</a></div></div>
+    <div class="sec-h">Connected sources</div>
+    ${SOURCES.map(([n,how,st])=>`<div class="feedcard" style="cursor:default;padding:12px 15px"><div class="top">
+      <span class="lens">${esc(n)}</span><span class="meta"><span class="pill watch">${esc(how)}</span> <span class="pill ${st==='live'?'opp':'watch'}">${st==='live'?'Available':'Coming soon'}</span></span></div></div>`).join('')}
+    <div id="complBox"></div>`;
+  // data completeness
+  const items=(compl.items||compl.detectors||[]);
+  if(items.length){ $('#complBox').innerHTML=`<div class="sec-h">Data completeness</div>`+items.slice(0,12).map(it=>`<div class="cite"><span class="sev" style="background:${it.have||it.ok?'var(--pos)':'var(--line)'}"></span><span>${esc(it.label||it.name||it.field||'')}</span><span style="margin-left:auto;color:var(--faint);font-size:12px">${(it.have||it.ok)?'connected':'missing'}</span></div>`).join(''); }
+}
+
+/* ============ ASK ============ */
+let CATS=[], activeCat=null, convId=null, streaming=false;
+let CONVS=[], convFilter='', abortCtl=null, lastQ=null, speakOn=false, audioCtx=null, micOn=false;
+async function loadAsk(){
+  try{ const d=await fetch('/api/ask/categories').then(r=>r.json()); CATS=d.categories||[]; }catch(e){}
+  try{ const m=await fetch('/api/ask/models').then(r=>r.json()); MODELS=m.models||[]; MODEL_ID=m.default; USAGE=m.usage||USAGE; }catch(e){}
+  await loadConvs();
+}
+async function loadConvs(){
+  try{ const d=await fetch('/api/ask/conversations').then(r=>r.json()); CONVS=d.conversations||[]; }catch(e){ CONVS=[]; }
+}
+
+/* ---- minimal markdown (Realify's own renderer, shared with the classic widget) ---- */
+function mdInline(s){ return s
+  .replace(/`([^`]+)`/g,'<code>$1</code>')
+  .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+  .replace(/(^|[^*])\*(?!\s)([^*]+?)\*/g,'$1<em>$2</em>')
+  .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>'); }
+function mdRender(src){
+  // fenced code first, so its contents are never treated as markdown
+  const fences=[]; let text=String(src==null?'':src).replace(/```(\w*)\n?([\s\S]*?)```/g,(m,lang,code)=>{
+    fences.push(`<div class="codewrap"><button class="codecopy" data-code>Copy</button><pre>${esc(code.replace(/\n$/,''))}</pre></div>`);
+    return `\n@@FENCE${fences.length-1}@@\n`; });
+  const L=esc(text).split('\n'); let h='',i=0,list=null;
+  const cl=()=>{ if(list){ h+='</'+list+'>'; list=null; } };
+  while(i<L.length){ const t=L[i].trim();
+    const fm=t.match(/^@@FENCE(\d+)@@$/); if(fm){ cl(); h+=fences[+fm[1]]||''; i++; continue; }
+    if(/^\|.*\|?$/.test(t)&&i+1<L.length&&/^\|?[\s:|-]*-[\s:|-]*\|?$/.test(L[i+1].trim())){ cl();
+      const cells=r=>r.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(c=>c.trim());
+      const head=cells(t); i+=2; let bd='';
+      while(i<L.length&&/^\|.*\|?$/.test(L[i].trim())){ bd+='<tr>'+cells(L[i]).map(x=>'<td>'+mdInline(x)+'</td>').join('')+'</tr>'; i++; }
+      h+='<table><thead><tr>'+head.map(x=>'<th>'+mdInline(x)+'</th>').join('')+'</tr></thead><tbody>'+bd+'</tbody></table>'; continue; }
+    let m;
+    if((m=t.match(/^(#{1,6})\s+(.*)$/))){ cl(); const n=m[1].length; h+='<h'+n+'>'+mdInline(m[2])+'</h'+n+'>'; i++; continue; }
+    if(/^(-{3,}|\*{3,}|_{3,})$/.test(t)){ cl(); h+='<hr>'; i++; continue; }
+    if((m=t.match(/^(?:>|&gt;)\s?(.*)$/))){ cl(); h+='<blockquote>'+mdInline(m[1])+'</blockquote>'; i++; continue; }
+    if((m=t.match(/^[-*+]\s+(.*)$/))){ if(list!=='ul'){cl(); h+='<ul>'; list='ul';} h+='<li>'+mdInline(m[1])+'</li>'; i++; continue; }
+    if((m=t.match(/^\d+\.\s+(.*)$/))){ if(list!=='ol'){cl(); h+='<ol>'; list='ol';} h+='<li>'+mdInline(m[1])+'</li>'; i++; continue; }
+    if(t===''){ cl(); i++; continue; }
+    // do/while: ALWAYS consume the current line before re-testing the guards. A plain `while` can
+    // spin forever mid-stream — a table's header row arrives before its `|---|` separator, so the
+    // table branch misses while the guard below rejects the leading `|`, and `i` never advances.
+    cl(); const p=[];
+    const brk=x=>/^(#{1,6}\s|>|&gt;|[-*+]\s|\d+\.\s|@@FENCE)/.test(x)||/^(-{3,}|\*{3,}|_{3,})$/.test(x);
+    do{ p.push(L[i].trim()); i++; } while(i<L.length&&L[i].trim()!==''&&!brk(L[i].trim()));
+    if(p.length) h+='<p>'+mdInline(p.join('<br>'))+'</p>'; }
+  cl(); return h;
+}
+function wireCode(root){ (root||document).querySelectorAll('[data-code]').forEach(b=>{ if(b._w) return; b._w=1;
+  b.onclick=()=>{ navigator.clipboard.writeText(b.parentElement.querySelector('pre').textContent);
+    b.textContent='Copied'; setTimeout(()=>b.textContent='Copy',1200); }; }); }
+
+/* ---- conversation rail ---- */
+function convGroup(iso){
+  const d=new Date(iso), now=new Date(), day=864e5;
+  const midnight=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+  if(d.getTime()>=midnight) return 'Today';
+  if(d.getTime()>=midnight-day) return 'Yesterday';
+  if(d.getTime()>=midnight-6*day) return 'Previous 7 days';
+  return 'Earlier';
+}
+function renderConvBar(){
+  const bar=$('#convbar'); if(!bar) return;
+  const q=convFilter.trim().toLowerCase();
+  const list=CONVS.filter(c=>!q||(c.title||'').toLowerCase().includes(q));
+  let h='';
+  if(!list.length) h=`<div class="grp" style="padding-top:18px">${q?'No matches':'No conversations yet'}</div>`;
+  let last=null;
+  for(const c of list){ const g=convGroup(c.updated_at||c.created_at);
+    if(g!==last){ h+=`<div class="grp">${g}</div>`; last=g; }
+    h+=`<div class="convitem ${c.id===convId?'on':''}" data-conv="${esc(c.id)}" title="${esc(c.title||'')}">
+      <span class="ct">${esc(c.title||'Conversation')}</span>
+      <button class="cx" data-del="${esc(c.id)}" title="Delete">&times;</button></div>`; }
+  $('#convlist').innerHTML=h;
+  $$('#convlist [data-conv]').forEach(b=>b.onclick=e=>{ if(e.target.dataset.del) return; openConv(b.dataset.conv); });
+  $$('#convlist [data-del]').forEach(b=>b.onclick=async e=>{ e.stopPropagation();
+    if(!confirm('Delete this conversation?')) return;
+    await fetch('/api/ask/conversations/'+b.dataset.del,{method:'DELETE'});
+    if(convId===b.dataset.del) convId=null;
+    await loadConvs(); if(!convId) renderAsk($('#surface')); else renderConvBar(); });
+}
+function convBarHTML(){
+  return `<aside class="convbar" id="convbar">
+    <div class="cvhd"><button class="newchat" id="newChat">＋ New chat</button></div>
+    <input class="convsearch" id="convSearch" placeholder="Search conversations…" value="${esc(convFilter)}">
+    <div class="convlist" id="convlist"></div></aside>`;
+}
+function wireConvBar(){
+  renderConvBar();
+  const nc=$('#newChat'); if(nc) nc.onclick=()=>{ convId=null; renderAsk($('#surface')); };
+  const s=$('#convSearch'); if(s) s.oninput=()=>{ convFilter=s.value; renderConvBar(); };
+}
+function newChat(){ convId=null; renderAsk($('#surface')); }
+function headline(){
+  // reuse a light live thesis: derived client-side from feed count if available, else a warm default
+  const n=ME.name||'there';
+  return `What do you want to know, <span class="hl">${esc(n)}</span>?`;
+}
+function usagePct(){ return Math.min(100, USAGE.pct||0); }
+function renderAsk(el){
+  convId=null;
+  el.innerHTML = `<div class="askwrap">${convBarHTML()}<div class="askmain" id="askmain">
+    <div class="ask-empty">
+    <div class="logo-assemble">
+      <img class="logo-ink" src="/assets/Final-logo-full-Dark-V3.png" alt="Realify">
+      <img class="logo-white" src="/assets/Final-logo-full-white-V3.png" alt="Realify">
+    </div>
+    <h1 class="ask-head">${headline()}</h1>
+    <p class="ask-dek">Ask about your margin, cash, ads, forecasts, or competition — grounded in your real data.</p>
+    ${omniHTML('askOmni')}
+    <div class="cats" id="cats">${CATS.map(c=>`<button class="cat" data-c="${c.id}">${esc(c.label)}</button>`).join('')}</div>
+    <div class="qlist" id="qlist"></div>
+  </div></div></div>`;
+  wireConvBar();
+  wireOmni('askOmni');
+  $$('#cats .cat').forEach(b=>b.onclick=()=>{
+    activeCat = activeCat===b.dataset.c?null:b.dataset.c;
+    $$('#cats .cat').forEach(x=>x.classList.toggle('on',x.dataset.c===activeCat));
+    const c=CATS.find(x=>x.id===activeCat);
+    $('#qlist').innerHTML = c?c.questions.map((q,i)=>`<button class="q" data-qi="${i}">${esc(q)}</button>`).join(''):'';
+    $$('#qlist .q').forEach(qb=>qb.onclick=()=>submit(c.questions[qb.dataset.qi], activeCat));
+  });
+}
+function omniHTML(id){
+  return `<div class="ombox" id="${id}">
+    <div class="usage" style="width:${usagePct()}%"></div>
+    <textarea rows="1" placeholder="Ask anything about your business…"></textarea>
+    <div class="bar">
+      <button class="modelpick" data-mp>${esc((MODELS.find(m=>m.id===MODEL_ID)||{}).label||'Model')} ▾</button>
+      <span class="usage-lbl">${USAGE.used||0}/${USAGE.cap||100} this month</span>
+      <button class="icobtn" data-mic title="Dictate a question" style="margin-left:auto">🎤</button>
+      <button class="icobtn" data-spk aria-pressed="${speakOn}" title="Read answers aloud">🔊</button>
+      <button class="send" data-send title="Send (Enter)">↑</button>
+    </div></div>`;
+}
+function wireOmni(id){
+  const box=$('#'+id); if(!box) return;
+  const ta=box.querySelector('textarea'), send=box.querySelector('[data-send]');
+  ta.addEventListener('focus',()=>box.classList.add('foc')); ta.addEventListener('blur',()=>box.classList.remove('foc'));
+  ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.min(180,ta.scrollHeight)+'px'; send.disabled=!ta.value.trim();});
+  ta.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault(); if(ta.value.trim()) submit(ta.value.trim());} });
+  send.disabled=true; send.onclick=()=>{ if(ta.value.trim()) submit(ta.value.trim()); };
+  box.querySelector('[data-mp]').onclick=(e)=>modelMenu(e.target);
+  const spk=box.querySelector('[data-spk]');
+  spk.onclick=()=>{ unlockAudio(); speakOn=!speakOn; $$('[data-spk]').forEach(b=>b.setAttribute('aria-pressed',speakOn)); };
+  box.querySelector('[data-mic]').onclick=e=>dictate(e.currentTarget, ta);
+}
+function modelMenu(anchor){
+  closeMenus(); const m=document.createElement('div'); m.className='menu'; m.id='mpMenu';
+  m.innerHTML = MODELS.map(x=>`<button data-m="${x.id}">${esc(x.label)} ${x.id===MODEL_ID?'✓':''}<div style="font-size:11px;color:var(--muted)">${esc(x.description||'')} · ${(USAGE.by_model||[]).find(u=>u.id===x.id)?.used||0} used</div></button>`).join('');
+  document.body.appendChild(m); const r=anchor.getBoundingClientRect(); m.style.left=r.left+'px'; m.style.top=(r.bottom+6)+'px';
+  m.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{MODEL_ID=b.dataset.m; closeMenus(); renderSurface();});
+}
+function closeMenus(){ $$('.menu').forEach(m=>m.remove()); }
+
+function ensureChatView(){
+  if($('#chat')) return;
+  const main=$('#askmain');
+  if(main){ main.innerHTML=`<div class="chat" id="chat"></div><div class="chatdock">${omniHTML('dockOmni')}</div>`; }
+  else{ $('#surface').innerHTML=`<div class="askwrap">${convBarHTML()}<div class="askmain" id="askmain">
+      <div class="chat" id="chat"></div><div class="chatdock">${omniHTML('dockOmni')}</div></div></div>`; wireConvBar(); }
+  wireOmni('dockOmni');
+}
+function scroller(){ return $('.surface-wrap'); }
+function nearBottom(){ const s=scroller(); return !s || (s.scrollHeight-s.scrollTop-s.clientHeight)<120; }
+function stickBottom(force){ const s=scroller(); if(s&&(force||nearBottom())) s.scrollTop=s.scrollHeight; }
+function setSending(on){
+  streaming=on;
+  $$('.ombox').forEach(box=>{
+    const send=box.querySelector('[data-send]'); let stop=box.querySelector('[data-stop]');
+    if(on){
+      if(send) send.style.display='none';
+      if(!stop){ stop=document.createElement('button'); stop.className='stop'; stop.dataset.stop='1';
+        stop.textContent='■ Stop'; stop.title='Stop generating';
+        stop.onclick=()=>{ if(abortCtl) abortCtl.abort(); };
+        box.querySelector('.bar').appendChild(stop); }
+    }else{
+      if(stop) stop.remove();
+      if(send){ send.style.display=''; send.disabled=!box.querySelector('textarea').value.trim(); }
+    }
+  });
+}
+
+async function submit(text, category){
+  if(streaming) return;
+  lastQ={text,category};
+  ensureChatView();
+  const chat=$('#chat');
+  chat.insertAdjacentHTML('beforeend', `<div class="turn u"><div class="bub">${esc(text)}</div></div>`);
+  const aid='a'+Date.now();
+  chat.insertAdjacentHTML('beforeend',
+    `<div class="turn a" id="${aid}"><div class="statusline" data-status><span class="sp"></span><span data-stxt>Thinking…</span></div>
+     <div data-live></div><div class="bub"></div></div>`);
+  const turn=$('#'+aid), bub=turn.querySelector('.bub');
+  const status=turn.querySelector('[data-status]'), stxt=turn.querySelector('[data-stxt]'), live=turn.querySelector('[data-live]');
+  stickBottom(true);
+  setSending(true);
+  abortCtl=new AbortController();
+  let msgId=null, parts=[], raw='', calls=[], stopped=false;
+
+  const paintLive=()=>{ // the agent's work, shown as it happens
+    live.innerHTML = calls.length ? `<div class="trace open"><div class="trace-hd" data-tt>⚙︎ <b>Working</b>
+      <span class="tmeta">${calls.length} step${calls.length===1?'':'s'}</span><span class="cv">›</span></div>
+      <div class="trace-bd">${calls.map(traceStepHTML).join('')}</div></div>` : '';
+    wireTrace(live); };
+
+  try{
+    const res=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
+      signal:abortCtl.signal,
+      body:JSON.stringify({message:text, category:category||null, conversation_id:convId, model_id:MODEL_ID})});
+    const reader=res.body.getReader(); const dec=new TextDecoder(); let buf='';
+    while(true){ const {value,done}=await reader.read(); if(done) break; buf+=dec.decode(value,{stream:true});
+      let idx; while((idx=buf.indexOf('\n\n'))>=0){ const line=buf.slice(0,idx).trim(); buf=buf.slice(idx+2);
+        if(!line.startsWith('data:')) continue;
+        let ev; try{ ev=JSON.parse(line.slice(5).trim()); }catch{ continue; }
+        if(ev.type==='meta'){ if(ev.conversation_id) convId=ev.conversation_id; if(ev.message_id) msgId=ev.message_id; }
+        else if(ev.type==='status'){ if(ev.text) stxt.textContent=ev.text; }
+        else if(ev.type==='tool'){ calls.push(ev.call||{}); stxt.textContent=(ev.call&&ev.call.label)||'Running a tool…'; paintLive(); stickBottom(); }
+        else if(ev.type==='verdict'){ stxt.textContent='Verifying every figure…'; }
+        else if(ev.type==='delta'){ if(status.parentNode) status.remove();
+          raw+=ev.text; bub.innerHTML=mdRender(raw)+'<span class="curs"></span>'; stickBottom(); }
+        else if(ev.type==='part'){ parts.push(ev.part); }
+        else if(ev.type==='usage'){ USAGE=ev.usage||USAGE; }
+        else if(ev.type==='error'){ if(status.parentNode) status.remove();
+          bub.innerHTML=`<span style="color:var(--crit)">${esc(ev.message||'Something went wrong.')}</span>`; }
+      } }
+  }catch(e){
+    if(e&&e.name==='AbortError'){ stopped=true; }
+    else { if(status.parentNode) status.remove();
+      bub.innerHTML=`<span style="color:var(--crit)">Something went wrong. Try again.</span>`; }
+  }
+  if(status.parentNode) status.remove();
+  bub.innerHTML = raw ? mdRender(raw) : bub.innerHTML;
+  if(stopped && raw) bub.insertAdjacentHTML('beforeend','<p class="tmeta">Stopped.</p>');
+  live.innerHTML='';                                  // the finished trace re-renders inside renderParts
+  wireCode(bub);
+  setSending(false); abortCtl=null;
+  renderParts(turn, parts, msgId, text);
+  $$('.ombox .usage').forEach(u=>u.style.width=usagePct()+'%');
+  $$('.ombox .usage-lbl').forEach(l=>l.textContent=`${USAGE.used||0}/${USAGE.cap||100} this month`);
+  await loadConvs(); renderConvBar();
+  if(speakOn && raw && !stopped) speak(bub.textContent);
+}
+
+function regenerate(){ if(!lastQ||streaming) return; submit(lastQ.text, lastQ.category); }
+/* one step of the agent trace — for query_cdp this is the actual SQL it wrote */
+function traceStepHTML(c){
+  const bits=[];
+  if(c.row_count!=null) bits.push(`${c.row_count} row${c.row_count===1?'':'s'}`);
+  if(c.backend) bits.push(esc(c.backend));
+  if(c.sku) bits.push(esc(c.sku));
+  if(c.ok===false) bits.push('failed');
+  let h=`<div class="tstep"><b>${esc(c.label||c.name||'Step')}</b>${bits.length?` <span class="tmeta">· ${bits.join(' · ')}</span>`:''}</div>`;
+  if(c.sql) h+=`<div class="sqlblock">${esc(c.sql)}</div>`;
+  if(c.error) h+=`<div class="tstep" style="color:var(--crit)">${esc(c.error)}</div>`;
+  if(c.explanation) h+=`<div class="tstep">${esc(c.explanation)}</div>`;
+  if(c.accuracy) h+=`<div class="tstep tmeta">${esc(c.accuracy)}</div>`;
+  return h;
+}
+function wireTrace(root){ (root||document).querySelectorAll('[data-tt]').forEach(hd=>{ if(hd._w) return; hd._w=1;
+  hd.onclick=()=>hd.closest('.trace').classList.toggle('open'); }); }
+function confHTML(p){
+  const tone=({verified:'var(--pos)',derived:'var(--accent)',estimated:'var(--warn)',inferred:'var(--warn)'})[p.tier]||'var(--muted)';
+  const g=(p.grounded_pct!=null)?`${Math.round(p.grounded_pct)}% of figures traced to your data`:'';
+  const tools=(p.tools||[]).length?` · ${p.tools.length} tool${p.tools.length===1?'':'s'}`:'';
+  return `<div class="conf" title="${esc(p.note||'')}"><span class="dot" style="background:${tone}"></span>
+    <b>${esc(p.label||p.tier||'Checked')}</b>${g?` · ${esc(g)}`:''}${tools}</div>`;
+}
+
+function renderParts(turn, parts, msgId, qtext){
+  let extra='';
+  for(const p of parts){
+    if(p.type==='tool'){
+      const n=(p.calls||[]).length;
+      extra+=`<div class="trace"><div class="trace-hd" data-tt>⚙︎ <b>How I got this</b>
+        <span class="tmeta">${n} step${n===1?'':'s'}${(p.calls||[]).some(c=>c.sql)?' · SQL':''}</span><span class="cv">›</span></div>
+        <div class="trace-bd">${(p.calls||[]).map(traceStepHTML).join('')||'<div class="tstep">No tools were needed.</div>'}</div></div>`;
+    }
+    else if(p.type==='confidence') extra+=confHTML(p);
+    else if(p.type==='tiles') extra+=`<div class="tiles">${p.tiles.map(t=>`<div class="tile ${t.tone==='critical'?'':'acc'}"><div class="tl">${esc(t.label)}</div><div class="tv">${esc(t.value)}</div></div>`).join('')}</div>`;
+    else if(p.type==='citations') extra+=`<div class="cites">${p.items.map(c=>`<div class="cite"><span class="sev" style="background:${sevColor(c.severity)}"></span><span>${esc(c.finding)}</span>${c.exposure_val?`<b style="margin-left:auto">${esc(c.exposure_val)}</b>`:''}</div>`).join('')}</div>`;
+    else if(p.type==='actions') extra+=`<div class="followups">${p.actions.map(a=>`<button class="fu" data-surf="${esc(a.surface||'')}">${esc(a.label)} →</button>`).join('')}</div>`;
+    else if(p.type==='followups') extra+=`<div class="followups">${p.questions.map(q=>`<button class="fu" data-fq="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
+  }
+  extra += `<div class="acts">
+    <button class="aact" data-copy>⧉ Copy</button>
+    <button class="aact" data-speak>🔊 Speak</button>
+    <button class="aact" data-regen>↻ Retry</button>
+    <button class="aact" data-fb="good">👍</button>
+    <button class="aact" data-fb="bad">👎</button>
+    <button class="aact" data-fu>★ Follow-up</button></div>`;
+  turn.insertAdjacentHTML('beforeend', extra);
+  wireTrace(turn); wireCode(turn);
+  const bubText=turn.querySelector('.bub').textContent;
+  turn.querySelectorAll('[data-fq]').forEach(b=>b.onclick=()=>submit(b.dataset.fq));
+  turn.querySelectorAll('[data-surf]').forEach(b=>b.onclick=()=>{ if(b.dataset.surf&&['intel','ads','agents','settings','integrations'].includes(b.dataset.surf)) go(b.dataset.surf); });
+  turn.querySelector('[data-copy]').onclick=e=>{ navigator.clipboard.writeText(bubText);
+    e.target.textContent='⧉ Copied'; setTimeout(()=>e.target.textContent='⧉ Copy',1200); };
+  turn.querySelector('[data-speak]').onclick=()=>{ unlockAudio(); speak(bubText); };
+  turn.querySelector('[data-regen]').onclick=()=>regenerate();
+  const fb=turn.querySelectorAll('[data-fb]');
+  fb.forEach(b=>b.onclick=()=>{ if(!msgId) return;
+    fetch('/api/ask/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message_id:msgId,rating:b.dataset.fb})});
+    fb.forEach(x=>x.classList.remove('on')); b.classList.add('on'); });
+  turn.querySelector('[data-fu]').onclick=(e)=>{ if(!msgId) return;
+    fetch('/api/ask/followup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message_id:msgId,conversation_id:convId,snippet:bubText.slice(0,200)})});
+    e.target.classList.add('on'); e.target.textContent='★ Saved'; };
+}
+function sevColor(s){ return ({crit:'var(--crit)',act:'var(--warn)',opp:'var(--pos)'})[s]||'var(--muted)'; }
+
+/* ---- voice: RIA's own STT/TTS (Meher clone on the DGX), with a graceful local fallback ---- */
+function unlockAudio(){ // must run inside a user gesture or the browser blocks later playback
+  try{ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended') audioCtx.resume(); }catch(e){} }
+async function speak(text){
+  text=(text||'').trim(); if(!text) return;
+  unlockAudio();
+  try{
+    const r=await fetch('/api/voice/tts',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:text.slice(0,700)})});
+    if(!r.ok) throw new Error('tts');
+    const buf=await audioCtx.decodeAudioData(await r.arrayBuffer());
+    const s=audioCtx.createBufferSource(); s.buffer=buf; s.connect(audioCtx.destination); s.start();
+  }catch(e){ // voice service down (it lives on the DGX) — fall back to the platform voice
+    try{ speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(text)); }catch(_){}
+  }
+}
+async function dictate(btn, ta){
+  if(micOn){ micOn=false; return; }
+  if(!navigator.mediaDevices||!window.MediaRecorder){ alert('Dictation needs a browser with microphone support.'); return; }
+  unlockAudio();
+  let stream; try{ stream=await navigator.mediaDevices.getUserMedia({audio:true}); }
+  catch(e){ alert('Microphone blocked — allow mic access to dictate.'); return; }
+  micOn=true; btn.classList.add('rec'); btn.textContent='■';
+  const mr=new MediaRecorder(stream), chunks=[];
+  mr.ondataavailable=e=>{ if(e.data.size) chunks.push(e.data); };
+  mr.onstop=async()=>{
+    stream.getTracks().forEach(t=>t.stop()); micOn=false; btn.classList.remove('rec'); btn.textContent='⏳';
+    try{
+      const r=await fetch('/api/voice/stt',{method:'POST',
+        headers:{'Content-Type':'application/octet-stream','x-audio-ext':'webm'},body:new Blob(chunks,{type:'audio/webm'})});
+      const t=((await r.json()).text||'').trim();
+      if(t){ ta.value=t; ta.dispatchEvent(new Event('input',{bubbles:true})); submit(t); }
+    }catch(e){}
+    btn.textContent='🎤';
+  };
+  mr.start(120);
+  // stop on the next click, or after 15s of recording
+  const stop=()=>{ try{ mr.stop(); }catch(e){} };
+  btn.onclick=()=>{ stop(); btn.onclick=()=>dictate(btn,ta); };
+  setTimeout(()=>{ if(mr.state==='recording') stop(); },15000);
+}
+
+/* ============ right pane ============ */
+const PANE_TABS=[['rules','Rules'],['followups','Follow-ups'],['actions','Action list'],['history','History'],['notifs','Notifications']];
+let paneTab='followups';
+function openPane(){ $('#pane').classList.add('show'); $('#scrim').classList.add('show'); renderPane(); }
+function closePane(){ $('#pane').classList.remove('show'); $('#scrim').classList.remove('show'); }
+function renderPane(){
+  $('#paneTabs').innerHTML = PANE_TABS.map(([k,l])=>`<button class="${paneTab===k?'on':''}" data-pt="${k}">${l}</button>`).join('');
+  $$('#paneTabs [data-pt]').forEach(b=>b.onclick=()=>{paneTab=b.dataset.pt; renderPane();});
+  const body=$('#paneBody'); body.innerHTML='<div class="empty">Loading…</div>';
+  if(paneTab==='followups') fetch('/api/ask/followups').then(r=>r.json()).then(d=>{
+    body.innerHTML=(d.followups||[]).length?d.followups.map(f=>`<div class="li">${esc(f.snippet||'(saved response)')}<div class="m">${new Date(f.created_at).toLocaleString()}</div></div>`).join(''):'<div class="empty">Nothing marked yet. Mark a response with ★ Follow-up.</div>';
+  }).catch(()=>body.innerHTML='<div class="empty">—</div>');
+  else if(paneTab==='history') fetch('/api/ask/conversations').then(r=>r.json()).then(d=>{
+    body.innerHTML=(d.conversations||[]).length?d.conversations.map(c=>`<div class="li" data-conv="${c.id}" style="cursor:pointer">${esc(c.title||'Conversation')}<div class="m">${new Date(c.updated_at).toLocaleString()}</div></div>`).join(''):'<div class="empty">No conversations yet.</div>';
+    body.querySelectorAll('[data-conv]').forEach(b=>b.onclick=()=>openConv(b.dataset.conv));
+  }).catch(()=>body.innerHTML='<div class="empty">—</div>');
+  else if(paneTab==='rules') renderRulesTab(body);
+  else if(paneTab==='actions') fetch('/api/log').then(r=>r.json()).then(d=>{
+    const rows=(d.log||d.entries||(Array.isArray(d)?d:[]));
+    body.innerHTML=rows.length?rows.slice(0,40).map(x=>`<div class="li"><b>${esc(x.title||x.action||'Action')}</b>${x.summary?`<div style="color:var(--muted);margin-top:3px">${esc(x.summary)}</div>`:''}<div class="m">${esc(x.card_type||'')} ${x.ts?new Date(x.ts).toLocaleString():''}</div></div>`).join(''):'<div class="empty">No actions recorded yet. Applying a recommendation logs it here.</div>';
+  }).catch(()=>body.innerHTML='<div class="empty">—</div>');
+  else if(paneTab==='notifs') fetch('/api/log').then(r=>r.json()).then(d=>{
+    const rows=(d.log||d.entries||d||[]); const arr=Array.isArray(rows)?rows:[];
+    body.innerHTML=arr.length?arr.slice(0,30).map(x=>`<div class="li">${esc(x.note||x.message||x.event||JSON.stringify(x).slice(0,80))}<div class="m">${x.at||x.ts||''}</div></div>`).join(''):'<div class="empty">No recent activity.</div>';
+  }).catch(()=>body.innerHTML='<div class="empty">No recent activity.</div>');
+}
+let ruleEdits={};
+async function renderRulesTab(body){
+  body.innerHTML='<div class="empty">Loading detectors…</div>'; ruleEdits={};
+  let d={}; try{ d=await fetch('/api/settings/detectors').then(r=>r.json()); }catch(e){}
+  const dets=d.detectors||[]; const groups=d.groups||[...new Set(dets.map(x=>x.group))];
+  if(!dets.length){ body.innerHTML='<div class="empty">No detectors available.</div>'; return; }
+  body.innerHTML=`<div style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Tune what Realify watches — thresholds, on/off, and how each surfaces. Changes apply to your account.</div>`+
+    groups.map(g=>{ const inG=dets.filter(x=>x.group===g); if(!inG.length) return '';
+      return `<div class="sec-h">${esc(g)}</div>`+inG.map(x=>{
+        const th=x.threshold;
+        return `<div class="li"><div style="display:flex;align-items:center;gap:8px"><b>${esc(x.name)}</b>
+          <label style="margin-left:auto;font-size:11px;color:var(--muted);cursor:pointer"><input type="checkbox" data-det="${esc(x.detector)}" data-enable ${x.enabled?'checked':''}> on</label></div>
+          ${x.watches?`<div style="color:var(--muted);font-size:12px;margin-top:4px">${esc(x.watches)}</div>`:''}
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">
+            ${th?`<label style="font-size:11.5px">Threshold <input type="number" data-det="${esc(x.detector)}" data-thr value="${th.value!=null?th.value:''}" ${th.min!=null?`min="${th.min}"`:''} ${th.max!=null?`max="${th.max}"`:''} step="any" style="width:80px;border:1px solid var(--line);border-radius:6px;padding:3px 6px;background:var(--panel);color:var(--ink)"> ${esc(th.label||'')}</label>`:'<span style="font-size:11.5px;color:var(--faint)">No numeric threshold — on/off only.</span>'}
+            <label style="font-size:11.5px;margin-left:auto">Surface as <select data-det="${esc(x.detector)}" data-sev style="border:1px solid var(--line);border-radius:6px;padding:3px 6px;background:var(--panel);color:var(--ink)">${[['act','Act'],['watch','Watch'],['opp','Opportunity']].map(([v,l])=>`<option value="${v}" ${x.severity===v?'selected':''}>${l}</option>`).join('')}</select></label>
+          </div></div>`;
+      }).join('');
+    }).join('')+
+    `<div style="position:sticky;bottom:0;background:var(--panel);padding-top:10px;margin-top:6px"><button class="mbtn primary" id="rulesApply" style="width:100%">Apply changes &amp; rebuild feed</button><div id="rulesMsg" style="font-size:12px;color:var(--muted);margin-top:6px;text-align:center"></div></div>`;
+  const edit=(det)=>{ ruleEdits[det]=ruleEdits[det]||{...(dets.find(x=>x.detector===det)||{})}; return ruleEdits[det]; };
+  body.querySelectorAll('[data-enable]').forEach(el=>el.onchange=()=>{ edit(el.dataset.det).enabled=el.checked; });
+  body.querySelectorAll('[data-thr]').forEach(el=>el.oninput=()=>{ edit(el.dataset.det).threshold=parseFloat(el.value); });
+  body.querySelectorAll('[data-sev]').forEach(el=>el.onchange=()=>{ edit(el.dataset.det).severity=el.value; });
+  $('#rulesApply').onclick=async()=>{
+    const msg=$('#rulesMsg'); const ids=Object.keys(ruleEdits);
+    if(!ids.length){ msg.textContent='No changes to apply.'; return; }
+    msg.textContent='Applying…';
+    for(const det of ids){ const e=ruleEdits[det]; await fetch('/api/settings/detectors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({detector:det,enabled:e.enabled,severity:e.severity,threshold:e.threshold})}); }
+    await fetch('/api/settings/rebuild',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).catch(()=>{});
+    // poll rebuild status briefly
+    let done=false; for(let i=0;i<30&&!done;i++){ await new Promise(r=>setTimeout(r,400)); try{ const s=await fetch('/api/settings/rebuild/status').then(r=>r.json()); done=s.done||s.idle; }catch(e){ done=true; } }
+    msg.style.color='var(--pos)'; msg.textContent='Rules applied ✓'; ruleEdits={};
+    if(SURFACE==='intel'&&SUB.intel==='intelligence') renderSurface();
+  };
+}
+async function openConv(id){
+  const d=await fetch('/api/ask/conversations/'+id).then(r=>r.json()); if(!d.ok) return;
+  if(SURFACE!=='ask') go('ask');
+  closePane();
+  convId=id;
+  // rebuild the surface so the conversation rail stays alongside the transcript
+  $('#surface').innerHTML = `<div class="askwrap">${convBarHTML()}<div class="askmain" id="askmain">
+    <div class="chat" id="chat"></div><div class="chatdock">${omniHTML('dockOmni')}</div></div></div>`;
+  wireConvBar(); wireOmni('dockOmni');
+  const chat=$('#chat');
+  for(const m of d.messages){
+    if(m.role==='user'){ chat.insertAdjacentHTML('beforeend',`<div class="turn u"><div class="bub">${esc(m.content)}</div></div>`); lastQ={text:m.content,category:m.category}; }
+    else { const aid='h'+Math.random().toString(36).slice(2);
+      chat.insertAdjacentHTML('beforeend',`<div class="turn a" id="${aid}"><div class="bub">${mdRender(m.content)}</div></div>`);
+      renderParts($('#'+aid), m.parts||[], m.id, ''); } }
+  stickBottom(true);
+}
+
+/* ============ profile menu ============ */
+function avatarMenu(){
+  closeMenus(); const m=document.createElement('div'); m.className='menu'; m.id='avMenu';
+  const role=[ME.account_type==='tester'?'Realify tester':null, ME.role==='owner'?'Owner':null].filter(Boolean).join(' · ');
+  m.innerHTML=`<div class="who"><b>${esc(ME.name||'You')}</b><br>${esc(ME.email||'')}<br><span style="color:var(--faint)">${esc(ME.tenant||'')} ${role?'· '+role:''}</span></div><div class="sep"></div>
+    <button data-go="settings">Settings</button>
+    <button data-go="integrations">Integrations</button>
+    <button id="explBtn">Explainability: <span id="explState">off</span></button>
+    <div class="sep"></div>
+    <button id="toLegacy">Switch to classic UI</button>
+    <button id="logoutBtn">Log out</button>`;
+  document.body.appendChild(m); const r=$('#avatarBtn').getBoundingClientRect(); m.style.right='16px'; m.style.top=(r.bottom+8)+'px';
+  m.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{closeMenus();go(b.dataset.go);});
+  m.querySelector('#toLegacy').onclick=()=>{ location.href='/?skin=legacy'; };
+  m.querySelector('#logoutBtn').onclick=()=>fetch('/api/logout',{method:'POST'}).then(()=>location.href='/');
+}
+
+/* ============ boot ============ */
+async function boot(){
+  try{ ME=await fetch('/api/me').then(r=>r.json()); }catch(e){ ME={}; }
+  if(ME&&ME.name) $('#avatarBtn').textContent=(ME.name[0]||'R').toUpperCase();
+  const feat=ME.features||{};
+  if(feat.ask!==false) await loadAsk();
+  renderRail();
+  go(feat.ask!==false ? 'ask' : 'intel');   // Ask is home when enabled; else Intel
+  // freshness label (best-effort)
+  fetch('/api/status').then(r=>r.json()).then(s=>{ if(s&&s.last_at) $('#freshLbl').textContent='updated '+timeAgo(s.last_at); }).catch(()=>{});
+}
+function timeAgo(t){ try{ const d=(Date.now()-new Date(t))/36e5; return d<1?'just now':(d<24?Math.round(d)+'h ago':Math.round(d/24)+'d ago'); }catch(e){ return '—'; } }
+$('#paneBtn').onclick=openPane; $('#paneX').onclick=closePane; $('#scrim').onclick=()=>{closePane();closeMenus();};
+$('#avatarBtn').onclick=avatarMenu;
+$('#themeBtn').onclick=()=>{ const r=document.documentElement; r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'; };
+$('#railToggle').onclick=()=>$('#app').classList.toggle('railmin');
+$('#railBurger').onclick=()=>$('#app').classList.toggle('railopen');
+function gotoAsk(){ if((ME.features||{}).ask===false){ go('intel'); return; } go('ask'); setTimeout(()=>$('.ombox textarea')?.focus(),60); }
+$('#omniMini').onclick=gotoAsk;
+document.addEventListener('keydown',e=>{ if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault(); gotoAsk();} if(e.key==='Escape'){closeMenus();closePane();} });
+document.addEventListener('click',e=>{ if(!e.target.closest('.menu')&&!e.target.closest('#avatarBtn')&&!e.target.closest('[data-mp]')) closeMenus(); });
+if(innerWidth<=720) $('#railBurger').style.display='inline-flex';
+boot();
+</script>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Realify · Tester &amp; Sandbox (restricted)</title>
+<style>
+  :root{
+    --charcoal:#1A1A1A; --sand:#E8DFD0; --terracotta:#C4785B; --slate:#5B7B94;
+    --sage:#7A9E7E; --alert:#B3402E;
+    --paper:#F4F0E8; --panel:#FFFFFF; --ink:#1A1A1A; --muted:#6B6459; --line:#DDD5C6;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55}
+  .mono{font-family:var(--mono)}
+
+  /* ===== mockup shell (navigation around the screens) ===== */
+  #shell{display:flex;min-height:100vh}
+  #nav{width:250px;flex-shrink:0;background:var(--charcoal);color:#EDE7DB;padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto}
+  #nav h1{font-size:15px;margin:0 0 4px;letter-spacing:-.01em}
+  #nav .sub{font-size:11.5px;color:#9C9483;margin-bottom:18px}
+  #nav .actor{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--terracotta);margin:16px 0 6px}
+  #nav button{display:block;width:100%;text-align:left;background:none;border:none;color:#CFC8BA;font-size:13px;
+    padding:7px 10px;border-radius:8px;cursor:pointer;font-family:var(--sans)}
+  #nav button:hover{background:#2A2A2A;color:#fff}
+  #nav button.on{background:var(--terracotta);color:#fff;font-weight:600}
+  #nav .num{display:inline-block;width:20px;color:#8A8272;font-family:var(--mono);font-size:11px}
+  #nav button.on .num{color:#F3D9CD}
+
+  #stage{flex:1;padding:26px 34px 60px;max-width:1100px}
+  .annot{background:#FBF7EF;border:1px dashed var(--terracotta);border-radius:10px;padding:10px 14px;
+    font-size:13px;color:#7A5A47;margin-bottom:18px}
+  .annot b{color:#9C4F30}
+  .screen{display:none}
+  .screen.on{display:block}
+  .flownext{margin-top:22px}
+  .flownext button{background:var(--charcoal);color:#fff;border:none;border-radius:100px;padding:9px 18px;
+    font-size:13px;cursor:pointer}
+  .flownext button:hover{background:#333}
+
+  /* ===== shared mock components ===== */
+  .browser{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    box-shadow:0 2px 6px rgba(26,26,26,.06),0 14px 40px rgba(26,26,26,.07)}
+  .browser .bar{display:flex;align-items:center;gap:8px;background:#EFEAE0;border-bottom:1px solid var(--line);padding:9px 14px}
+  .browser .dots span{display:inline-block;width:9px;height:9px;border-radius:50%;background:#CFC8BA;margin-right:5px}
+  .browser .url{flex:1;background:#fff;border:1px solid var(--line);border-radius:100px;font-family:var(--mono);
+    font-size:11.5px;color:var(--muted);padding:4px 14px}
+  .page{padding:28px 34px}
+
+  .wordmark{font-weight:700;font-size:16px;letter-spacing:-.02em}
+  .wordmark .dot{color:var(--terracotta)}
+  .tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    background:var(--sand);color:#7A6A4F;border-radius:100px;padding:3px 10px;margin-left:10px;vertical-align:middle}
+
+  h2.pg{font-size:24px;margin:18px 0 6px;letter-spacing:-.02em}
+  p.lede{color:var(--muted);margin:0 0 22px;max-width:56ch}
+
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px}
+  .field label .req{color:var(--terracotta)}
+  .field input[type=text],.field input[type=email],.field select,.field textarea{
+    width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:14px;
+    font-family:var(--sans);background:#FDFCF9;color:var(--ink)}
+  .field .hint{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+  .checks{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid var(--line);border-radius:100px;padding:6px 13px;font-size:13px;cursor:pointer;background:#FDFCF9;user-select:none}
+  .chip.sel{background:var(--charcoal);color:#fff;border-color:var(--charcoal)}
+  .btn{display:inline-block;background:var(--terracotta);color:#fff;border:none;border-radius:9px;
+    padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans)}
+  .btn:hover{filter:brightness(.95)}
+  .btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+  .btn.danger{background:#fff;color:var(--alert);border:1px solid var(--alert)}
+  .btn.slate{background:var(--slate)}
+  .btn.sage{background:var(--sage)}
+
+  /* status chips */
+  .st{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.04em;
+    border-radius:100px;padding:3px 10px}
+  .st.new{background:#EAF0F5;color:var(--slate)}
+  .st.appr{background:#EDF3EC;color:#4E7A52}
+  .st.prov{background:#F6E9E2;color:#9C4F30}
+  .st.rej{background:#F5E7E4;color:var(--alert)}
+  .st.wait{background:#F3EFE5;color:#8A7A55}
+
+  table.mock{border-collapse:collapse;width:100%;font-size:13.5px}
+  table.mock th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-weight:600}
+  table.mock td{padding:11px 12px;border-bottom:1px solid #EFEAE0;vertical-align:middle}
+  table.mock tr.click:hover{background:#FBF8F1;cursor:pointer}
+
+  .emailwrap{max-width:620px;margin:0 auto}
+  .email{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .email .ehead{background:#F7F3EA;border-bottom:1px solid var(--line);padding:14px 20px;font-size:13px}
+  .email .ehead div{margin:2px 0}
+  .email .ehead b{display:inline-block;width:62px;color:var(--muted);font-weight:600;font-size:12px}
+  .email .ebody{padding:26px 30px}
+
+  .kv{display:grid;grid-template-columns:180px 1fr;gap:7px 14px;font-size:13.5px}
+  .kv dt{color:var(--muted)}
+  .kv dd{margin:0;font-weight:500}
+
+  .panelbox{background:#FDFCF9;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+  .panelbox h4{margin:0 0 10px;font-size:13px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+  ul.checklist{list-style:none;padding:0;margin:0}
+  ul.checklist li{padding:8px 0 8px 30px;position:relative;border-bottom:1px solid #EFEAE0;font-size:14px}
+  ul.checklist li:last-child{border-bottom:none}
+  ul.checklist li::before{content:"✓";position:absolute;left:2px;top:7px;width:19px;height:19px;border-radius:50%;
+    background:var(--sage);color:#fff;font-size:12px;text-align:center;line-height:19px}
+  ul.checklist li .mono{color:var(--muted);font-size:12px}
+
+  .steps{display:flex;gap:8px;margin-bottom:26px}
+  .steps .s{flex:1;text-align:center;font-size:12px;padding:8px 4px;border-radius:9px;background:#F1ECE1;color:var(--muted);cursor:pointer}
+  .steps .s.on{background:var(--charcoal);color:#fff;font-weight:600}
+  .steps .s.done{background:var(--sand);color:#6B5B3E}
+  .steps .s .n{font-family:var(--mono);font-size:10px;display:block;opacity:.7}
+
+  .envcard{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;background:#FDFCF9}
+  .envcard.sel{border-color:var(--terracotta);background:#FBF3EE;box-shadow:0 0 0 1px var(--terracotta)}
+  .envcard h5{margin:0 0 3px;font-size:14px}
+  .envcard p{margin:0;font-size:12.5px;color:var(--muted)}
+
+  .lensrow{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #EFEAE0;font-size:13.5px}
+  .lensrow:last-child{border-bottom:none}
+  .dial{display:flex;gap:6px}
+  .dial span{font-size:11.5px;border:1px solid var(--line);border-radius:100px;padding:3px 11px;cursor:pointer;background:#fff}
+  .dial span.on{background:var(--slate);color:#fff;border-color:var(--slate)}
+  .dial span.off{opacity:.35;cursor:not-allowed;text-decoration:line-through}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+  .kpi{background:#FDFCF9;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .kpi .v{font-family:var(--mono);font-size:22px;font-weight:600}
+  .kpi .k{font-size:11px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+
+  .banner{background:#EAF0F5;border:1px solid #C9D6E0;border-radius:10px;padding:12px 16px;font-size:13.5px;color:#3E566A;margin-bottom:18px}
+  .banner.sagey{background:#EDF3EC;border-color:#CBDCC9;color:#456A49}
+  .center{text-align:center}
+  .bigcheck{width:58px;height:58px;border-radius:50%;background:var(--sage);color:#fff;font-size:28px;
+    line-height:58px;text-align:center;margin:0 auto 16px}
+  .note-inline{font-size:12px;color:var(--muted)}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .toolbar .search{border:1px solid var(--line);border-radius:100px;padding:7px 16px;font-size:13px;color:var(--muted);background:#FDFCF9;width:260px}
+  .hydema{display:inline-block;width:8px;height:8px;border-radius:50%;background:#D9A441;margin-right:6px;animation:pulse 1.4s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* connection tiles + csv upload */
+  .conn{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #EFEAE0}
+  .conn:last-child{border-bottom:none}
+  .conn .nm{font-weight:600;font-size:13.5px}
+  .conn .nm small{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
+  .conn.soon{opacity:.5}
+  .btn.sm{padding:6px 14px;font-size:12.5px;border-radius:8px}
+  .drop{border:2px dashed #CCC2AE;border-radius:12px;padding:26px 16px;text-align:center;color:var(--muted);background:#FBF9F4;margin-bottom:14px;font-size:13.5px}
+  .drop b{color:var(--ink)}
+
+  /* admin metrics */
+  .meter{height:7px;border-radius:100px;background:#EDE7DA;overflow:hidden;min-width:70px}
+  .meter i{display:block;height:100%;border-radius:100px;background:var(--sage)}
+  .meter.warn i{background:#D9A441}
+  .meter.bad i{background:var(--alert)}
+  .gate{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #EFEAE0;font-size:13.5px}
+  .gate:last-child{border-bottom:none}
+  .gate .g-pass{color:#4E7A52;font-weight:600;font-size:12px}
+  .gate .g-fail{color:var(--alert);font-weight:600;font-size:12px}
+  .gate .g-wait{color:#8A7A55;font-weight:600;font-size:12px}
+  .delta-up{color:#4E7A52;font-family:var(--mono);font-size:11px}
+  .delta-dn{color:var(--alert);font-family:var(--mono);font-size:11px}
+  .prov{font-family:var(--mono);font-size:9px;letter-spacing:.06em;border-radius:100px;padding:2px 7px;
+    background:#EEF0F3;color:#5B6572;margin-left:6px;vertical-align:middle}
+  .prov.att{background:#F8EFDD;color:#8A6A12}
+  .phone{width:344px;margin:0 auto;border:11px solid var(--charcoal);border-radius:38px;overflow:hidden;
+    background:var(--panel);box-shadow:0 18px 50px rgba(26,26,26,.18)}
+  .phone .pstatus{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;
+    color:var(--muted);padding:8px 18px 4px;background:#F7F3EA}
+  .phone .pbody{padding:18px 18px 22px}
+  .btn.full{display:block;width:100%;text-align:center;padding:14px;font-size:15px;margin-bottom:9px}
+
+  /* sandbox / tester */
+  .sandbar{background:repeating-linear-gradient(-45deg,#F3E2C6,#F3E2C6 12px,#EED7B2 12px,#EED7B2 24px);
+    border-bottom:1px solid #DDC391;padding:7px 16px;font-size:12px;color:#6B5320;display:flex;justify-content:space-between;align-items:center}
+  .sandbar b{font-family:var(--mono);letter-spacing:.08em}
+  .persona{border:1px solid var(--line);border-radius:14px;padding:18px;cursor:pointer;background:#FDFCF9;text-align:left}
+  .persona:hover{border-color:var(--terracotta)}
+  .persona .p-role{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--terracotta);margin-bottom:6px}
+  .persona h5{margin:0 0 4px;font-size:15px}
+  .persona p{margin:0;font-size:12.5px;color:var(--muted)}
+  .scenario{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #EFEAE0;font-size:13.5px}
+  .scenario:last-child{border-bottom:none}
+  .script-step{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid #EFEAE0;font-size:13px}
+  .script-step:last-child{border-bottom:none}
+  .script-step .n{font-family:var(--mono);font-size:11px;color:var(--terracotta);font-weight:600}
+  .script-step .who{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+  /* work queue items */
+  .qitem{display:grid;grid-template-columns:92px 1fr auto;gap:14px;align-items:start;padding:14px 16px;
+    border:1px solid var(--line);border-radius:12px;background:#FDFCF9;margin-bottom:10px}
+  .qitem .imp{font-family:var(--mono);font-weight:700;font-size:16px;color:#4E7A52}
+  .qitem .imp small{display:block;font-weight:400;font-size:10px;color:var(--muted);letter-spacing:.04em}
+  .qitem h5{margin:0 0 3px;font-size:14px}
+  .qitem p{margin:0;font-size:12.5px;color:var(--muted)}
+  .qitem .acts{display:flex;gap:6px;align-items:flex-start}
+  .qitem.dim{opacity:.6}
+  .lens{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;background:var(--sand);border-radius:100px;padding:2px 8px;color:#7A6A4F;margin-left:6px;vertical-align:middle}
+  .conf{font-family:var(--mono);font-size:10.5px;color:var(--slate)}
+  .timeline{display:flex;gap:0;margin:18px 0}
+  .timeline .t{flex:1;text-align:center;font-size:12px;color:var(--muted);position:relative;padding-top:20px}
+  .timeline .t::before{content:"";position:absolute;top:5px;left:50%;transform:translateX(-50%);width:11px;height:11px;border-radius:50%;background:#D8CFBC}
+  .timeline .t::after{content:"";position:absolute;top:10px;left:calc(50% + 8px);right:calc(-50% + 8px);height:2px;background:#E5DDCB}
+  .timeline .t:last-child::after{display:none}
+  .timeline .t.done::before{background:var(--sage)}
+  .timeline .t.now::before{background:var(--terracotta);box-shadow:0 0 0 4px #F3DCD0}
+  .timeline .t.now{color:var(--ink);font-weight:600}
+
+  /* ===== dark mode ===== */
+  #themeToggle{position:fixed;bottom:14px;right:14px;z-index:60;font-family:var(--mono);font-size:11px;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--panel);
+    border:1px solid var(--line);border-radius:100px;padding:7px 13px;cursor:pointer}
+  #themeToggle:hover{color:var(--ink)}
+  :root[data-theme="dark"]{
+    --paper:#131110; --panel:#1D1A17; --ink:#EDE7DC; --muted:#A79D8E; --line:#383329;
+    --sand:#2E2820; --terracotta:#D28A68; --slate:#7FA3BC; --sage:#8FB893; --alert:#E07B63;
+  }
+  [data-theme="dark"] .panelbox,[data-theme="dark"] .kpi,[data-theme="dark"] .envcard,
+  [data-theme="dark"] .qitem,[data-theme="dark"] .chip,[data-theme="dark"] .persona{background:#211D18}
+  [data-theme="dark"] .chip.sel{background:#EDE7DC;color:#131110;border-color:#EDE7DC}
+  [data-theme="dark"] .field input,[data-theme="dark"] .field select,[data-theme="dark"] .field textarea,
+  [data-theme="dark"] .gate select{background:#171411;color:var(--ink);border-color:var(--line)}
+  [data-theme="dark"] .browser .bar{background:#161310;border-color:var(--line)}
+  [data-theme="dark"] .browser .dots span{background:#3A342C}
+  [data-theme="dark"] .url{background:#1D1A17;border-color:var(--line)}
+  [data-theme="dark"] .email{background:#1D1A17;border-color:var(--line)}
+  [data-theme="dark"] .email .ehead{background:#171411;border-color:var(--line)}
+  [data-theme="dark"] .annot{background:#271F15;color:#CBA687}
+  [data-theme="dark"] .annot b{color:#DDA477}
+  [data-theme="dark"] .banner{background:#1E2730;border-color:#31404D;color:#A9C4DA}
+  [data-theme="dark"] .banner.sagey{background:#1C2620;border-color:#2E4237;color:#A5C8AB}
+  [data-theme="dark"] .steps .s{background:#221E19;color:var(--muted)}
+  [data-theme="dark"] .steps .s.done{background:#2A2520;color:#C0AE83}
+  [data-theme="dark"] .drop{background:#1A1713;border-color:#4A4235}
+  [data-theme="dark"] .dial span{background:#1D1A17;border-color:var(--line)}
+  [data-theme="dark"] .search{background:#1D1A17;border-color:var(--line)}
+  [data-theme="dark"] .meter{background:#2A251F}
+  [data-theme="dark"] table.mock tr.click:hover{background:#221E19}
+  [data-theme="dark"] td,[data-theme="dark"] ul.checklist li,[data-theme="dark"] .gate,
+  [data-theme="dark"] .conn,[data-theme="dark"] .scenario,[data-theme="dark"] .script-step,
+  [data-theme="dark"] .lensrow,[data-theme="dark"] .card .metric{border-color:#2A251F}
+  [data-theme="dark"] .timeline .t::before{background:#3A342C}
+  [data-theme="dark"] .timeline .t::after{background:#2A251F}
+  [data-theme="dark"] .sandbar{background:repeating-linear-gradient(-45deg,#3A2F17,#3A2F17 12px,#332911 12px,#332911 24px);color:#D9B96A;border-color:#57431C}
+  [data-theme="dark"] .phone .pstatus{background:#171411}
+  [data-theme="dark"] .btn.ghost{color:var(--ink);border-color:var(--line)}
+  [data-theme="dark"] .flownext button{background:#EDE7DC;color:#131110}
+  [data-theme="dark"] [style*="background:#FBF8F1"]{background:#221E19!important}
+  [data-theme="dark"] [style*="background:#FBF3EE"]{background:#2A211B!important;border-color:#4A382E!important}
+  [data-theme="dark"] [style*="background:#F5E7E4"]{background:#2E1B16!important;border-color:#5A3A30!important;color:#E0A79A!important}
+  [data-theme="dark"] [style*="color:#0E4C63"]{color:#8FC4DC!important}
+
+</style>
+</head>
+<body>
+<div id="shell">
+  <nav id="nav">
+    <h1>Realify · Sandbox</h1>
+    <div class="sub">Restricted tester &amp; demo surface<br>Gated by admin key · superlogin</div>
+    <div class="actor">Gate</div>
+    <button data-s="g0" class="on"><span class="num">1</span>Superlogin · realifyai.app</button>
+    <div class="actor">Sandbox · tester &amp; demo</div>
+    <button data-s="s14"><span class="num">2</span>Tester sign-in · personas</button>
+    <button data-s="s15"><span class="num">3</span>Sandbox control &amp; demo scripts</button>
+  </nav>
+  <main id="stage">
+
+  <!-- ============ SUPERLOGIN GATE ============ -->
+  <section class="screen on" id="g0">
+    <div class="annot"><b>Decoupled from the customer flow.</b> Two entry points, both landing here: the direct backdoor <span class="mono">realifyai.app/superlogin</span> (memorable for staff, on a separate domain so it is never guessable from product URLs), and the 🧪 Sandbox button inside the internal admin console. No customer-facing surface links to this page. The admin key alone is not enough — key + staff email + OTP, and every session is ledgered.</div>
+    <div class="browser" style="max-width:560px;margin:0 auto">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">realifyai.app/superlogin</span></div>
+      <div class="page" style="padding:40px 44px">
+        <div class="wordmark">realify<span class="dot">●</span> <span class="tag" style="background:#F5E7E4;color:#7A3527">restricted · staff only</span></div>
+        <h2 class="pg">Sandbox superlogin</h2>
+        <div class="field"><label>Realify staff email</label><input type="email" value="shiva@realify.ai"></div>
+        <div class="field"><label>Admin key</label><input type="text" value="••••••••••••••••••••••••"></div>
+        <div class="field"><label>One-time code (authenticator)</label><input type="text" value="_ _ _  _ _ _"></div>
+        <button class="btn" onclick="go('s14')">Enter sandbox →</button>
+        <ul class="clean" style="margin-top:22px;font-size:13px">
+          <li>Every superlogin session is <b>ledgered</b> — who, when, IP, duration.</li>
+          <li>Sessions expire after <b>8 hours</b>. Key rotates quarterly.</li>
+          <li>This surface reaches <b>sandbox tenants only</b> — production data is not routable from here, by construction.</li>
+          <li>3 failed attempts → lockout + alert to <span class="mono">#security</span>.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s14')">Next: pick a persona →</button></div>
+  </section>
+
+<!-- ============ 14. TESTER SIGN-IN / PERSONA PICKER ============ -->
+  <section class="screen" id="s14">
+    <div class="annot"><b>Why this screen:</b> one email, three grants — the persona picker isn't a special testing hack, it's the tenancy model demoing itself. shiva@realify.ai is a single User holding a Realify-staff membership, an agency-role grant in the sandbox agency, and a brand-owner grant in a sandbox brand. Switching persona switches <i>grants</i>, so every permission rule (envelope ⊗ grant) is exercised for real. Sandbox orgs are ordinary tenants flagged <span class="mono">sandbox: true</span> — same code paths, mock marketplace writes, excluded from billing, metrics, and the Signal Graph.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">app.realify.ai/login</span></div>
+      <div class="sandbar"><span><b>SANDBOX</b> · synthetic data · writes go to mock marketplaces · nightly reset 04:00 PT</span><span>env: staging</span></div>
+      <div class="page">
+        <div class="wordmark">realify<span class="dot">●</span></div>
+        <h2 class="pg">Welcome back, Shiva</h2>
+        <p class="lede">shiva@realify.ai holds grants in 4 sandbox organizations. Choose who to be for this session — you can switch any time from the top bar without signing out.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:760px">
+          <div class="persona" onclick="alert('Opens the product as this persona - see the main flow mockups file')">
+            <div class="p-role">Realify · internal</div>
+            <h5>Realify Admin</h5>
+            <p>Agency ops console — fleet metrics, gates, provisioning, billing. The view VCs never see elsewhere.</p>
+          </div>
+          <div class="persona" onclick="alert('Opens the product as this persona - see the main flow mockups file')">
+            <div class="p-role">Agency · BrightPeak-Sandbox</div>
+            <h5>Client Lead (AM)</h5>
+            <p>Work queue + portfolio console across 8 synthetic brands. Also switchable to Ads Specialist / Analyst to test lesser roles.</p>
+          </div>
+          <div class="persona" onclick="alert('Opens today\'s seller product (five lenses) as a direct brand - no agency involved')">
+            <div class="p-role">Direct Brand · Meridian-Sandbox</div>
+            <h5>Direct Brand Owner</h5>
+            <p>The classic Realify seller — the existing five-lens product, no agency, no engagement. Proves the agency console changed nothing for direct customers, and demos today's product standalone.</p>
+          </div>
+          <div class="persona" onclick="alert('Opens the product as this persona - see the main flow mockups file')">
+            <div class="p-role">Brand · Suncrest-Sandbox</div>
+            <h5>Brand Owner</h5>
+            <p>Portal: consent controls, approvals inbox, the transparent log of everything the agency did.</p>
+          </div>
+        </div>
+        <p class="note-inline" style="margin-top:18px">Every action in any persona lands in the same Autonomy Ledger — so after a demo you can show the audit trail of the demo itself.</p>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s15')">Next: the sandbox control panel →</button></div>
+  </section>
+
+  
+<!-- ============ 15. SANDBOX CONTROL & DEMO SCRIPTS ============ -->
+  <section class="screen" id="s15">
+    <div class="annot"><b>Why this screen:</b> demos die on empty or random data. Scenarios are seeded deterministically (same seed → same book, same numbers) so a rehearsed demo is repeatable to the digit. Event injectors create the "aha" moments live — inject an undercut, switch persona, and the decision appears in the agency queue in seconds. Reset restores the pristine state between meetings.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">admin.realify.ai/sandbox</span></div>
+      <div class="sandbar"><span><b>SANDBOX CONTROL</b> · acting as Realify Admin</span><span>seed: <b>demo-2026Q3-v4</b></span></div>
+      <div class="page">
+        <h2 class="pg" style="margin-top:0">Sandbox control</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+          <div>
+            <div class="panelbox">
+              <h4>Scenario presets (deterministic seeds)</h4>
+              <div class="scenario"><span><b>Pilot agency</b> — 8 brands (5 USD · 3 INR), US+IN, 90d history, 2 AMs<br><span class="note-inline">The BrightPeak story. Default for customer demos — exercises mixed-currency rollups by default.</span></span><span class="st appr">LOADED</span></div>
+              <div class="scenario"><span><b>Enterprise book</b> — 40 brands, mixed health, migration mid-flight</span><button class="btn ghost sm">Load</button></div>
+              <div class="scenario"><span><b>India-based agency</b> — IN agency (en-IN, IST) managing US + IN brands; Flipkart/Shopzee heavy, Diwali approaching; USD invoicing to an Indian entity</span><button class="btn ghost sm">Load</button></div>
+              <div class="scenario"><span><b>Empty book</b> — for testing onboarding flows end-to-end</span><button class="btn ghost sm">Load</button></div>
+              <div style="margin-top:12px"><button class="btn ghost sm">↻ Reset to seed</button> <span class="note-inline">Restores pristine state in ~20s. Auto-reset nightly.</span></div>
+            </div>
+            <div class="panelbox" style="margin-bottom:0">
+              <h4>Event injectors — create the moment live</h4>
+              <div class="scenario"><span>💥 Competitor undercuts Alpine's hero SKU by 8%</span><button class="btn slate sm">Inject</button></div>
+              <div class="scenario"><span>📉 AHR degradation on Corva Audio (suspension risk path)</span><button class="btn slate sm">Inject</button></div>
+              <div class="scenario"><span>📦 Stockout risk on advertised SKU (ads × inventory arbitration)</span><button class="btn slate sm">Inject</button></div>
+              <div class="scenario"><span>💸 Ad overspend vs break-even ACOS on 3 brands (bulk-fix moment)</span><button class="btn slate sm">Inject</button></div>
+              <div class="scenario"><span>💱 FX swing: INR −6% overnight (rollup, ranking &amp; report stability)</span><button class="btn slate sm">Inject</button></div>
+              <div class="scenario"><span>⏩ Advance clock 30 days (ledger accrues, report generates)</span><button class="btn slate sm">Run</button></div>
+            </div>
+          </div>
+          <div>
+            <div class="panelbox">
+              <h4>Demo script · Customer (agency) · ~15 min</h4>
+              <div class="script-step"><span class="n">1</span><span>Morning triage: one queue, 8 clients, $-ranked — approve top 2</span><span class="who">as AM</span></div>
+              <div class="script-step"><span class="n">2</span><span>Inject undercut → watch it arrive in the queue with $ impact</span><span class="who">injector</span></div>
+              <div class="script-step"><span class="n">3</span><span>Bulk bid fix across 3 brands: simulate → canary → apply</span><span class="who">as AM</span></div>
+              <div class="script-step"><span class="n">4</span><span>Switch persona: brand sees the action in its log, approves a co-sign</span><span class="who">as Brand</span></div>
+              <div class="script-step"><span class="n">5</span><span>Generate the white-label report — counterfactual ROI page</span><span class="who">as AM</span></div>
+              <button class="btn" style="margin-top:12px">▶ Start guided run</button>
+            </div>
+            <div class="panelbox" style="margin-bottom:0">
+              <h4>Demo script · VC · ~8 min</h4>
+              <div class="script-step"><span class="n">1</span><span>Admin fleet view: leverage ratio 12.8 → 24.3, the falsifiable bet paying</span><span class="who">as Realify</span></div>
+              <div class="script-step"><span class="n">2</span><span>One agency = 34 accounts, $264k ARR shape, NRR 118%</span><span class="who">as Realify</span></div>
+              <div class="script-step"><span class="n">3</span><span>The moat live: Autonomy Ledger + counterfactual $412k margin proof</span><span class="who">as Realify</span></div>
+              <div class="script-step"><span class="n">4</span><span>60-second persona flip: agency queue → brand transparency → back</span><span class="who">switch</span></div>
+              <div class="script-step"><span class="n">5</span><span>Close on trust: guardrail blocks, break-glass audit, zero-leak record</span><span class="who">as Realify</span></div>
+              <button class="btn" style="margin-top:12px">▶ Start guided run</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('g0')">↻ Back to the gate</button></div>
+  </section>
+
+
+  </main>
+</div>
+<script>
+  function go(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+    document.getElementById(id).classList.add('on');
+    document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.s===id));
+    window.scrollTo({top:0});
+  }
+  document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
+</script>
+
+<script>
+(function(){
+  var b=document.createElement('button');b.id='themeToggle';
+  function apply(t){document.documentElement.setAttribute('data-theme',t);
+    b.textContent=(t==='dark')?'\u25D1 light mode':'\u25D0 dark mode';
+    try{localStorage.setItem('mockTheme',t);}catch(e){}}
+  b.onclick=function(){apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');};
+  document.body.appendChild(b);
+  var saved='light';try{saved=localStorage.getItem('mockTheme')||'light';}catch(e){}
+  apply(saved);
+})();
+</script>
+</body>
+</html>

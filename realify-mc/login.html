@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Realify · Multi-channel build — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#EDEFF3;--ink:#15233B;--ink-2:#33415C;--muted:#5C6B82;--faint:#8A97A8;
+  --line:#DBE0E8;--line-2:#E7EAF0;--competitive:#1E5FA8;--opportunity:#6B4FBB;--positive:#0E7C66;--critical:#B0541A}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Inter";background:var(--paper);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;max-width:430px;width:100%;
+  box-shadow:0 20px 60px rgba(21,35,59,.12);overflow:hidden}
+.head{padding:26px 28px 18px;border-bottom:1px solid var(--line)}
+.logo{font-family:"Space Grotesk";font-weight:700;font-size:22px;letter-spacing:-.01em}
+.logo span{color:var(--competitive)}
+.tag{font-family:"IBM Plex Mono";font-size:11px;color:var(--faint);margin-top:4px;letter-spacing:.04em}
+.body{padding:22px 28px 26px}
+.tabs{display:flex;gap:6px;margin-bottom:18px}
+.tab{flex:1;text-align:center;padding:8px;border:1px solid var(--line);border-radius:9px;background:#fff;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--muted)}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin:12px 0 5px}
+input{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px 13px;font-size:14px;font-family:"Inter"}
+input:focus{outline:none;border-color:var(--competitive)}
+.btn{width:100%;border:none;background:var(--ink);color:#fff;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;margin-top:18px}
+.btn:hover{filter:brightness(1.1)}
+/* async CTA: the button becomes a spinning Realify starburst while working, then reads "Go inside" */
+.btn.btn-working{pointer-events:none;display:flex;align-items:center;justify-content:center}
+.rf-btnlogo{font-size:17px;color:#fff}
+@media (prefers-reduced-motion:reduce){
+  .rf-burst,#rfLogo.proc{animation:none}
+  .rf-btnlogo{animation:rf-fade 1.3s ease-in-out infinite}   /* static logo + subtle opacity pulse fallback */
+}
+@keyframes rf-fade{0%,100%{opacity:.45}50%{opacity:1}}
+.err{color:var(--critical);font-size:12.5px;margin-top:12px;min-height:16px}
+.note{font-size:11.5px;color:var(--faint);margin-top:14px;line-height:1.5}
+/* onboarding */
+.ob{display:none}.ob.show{display:block}.auth.hide{display:none}
+.opt{border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:12px;cursor:pointer}
+.opt:hover{border-color:var(--competitive)}
+.opt.sel{border-color:var(--competitive);background:#f4f8fc}
+.opt h4{font-family:"Space Grotesk";font-size:14.5px;margin-bottom:4px}
+.opt p{font-size:12.5px;color:var(--muted);line-height:1.5}
+.opt .soon{font-family:"IBM Plex Mono";font-size:10px;color:var(--opportunity);text-transform:uppercase;letter-spacing:.05em}
+.spin{display:none;text-align:center;font-family:"IBM Plex Mono";font-size:12.5px;color:var(--muted);padding:14px}
+.spin.show{display:block}
+.prog{display:none;margin-top:16px}
+.prog.show{display:block}
+.pbar{height:8px;background:var(--line-2);border-radius:6px;overflow:hidden}
+.pfill{height:100%;width:0%;background:linear-gradient(90deg,var(--competitive),var(--opportunity));border-radius:6px;transition:width .5s ease}
+.pstage{font-family:"IBM Plex Mono";font-size:12px;color:var(--ink-2);margin-top:9px;text-align:center}
+.joke{margin-top:14px;padding:13px 14px;background:#fff;border:1px solid var(--line);border-radius:10px;
+  font-size:12.5px;color:var(--muted);line-height:1.5;min-height:46px;text-align:center;transition:opacity .4s}
+.joke b{color:var(--ink);font-family:"Space Grotesk"}
+/* ---- onboarding drag-drop upload ---- */
+.chtabs{display:flex;gap:7px;margin:2px 0 12px;flex-wrap:wrap}
+.chtab{font-family:"Space Grotesk";font-size:12.5px;font-weight:600;padding:7px 14px;border:1px solid var(--line);
+  border-radius:9px;background:#fff;color:var(--ink-2);cursor:pointer;transition:all .15s}
+.chtab:hover:not([disabled]){border-color:var(--competitive)}
+.chtab.on{border-color:var(--competitive);background:#f4f8fc;color:var(--ink)}
+.chtab[disabled]{opacity:.5;cursor:not-allowed}
+.chtab .soon{font-family:"IBM Plex Mono";font-size:9px;color:var(--opportunity);text-transform:uppercase;letter-spacing:.05em;margin-left:4px}
+.dropzone{border:1.5px dashed var(--line-2);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;
+  background:#FAFBFD;transition:all .15s;margin-bottom:12px}
+.dropzone:hover,.dropzone.drag{border-color:var(--competitive);background:#f4f8fc}
+.dz-icon{font-size:22px;color:var(--competitive);line-height:1;margin-bottom:6px}
+.dz-main{font-size:13px;color:var(--ink-2);margin-bottom:4px}
+.dz-link{color:var(--competitive);font-weight:600}
+.dz-sub{font-size:11.5px;color:var(--faint);line-height:1.5}
+.dz-sub a{color:var(--competitive)}
+.ob-check{margin:2px 0 8px}
+.ck-row{display:flex;align-items:center;gap:9px;padding:6px 2px;border-top:1px solid var(--line);font-size:12px}
+.ck-row:first-child{border-top:none}
+.ck-box{flex:0 0 17px;width:17px;height:17px;border:1px solid var(--line-2);border-radius:5px;display:flex;
+  align-items:center;justify-content:center;font-size:11px;color:#fff;background:#fff;transition:all .15s}
+.ck-row.on .ck-box{background:var(--positive);border-color:var(--positive)}
+.ck-row.on .ck-lbl{color:var(--ink);font-weight:600}
+.ck-lbl{color:var(--muted);flex:1 1 auto}
+.ck-need{font-family:"IBM Plex Mono";font-size:9px;color:var(--opportunity);text-transform:uppercase;letter-spacing:.04em;margin-left:5px}
+.ck-unlk{font-size:10.5px;color:var(--faint);flex:0 1 auto;text-align:right;max-width:44%}
+.ck-group{margin:0 0 10px}
+.ck-gh{font-family:"IBM Plex Mono";font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin:8px 0 2px}
+.ck-file{font-size:10.5px;color:var(--positive);font-weight:600;word-break:break-all}
+.ob-info{margin:4px 0 12px;display:flex;flex-direction:column;gap:5px}
+.ob-info>div{font-size:11.5px;line-height:1.5;padding:7px 10px;border-radius:8px}
+.obi-ok{background:#eef7f0;color:#1f6b3b}
+.obi-dim{background:#f5f6f8;color:var(--muted)}
+.obi-warn{background:#fdf3e7;color:#9a5b12}
+/* ===== shared "Resolve conflicts" card (inline conflict resolution) — kept in sync with frontend.html ===== */
+.cflt-card{border:1px solid #e2c98a;background:#fffdf6;border-radius:12px;padding:14px 16px;margin:12px 0;min-width:0;max-width:100%;overflow-x:hidden;box-sizing:border-box}
+.cflt-card.cflt-done{border-color:#cfe3d4;background:#f4faf5}
+.cflt-top{min-width:0}
+.cflt-title{font-family:"Space Grotesk";font-weight:700;font-size:13px}
+.cflt-sub{font-size:11.5px;color:var(--faint);margin-top:4px;line-height:1.45}
+.cflt-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.cflt-resolve,.cflt-all,.cflt-apply,.cflt-dl{font-family:"Space Grotesk";font-size:12px;font-weight:600;border-radius:8px;padding:6px 12px;cursor:pointer;border:1px solid var(--line)}
+.cflt-resolve,.cflt-dl{background:#fff;color:var(--ink)}
+.cflt-all,.cflt-apply{background:#15233B;color:#fff;border-color:#15233B}
+.cflt-apply{margin-top:10px}
+.cflt-dlnote{font-size:11px;color:var(--faint);margin-top:8px;line-height:1.45}
+.cflt-detail{margin-top:12px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.cflt{border-top:1px solid #eee;padding-top:12px;min-width:0}
+.cflt-hd{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;min-width:0}
+.cflt-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:0 0 auto}
+.cflt-high{background:#1E7A4D}.cflt-medium{background:#C9A227}
+.cflt-legend{display:flex;flex-direction:column;gap:4px;margin:8px 0;min-width:0}
+.cflt-file{display:flex;align-items:baseline;gap:6px;min-width:0}
+.cflt-tag{flex:0 0 auto;font-weight:700;font-size:11px}
+.cflt-fn{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:"IBM Plex Mono";font-size:10.5px;color:var(--ink-2)}
+.cflt-per{flex:0 0 auto;color:var(--faint);font-family:"IBM Plex Mono";font-size:10px}
+.cflt-metrics{display:flex;flex-direction:column;gap:8px;margin:2px 0 6px;min-width:0}
+.cflt-metric{min-width:0}
+.cflt-mname{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em}
+.cflt-vals{display:flex;flex-wrap:wrap;gap:3px 14px;margin-top:2px;font-size:12.5px}
+.cflt-v{white-space:nowrap}
+.cflt-v b{color:var(--faint);font-weight:600;margin-right:3px}
+.cflt-delta{color:#9a5b12;font-weight:600}
+.cflt-impact{font-size:12px;color:var(--ink);background:#f5f6f8;border-radius:8px;padding:8px 10px;margin:6px 0;min-width:0;line-height:1.45}
+.cflt-opts{display:flex;flex-direction:column;gap:6px;margin:8px 0;min-width:0}
+.cflt-opt{font-size:12.5px;color:var(--ink);cursor:pointer;min-width:0}
+.cflt-optnote{color:var(--faint);font-size:11px}
+.cflt-reason{font-size:11.5px;color:var(--faint);min-width:0;line-height:1.45}
+.cflt-note{color:var(--faint)}
+.obi-load{background:#f5f6f8;color:var(--muted)}
+.ob-reco{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:9px 12px;border-radius:10px;background:#EEF3FB;border:1px solid #D6E2F2;color:#2A4E86;font-size:12.5px;font-weight:500}
+.ob-reco-dot{width:9px;height:9px;border-radius:50%;background:#2A4E86;animation:obpulse 1s ease-in-out infinite}
+@keyframes obpulse{0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+/* processing motif (item 3): subtle logo pulse + a spinning starburst in the status pill while
+   reports are being recognized / ingested. CSS-only, transform-based — no layout shift. */
+@keyframes rf-pulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+@keyframes rf-spin{to{transform:rotate(360deg)}}
+#rfLogo{transform-origin:center}
+#rfLogo.proc{animation:rf-pulse 1.4s ease-in-out infinite}
+.rf-burst{display:inline-block;flex:0 0 auto;font-size:13px;line-height:1;color:#2A4E86;animation:rf-spin 1.15s linear infinite}
+/* dad-jokes panel above the FAQ (item 2) — baked-in rotation, matches the card styling */
+.dadjoke{max-width:780px;margin:0 auto 30px;padding:0 24px}
+.dadjoke-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:0 2px 10px rgba(21,35,59,.04);text-align:center}
+.dj-eyebrow{font-family:"IBM Plex Mono";font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin-bottom:8px}
+.dj-text{font-size:14px;color:var(--muted);line-height:1.55;min-height:44px;transition:opacity .4s}
+.dj-text b{color:var(--ink);font-family:"Space Grotesk"}
+.dj-btn{margin-top:12px;font-family:"Space Grotesk";font-size:12.5px;font-weight:600;color:var(--competitive);background:#f4f8fc;border:1px solid var(--line);border-radius:9px;padding:7px 14px;cursor:pointer;transition:all .15s}
+.dj-btn:hover{border-color:var(--competitive)}
+/* ---- hero + FAQ landing ---- */
+body{display:block;padding:0}
+.hero{min-height:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:48px 24px 18px}
+.faq{max-width:780px;margin:0 auto;padding:6px 24px 90px}
+.faq-h{font-family:"Space Grotesk";font-size:25px;text-align:center;margin-bottom:6px;letter-spacing:-.01em}
+.faq-sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:26px}
+.qa{background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden;box-shadow:0 2px 10px rgba(21,35,59,.04)}
+.qa>summary{list-style:none;cursor:pointer;padding:16px 20px;font-family:"Space Grotesk";font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--ink)}
+.qa>summary::-webkit-details-marker{display:none}
+.qa>summary::after{content:"+";color:var(--competitive);font-size:22px;font-weight:400;line-height:1;transition:transform .2s}
+.qa[open]>summary::after{content:"\2212"}
+.qa .a{padding:0 20px 18px;font-size:13.5px;line-height:1.66;color:var(--ink-2)}
+.qa .a b{color:var(--ink)}
+.viz{margin:14px 0 4px;border:1px solid var(--line-2);border-radius:11px;background:#FAFBFD;padding:16px 14px;overflow:hidden}
+.viz-cap{font-family:"IBM Plex Mono";font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-top:10px;text-align:center}
+/* two-plane flow (Q2) */
+.flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.flow .stage{flex:1;min-width:120px;border-radius:10px;padding:11px 12px;color:#fff;text-align:center}
+.flow .s1{background:var(--ink)} .flow .s2{background:linear-gradient(135deg,#1E5FA8,#0E7C66)} .flow .s3{background:#6B4FBB}
+.flow .stage .t{font-family:"Space Grotesk";font-weight:600;font-size:12.5px}
+.flow .stage .d{font-size:10.5px;opacity:.85;margin-top:3px;line-height:1.35}
+.flow .arr{font-size:18px;color:var(--faint);animation:pulseArr 2.4s infinite}
+@keyframes pulseArr{0%,100%{opacity:.3;transform:translateX(0)}50%{opacity:1;transform:translateX(3px)}}
+/* mini feed (Q1) */
+.mfeed{display:flex;flex-direction:column;gap:8px}
+.mcard{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:#fff;opacity:0;transform:translateY(8px)}
+.viz.in .mcard{animation:cardIn .5s forwards}
+.viz.in .mcard:nth-child(1){animation-delay:.05s}.viz.in .mcard:nth-child(2){animation-delay:.55s}.viz.in .mcard:nth-child(3){animation-delay:1.05s}
+@keyframes cardIn{to{opacity:1;transform:translateY(0)}}
+.mdot{width:9px;height:9px;border-radius:50%;flex:none}
+.mtitle{font-size:11.5px;font-weight:600;color:var(--ink);flex:1}
+.mmetric{font-family:"IBM Plex Mono";font-size:11px;color:var(--muted)}
+/* explainability reveal (Q3) */
+.layers{display:flex;flex-direction:column;gap:7px}
+.layer{border-left:3px solid;border-radius:6px;background:#fff;border:1px solid var(--line);padding:8px 11px;opacity:0;transform:translateX(-6px)}
+.viz.in .layer{animation:layerIn .5s forwards}
+.viz.in .layer:nth-child(1){animation-delay:.1s}.viz.in .layer:nth-child(2){animation-delay:.7s}.viz.in .layer:nth-child(3){animation-delay:1.3s}
+@keyframes layerIn{to{opacity:1;transform:translateX(0)}}
+.layer .lk{font-family:"IBM Plex Mono";font-size:9.5px;text-transform:uppercase;letter-spacing:.05em}
+.layer .lv{font-size:12px;color:var(--ink-2);margin-top:2px}
+/* completeness (Q7) */
+.comp{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.cpill{font-size:10px;text-align:center;padding:6px 4px;border-radius:7px;border:1px solid var(--line);color:var(--muted)}
+.cpill.on{background:#e7f4ee;border-color:#b9dccb;color:var(--positive);font-weight:600}
+/* music toggle */
+#musicBtn{position:fixed;top:16px;right:16px;z-index:60;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(21,35,59,.10);display:flex;align-items:center;justify-content:center;color:var(--ink)}
+#musicBtn:hover{border-color:var(--competitive)}
+#musicBtn svg{width:18px;height:18px}
+.scrollcue{text-align:center;margin-top:8px;font-size:12px;color:var(--faint);animation:pulseArr 2.4s infinite}
+</style></head>
+<body>
+<button id="musicBtn" title="Ambient sound" aria-label="Toggle ambient sound">
+  <svg id="musicIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+</button>
+<div class="hero">
+<div class="card">
+  <div class="head"><div class="logo"><img id="rfLogo" src="/assets/logo.png" alt="Realify" style="height:30px;width:auto;display:block"></div>
+    <div class="tag">COMMERCE INTELLIGENCE</div></div>
+  <div class="body">
+    <!-- AUTH -->
+    <div class="auth" id="auth">
+      <div id="joinBanner" style="display:none;background:#eef7f2;border:1px solid #b9dccb;border-radius:9px;padding:10px 12px;margin-bottom:12px;font-size:12.5px;color:#0F6E4F"></div>
+      <div class="tabs"><div class="tab on" data-m="login">Log in</div><div class="tab" data-m="signup">Sign up</div></div>
+      <div id="acctWrap" style="display:none"><label>Account / brand name</label><input id="acct" placeholder="e.g. Autofy"></div>
+      <label>Email</label><input id="email" type="email" placeholder="you@brand.com">
+      <label>Password</label><input id="pw" type="password" placeholder="••••••••">
+      <button class="btn" id="go">Log in</button>
+      <div class="err" id="err"></div>
+      <div class="note" id="note">Testers welcome — sign up, choose synthesized data, and you'll see a full insights feed in seconds. You can wipe and start over anytime.</div>
+    </div>
+    <!-- ONBOARDING -->
+    <div class="ob" id="ob">
+      <a href="#" class="backLink" data-back="1" style="font-size:12px;color:var(--muted);text-decoration:none;display:inline-block;margin-bottom:10px">← Choose a different account type</a>
+      <h4 style="font-family:'Space Grotesk';font-size:16px;margin-bottom:4px">Add your products</h4>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px">Start with demo SKUs, or upload your own. We build a full dataset and insights from them.</p>
+
+      <div class="opt sel" id="optDemo" data-src="sample">
+        <h4>Use demo SKUs <span class="soon">quick start</span></h4>
+        <p>Start instantly with the bundled Autofy catalog (44 real auto-accessory SKUs).</p>
+      </div>
+
+      <div class="opt" id="optUpload" data-src="upload">
+        <h4>Connect my stores</h4>
+        <p>Upload each store's catalog/listings export (CSV or Excel) — same channels as your workspace. We map the columns and synthesize the rest. Only a <b>SKU/ASIN</b> column is required.</p>
+        <div id="uploadArea" style="display:none;margin-top:10px">
+          <div id="obChannelGrid"></div>
+          <div style="font-size:11px;color:var(--faint);margin-top:8px">
+            <a href="#" id="tmpl" style="color:var(--competitive)">Download CSV template</a> ·
+            <span id="seedStat"></span>
+          </div>
+        </div>
+      </div>
+
+      <div id="ctryWrap" style="margin:4px 0 14px">
+        <label style="display:block;font-size:12px;color:var(--muted);margin-bottom:5px">Marketplace</label>
+        <select id="country" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fff">
+          <option value="IN" selected>India — amazon.in (₹)</option>
+          <option value="US">United States — amazon.com ($)</option>
+        </select>
+      </div>
+
+      <button class="btn" id="provision">Use demo SKUs</button>
+      <div class="prog" id="prog">
+        <div class="pbar"><div class="pfill" id="pfill"></div></div>
+        <div class="pstage" id="pstage">Starting…</div>
+      </div>
+      <div class="err" id="oberr"></div>
+      <div class="note" style="margin-top:14px">Full Seller Central &amp; Shopify report upload (sales, orders, settlements, returns, inventory) is coming next — for now we synthesize a realistic dataset from your ASINs.</div>
+      <div class="joke" id="joke" style="display:none"></div>
+    </div>
+
+    <!-- ACCOUNT TYPE GATE -->
+    <div class="ob" id="gate">
+      <a href="#" id="gateBack" style="font-size:12px;color:var(--muted);text-decoration:none;display:inline-block;margin-bottom:10px">← Log out</a>
+      <h4 style="font-family:'Space Grotesk';font-size:16px;margin-bottom:4px">How will you use Realify?</h4>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px">You can switch back anytime before you set up your data. Once your data is provisioned, the choice is locked to this account.</p>
+      <div class="opt" id="optTester">
+        <h4>I'm a tester <span class="soon">demo &amp; synthetic</span></h4>
+        <p>Explore with the bundled demo catalog, or upload an ASIN list and we synthesize a full dataset. You can wipe and resynthesize anytime.</p>
+      </div>
+      <div class="opt" id="optCustomer">
+        <h4>I'm a customer <span class="soon">my real data</span></h4>
+        <p>Upload your real reports (sales, orders, inventory, returns, settlements) and a COGS file. Nothing is synthesized — you see only what your data supports. No wipe/resynthesize.</p>
+      </div>
+      <div class="err" id="gateErr"></div>
+    </div>
+
+    <!-- CUSTOMER ONBOARDING -->
+    <div class="ob" id="obCustomer">
+      <a href="#" class="backLink" data-back="1" style="font-size:12px;color:var(--muted);text-decoration:none;display:inline-block;margin-bottom:10px">← Choose a different account type</a>
+      <a href="/" id="addCancel" style="display:none;font-size:12px;color:var(--muted);text-decoration:none;margin-bottom:10px">← Cancel · back to dashboard</a>
+      <h4 id="obCustHead" style="font-family:'Space Grotesk';font-size:16px;margin-bottom:4px">Connect your data</h4>
+      <p id="obCustSub" style="font-size:12.5px;color:var(--muted);margin-bottom:14px">Upload one or more reports per channel. We map columns and use only what you provide — no synthesis. A catalog/listings export and a COGS file are required to start.</p>
+
+      <div id="obWizEntry" style="margin:0 0 14px">
+        <button class="btn" id="wizardStart" style="margin-top:0;background:var(--opportunity)">✦ Set up with a guided wizard</button>
+        <div style="font-size:11.5px;color:var(--faint);margin-top:6px">Answer a few questions and we'll build your exact file checklist. Or just drop files below — we recognize them either way.</div>
+      </div>
+      <div id="obWizard" style="display:none;border:1px solid var(--line);border-radius:12px;padding:14px;margin:0 0 14px;background:#fff"></div>
+
+      <div id="obReco" class="ob-reco" style="display:none"><span class="rf-burst">✳</span> <span>Recognizing your reports…</span></div>
+
+      <div style="margin:4px 0 14px">
+        <label style="display:block;font-size:12px;color:var(--muted);margin-bottom:5px">Marketplace</label>
+        <select id="custCountry" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fff">
+          <option value="IN" selected>India — amazon.in (₹)</option>
+          <option value="US">United States — amazon.com ($)</option>
+        </select>
+      </div>
+
+      <div class="chtabs" id="obChTabs"></div>
+
+      <div class="dropzone" id="obDrop">
+        <input type="file" id="obFiles" accept=".csv,.tsv,.xlsx,.xls,.xlsm" multiple style="display:none">
+        <div class="dz-icon">⤓</div>
+        <div class="dz-main">Drag &amp; drop your reports here, or <span class="dz-link">choose files</span></div>
+        <div class="dz-sub">Drop as many as you like — we recognize each one. <a href="#" id="cogsTmpl">Download the COGS template</a></div>
+      </div>
+
+      <div id="obChecklist" class="ob-check"></div>
+      <div id="obInfo" class="ob-info"></div>
+      <div id="obConflicts"></div>
+
+      <button class="btn" id="custProvision" disabled>Connect my data</button>
+      <div class="prog" id="custProg">
+        <div class="pbar"><div class="pfill" id="custFill"></div></div>
+        <div class="pstage" id="custStage">Starting…</div>
+      </div>
+      <div class="err" id="custErr"></div>
+    </div>
+  </div>
+</div>
+<div class="scrollcue">↓ Questions? Scroll for answers</div>
+</div><!-- /hero -->
+
+<!-- dad-jokes panel — baked-in rotation, sits directly above the FAQ heading (item 2) -->
+<div class="dadjoke">
+  <div class="dadjoke-card">
+    <div class="dj-eyebrow">✳ While that uploads… a dad joke</div>
+    <div class="dj-text" id="djText"></div>
+    <button class="dj-btn" id="djBtn" type="button">Another one →</button>
+  </div>
+</div>
+
+<section class="faq">
+  <div class="faq-h">FAQs (Frequently Asked Questions)</div>
+  <div class="faq-sub">What Realify does, how it works, and how to try it before you commit your data.</div>
+
+  <details class="qa" open>
+    <summary>I sell on Amazon, Shopify, Walmart, and more. How does Realify help me?</summary>
+    <div class="a">
+      You already have the data — it's just scattered across a dozen dashboards and exports, and the signal that matters is buried in it. Realify reads your channels and surfaces the handful of things worth acting on <b>today</b>: a SKU quietly slipping below its margin floor, buy box you're losing, inventory about to stock out before your next reorder lands, returns creeping up, ad spend outrunning its return. Each issue arrives as a prioritized card with the numbers behind it and a recommended move. It's the difference between <b>reacting</b> to last month's report and <b>acting</b> on this week's risk — across every channel, in one place.
+      <div class="viz">
+        <div class="mfeed">
+          <div class="mcard"><span class="mdot" style="background:#1E5FA8"></span><span class="mtitle">Losing Buy Box on SKU-A24</span><span class="mmetric">72% → 41%</span></div>
+          <div class="mcard"><span class="mdot" style="background:#B0541A"></span><span class="mtitle">Margin below floor · 3 SKUs</span><span class="mmetric">8.1% net</span></div>
+          <div class="mcard"><span class="mdot" style="background:#6B4FBB"></span><span class="mtitle">Stockout in ~9 days</span><span class="mmetric">cover 9d</span></div>
+        </div>
+        <div class="viz-cap">A prioritized feed — most material issue first</div>
+      </div>
+    </div>
+  </details>
+
+  <details class="qa">
+    <summary>How does Realify work?</summary>
+    <div class="a">
+      Two layers, deliberately separated. A <b>deterministic engine does the math — and uses ML models — on your numbers</b> against your thresholds (margins, cover, buy box, velocity, returns, ad efficiency) to decide what's worth flagging and to forecast where each metric is heading. Then a language layer explains each finding in plain English and drafts the action. The decisions are never guessed by an AI; they come from rules and models you can see and tune. You connect your data, Realify computes the signals, and you get a ranked feed — each card openable to show exactly <b>why</b> it fired, down to the rule and the value that tripped it. Nothing is a black box.
+      <div class="viz">
+        <div class="flow">
+          <div class="stage s1"><div class="t">Your numbers</div><div class="d">channels, costs, inventory</div></div>
+          <div class="arr">→</div>
+          <div class="stage s2"><div class="t">Rules + ML decide</div><div class="d">deterministic math &amp; forecasts</div></div>
+          <div class="arr">→</div>
+          <div class="stage s3"><div class="t">AI explains</div><div class="d">plain-English + action</div></div>
+        </div>
+        <div class="viz-cap">Math &amp; models decide · language only phrases</div>
+      </div>
+    </div>
+  </details>
+
+  <details class="qa">
+    <summary>How is Realify different from the others?</summary>
+    <div class="a">
+      Most tools are single-purpose: one for keywords, one for repricing, one for ads — each sees a slice. Realify's advantage is <b>cross-signal</b>: it reasons about margin, inventory, buy box, and ad efficiency together, because in reality those decisions are entangled (dropping price to win buy box can quietly sink margin; a stockout warps your ad ROI). And unlike bolting a chatbot onto your data, every number is deterministic and <b>auditable</b> — you can trace any insight to the rule and figure behind it, so you can trust it enough to act. It compounds, too: the longer it watches your operation, the better it understands what "normal" looks like for your catalog.
+      <div class="viz">
+        <div class="layers">
+          <div class="layer" style="border-left-color:#1E5FA8"><div class="lk" style="color:#1E5FA8">L1 · Rule fired</div><div class="lv">net margin 8.1% &lt; floor 12% on 3 SKUs</div></div>
+          <div class="layer" style="border-left-color:#0E7C66"><div class="lk" style="color:#0E7C66">Model · Forecast</div><div class="lv">trend −1.4 pts / 14d · confidence high</div></div>
+          <div class="layer" style="border-left-color:#6B4FBB"><div class="lk" style="color:#6B4FBB">L2 · Explanation</div><div class="lv">"Margin is eroding faster than ad gains — review price or COGS."</div></div>
+        </div>
+        <div class="viz-cap">Every card opens to its full reasoning trace</div>
+      </div>
+    </div>
+  </details>
+
+  <details class="qa">
+    <summary>How do I try Realify before onboarding my real data?</summary>
+    <div class="a">
+      Start as a <b>Tester</b> — no real data required. Load the built-in demo catalog, or just paste an ASIN list and Realify generates a realistic dataset so you can explore the full product: the feed, the insight cards, the explainability, the works. When you're convinced, create a <b>Customer</b> account and connect your real reports and costs. Testing is risk-free and reversible — your real data only enters when you choose.
+    </div>
+  </details>
+
+  <details class="qa">
+    <summary>Is my data private and secure?</summary>
+    <div class="a">
+      Your data is isolated to your organization and never shared or pooled with other sellers. Realify reads only what you connect, and you can <b>permanently delete</b> your account and all its data at any time, from the account settings.
+    </div>
+  </details>
+
+  <details class="qa">
+    <summary>Does Realify scrape Amazon or risk my marketplace account?</summary>
+    <div class="a">
+      No. Realify uses <b>official APIs and licensed market data</b> (Keepa) — never scraping. It's built to keep you compliant, not to put your seller account at risk.
+    </div>
+  </details>
+
+  <details class="qa">
+    <summary>What do I need to get started?</summary>
+    <div class="a">
+      At minimum, a product/catalog export and your cost-of-goods (COGS) — that's enough to start surfacing margin insights. From there, every additional report you connect (sales, inventory, returns, ads) lights up more of the engine. You see exactly what's active and what each new upload unlocks.
+      <div class="viz">
+        <div class="comp">
+          <div class="cpill on">Catalog ✓</div><div class="cpill on">COGS ✓</div><div class="cpill on">Margin ✓</div><div class="cpill">Inventory</div><div class="cpill">Returns</div>
+        </div>
+        <div class="viz-cap">3 of 5 detectors active — add inventory to unlock cover alerts</div>
+      </div>
+    </div>
+  </details>
+
+  <details class="qa">
+    <summary>Does Realify make changes to my store on its own?</summary>
+    <div class="a">
+      No — you stay in control. Realify surfaces decisions and drafts the recommended action, but <b>you approve what happens</b>. It's a co-pilot for your merchandising and ops team, not an autopilot acting behind your back.
+    </div>
+  </details>
+
+  <details class="qa">
+    <summary>Can my whole team use one account?</summary>
+    <div class="a">
+      Yes. Create an organization and invite teammates — everyone works from the same data and the same prioritized feed. Generate an invite, send it, and they join your organization in a couple of clicks.
+    </div>
+  </details>
+</section>
+
+<script>
+const AMBIENT_OFF_ICON = '<path d="M11 5 6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
+const AMBIENT_ON_ICON = '<path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>';
+</script>
+<script>
+let mode='login';
+let joinToken = new URLSearchParams(location.search).get('token') || '';
+const $=id=>document.getElementById(id);
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); t.classList.add('on');
+  mode=t.dataset.m;
+  $('acctWrap').style.display = mode==='signup'?'block':'none';
+  $('go').textContent = mode==='signup'?'Create account':'Log in';
+}));
+async function postJSON(u,b){const r=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});return {ok:r.ok,data:await r.json()};}
+$('go').addEventListener('click', async ()=>{
+  $('err').textContent='';
+  const email=$('email').value, pw=$('pw').value;
+  if(mode==='join'){
+    const {ok,data}=await postJSON('/api/join',{password:pw, token:joinToken});
+    if(!ok){ $('err').textContent=data.error||'Could not join.'; return; }
+    if(data.provisioned){ location.href='/'; } else { routeAfterAuth(); }
+    return;
+  }
+  const url = mode==='signup'?'/api/signup':'/api/login';
+  const body = mode==='signup'?{email,password:pw,account:$('acct').value}:{email,password:pw};
+  const {ok,data}=await postJSON(url,body);
+  if(!ok){ $('err').textContent=data.error||'Something went wrong.'; return; }
+  if(data.provisioned){ location.href='/'; }       // returning user with data
+  else { routeAfterAuth(); }                         // new signup or not-yet-provisioned
+});
+function showOnboarding(){ hideAll(); $('ob').classList.add('show'); }
+function hideAll(){ $('auth').classList.add('hide'); ['ob','gate','obCustomer'].forEach(id=>$(id).classList.remove('show')); }
+function showGate(){ hideAll(); $('gate').classList.add('show'); }
+async function routeAfterAuth(){
+  try{
+    const t=await fetch('/api/account/type').then(r=>r.json());
+    if(!t.account_type) return showGate();
+    if(t.account_type==='customer') return showCustomerOnboarding();
+    return showOnboarding();
+  }catch(e){ showGate(); }
+}
+async function chooseType(t){
+  $('gateErr').textContent='';
+  const {ok,data}=await postJSON('/api/account/type',{account_type:t});
+  if(!ok){ $('gateErr').textContent=(data&&data.error)||'Could not set account type.'; return; }
+  if(t==='customer') showCustomerOnboarding(); else showOnboarding();
+}
+$('optTester').addEventListener('click',()=>chooseType('tester'));
+$('optCustomer').addEventListener('click',()=>chooseType('customer'));
+$('gateBack').addEventListener('click', async (e)=>{ e.preventDefault(); try{ await fetch('/api/logout',{method:'POST'}); }catch(_){ } location.href='/login'; });
+document.querySelectorAll('.backLink[data-back]').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); showGate(); }));
+
+// ---- customer onboarding (drag-drop + live recognition) ----
+let obFileMap=new Map();      // filename -> File  (accumulates across drops)
+// resolve conflicting-file names -> the in-memory File objects, for the card's "Download" action
+window.rfResolveFiles = names => (names||[]).map(n=>obFileMap.get(n)).filter(Boolean);
+let obChannel='amazon';
+let obReady=false;
+function showCustomerOnboarding(){ hideAll(); $('obCustomer').classList.add('show'); initObUpload(); }
+$('cogsTmpl').addEventListener('click',e=>{ e.preventDefault(); window.location='/api/cogs/template'; });
+
+async function initObUpload(){
+  if($('obCustomer').dataset.init) return;
+  $('obCustomer').dataset.init='1';
+  { const _ws=$('wizardStart'); if(_ws) _ws.addEventListener('click',_wizStart); }   // guided wizard entry
+  // channel tabs
+  let cat; try{ cat=await fetch('/api/ingest/catalog').then(r=>r.json()); }catch(e){ cat={channels:[{channel:'amazon',label:'Amazon',active:true,reports:[]}]}; }
+  window._obCat=cat;
+  // active channels are passive labels now; the ONE unified checklist below spans all of them (grouped),
+  // so there's a single drop target + a single list — no per-tab switching.
+  $('obChTabs').innerHTML=(cat.channels||[]).map(c=>
+    `<span class="chtab${c.active?' on':' soon'}" style="cursor:default">${c.label}${c.active?'':' <span class="soon">soon</span>'}</span>`).join('');
+  window._obTargets=_obDefaultTargets();
+  renderObChecklist(null);
+  // dropzone wiring
+  const dz=$('obDrop'), inp=$('obFiles');
+  dz.addEventListener('click',()=>inp.click());
+  dz.addEventListener('dragover',e=>{ e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+  dz.addEventListener('drop',e=>{ e.preventDefault(); dz.classList.remove('drag'); addObFiles(e.dataTransfer.files); });
+  inp.addEventListener('change',e=>addObFiles(e.target.files));
+}
+/* ---- guided cross-channel onboarding wizard (spec §6/§9) — a thin interview → personalized checklist +
+   completeness. Renders from /api/wizard/graph, resolves via /api/wizard/resolve, then hands back to the
+   drag-drop uploader below, pre-armed. Reuses existing chtab / ck-row / obi- styles. ---- */
+function _we(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+const _WGOAL={'Profit after ads':'PROFIT_AFTER_ADS','Ad efficiency':'AD_EFFICIENCY','Category intel':'CATEGORY_INTEL','Everything':'EVERYTHING'};
+async function _wizStart(){
+  let g; try{ g=await fetch('/api/wizard/graph').then(r=>r.json()); }catch(_){ return; }
+  if(!g||!g.ok) return;
+  window._wizNodes=g.nodes; window._wizAns={}; window._obWizBanner='';   // clear stale preview while re-answering
+  const body=g.nodes.map(n=>{
+    const opts=n.options.map(o=>`<button type="button" class="chtab" data-wn="${_we(n.id)}" data-wo="${_we(o)}">${_we(o)}</button>`).join('');
+    return `<div class="wiz-node" data-node="${_we(n.id)}" data-req="${_we(n.requires||'')}" style="margin:0 0 12px">
+      <div style="font-size:13px;color:var(--ink);font-weight:600;margin-bottom:6px">${_we(n.prompt)}${n.optional?' <span class="soon">optional</span>':''}</div>
+      <div class="chtabs">${opts}</div></div>`; }).join('');
+  const p=$('obWizard');
+  p.innerHTML=`<div style="font-family:'Space Grotesk';font-weight:700;font-size:15px;margin-bottom:10px">Guided setup</div>${body}
+    <button class="btn" id="wizBuild">Build my checklist</button>`;
+  p.style.display='block'; $('obWizEntry').style.display='none';
+  p.querySelectorAll('[data-wn]').forEach(ch=>ch.addEventListener('click',()=>_wizPick(ch)));
+  $('wizBuild').addEventListener('click',_wizResolve);
+  _wizGate();
+}
+function _wizPick(chip){
+  const nid=chip.dataset.wn, o=chip.dataset.wo, node=(window._wizNodes||[]).find(x=>x.id===nid); if(!node) return;
+  if(node.type==='single'){ chip.parentElement.querySelectorAll('[data-wn]').forEach(c=>c.classList.remove('on')); chip.classList.add('on'); window._wizAns[nid]=o; }
+  else { chip.classList.toggle('on'); const sel=[...chip.parentElement.querySelectorAll('.on')].map(c=>c.dataset.wo);
+         if(sel.length) window._wizAns[nid]=sel; else delete window._wizAns[nid]; }
+  _wizGate();
+}
+function _wizGate(){   // reveal a gated node only when its channel is selected (server resolve is authoritative)
+  const chans=window._wizAns['CHANNELS']||[];
+  $('obWizard').querySelectorAll('.wiz-node').forEach(el=>{ const req=el.dataset.req;
+    el.style.display=(!req||chans.indexOf(req)>=0)?'':'none'; });
+}
+async function _wizResolve(){
+  let r; try{ r=await fetch('/api/wizard/resolve',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({answers:window._wizAns})}).then(x=>x.json()); }catch(_){ return; }
+  if(!r||!r.ok) return;
+  // Drive the ONE unified checklist from the wizard's personalized items, then COLLAPSE the interview —
+  // the checklist + completeness live in the single dropzone area below, ticking as files are recognized.
+  window._obTargets=_obWizTargets(r.checklist);
+  const gk=_WGOAL[window._wizAns['G1']]||'EVERYTHING', cp=(r.completeness||{})[gk]||{};
+  const cls=cp.state==='AVAILABLE'?'obi-ok':(cp.state==='UNAVAILABLE'?'obi-warn':'obi-dim');
+  window._obWizBanner=cp.line?`<div class="${cls}">${_we(cp.line)}</div>`:'';
+  $('obWizard').innerHTML=`<div class="obi-ok" style="font-size:12px;padding:8px 10px;border-radius:8px;margin:0">`
+    +`✓ Your checklist is ready below — drop your files into the box and each one ticks off. `
+    +`<a href="#" id="wizRedo" style="color:inherit;font-weight:700">Change answers</a></div>`;
+  $('wizRedo').addEventListener('click',e=>{ e.preventDefault(); _wizStart(); });
+  if(obFileMap.size) identifyObFiles(obGen);           // re-tick any already-dropped files against the new list
+  else { renderObChecklist(null); }
+  $('obDrop').scrollIntoView({behavior:'smooth',block:'center'});
+}
+let obPresent=new Set();      // report types recognized so far (accumulates across per-file identifies)
+let obGen=0;                  // invalidation token — bumped on reset/channel-switch so stale in-flight identify resolves become no-ops
+let obBusy=0, recoBusy=0;     // ref-counts so overlapping drops don't stop the logo/pill animation early
+function logoOn(){ obBusy++; const l=$('rfLogo'); if(l) l.classList.add('proc'); }         // animate during recognize/ingest
+function logoOff(){ if(obBusy>0) obBusy--; if(!obBusy){ const l=$('rfLogo'); if(l) l.classList.remove('proc'); } }
+function recoOn(){ recoBusy++; const r=$('obReco'); if(r) r.style.display='flex'; }         // "Recognizing…" pill
+function recoOff(){ if(recoBusy>0) recoBusy--; if(!recoBusy){ const r=$('obReco'); if(r) r.style.display='none'; } }
+// ---- ONE unified checklist model: targets (from the wizard OR the default catalog) that tick as files
+//      are recognized, so every filename lives in one place beside the single dropzone ----
+function _obDefaultTargets(){
+  const cat=window._obCat; if(!cat) return [];
+  const out=[];
+  (cat.channels||[]).filter(c=>c.active).forEach(c=>(c.reports||[]).forEach(r=>out.push({
+    key:r.type, label:r.label, group:c.channel.toUpperCase(),
+    essentiality:(r.sku_source||r.is_cogs)?'essential':'supporting',
+    where:r.unlocks||'', arrival:'INSTANT', match:[r.type], present:false, files:[]})));
+  return out;
+}
+function _obWizTargets(list){
+  return (list||[]).map(ci=>({key:ci.file_row_id, label:ci.label||ci.file_row_id, group:ci.group,
+    essentiality:(ci.essentiality||'').toLowerCase(), where:ci.where_to_find||'',
+    arrival:ci.arrival_hint||'INSTANT', match:ci.match_types||[], present:false, files:[]}));
+}
+function _obResetTargets(){ (window._obTargets||[]).forEach(r=>{ r.present=false; r.files=[]; }); }
+function _obApplyRecognized(files){
+  const tg=window._obTargets||[];
+  (files||[]).filter(f=>f.recognized&&f.type).forEach(f=>tg.forEach(r=>{
+    if(r.match.indexOf(f.type)>=0){ r.present=true; if(r.files.indexOf(f.filename)<0) r.files.push(f.filename); } }));
+}
+const _OB_GROUPS=['AMAZON','SHOPIFY','ADS','COGS'];
+function paintChecks(){
+  const tg=window._obTargets||(window._obTargets=_obDefaultTargets());
+  const byG={}; tg.forEach(r=>{(byG[r.group]=byG[r.group]||[]).push(r);});
+  const groups=_OB_GROUPS.filter(g=>byG[g]).concat(Object.keys(byG).filter(g=>_OB_GROUPS.indexOf(g)<0));
+  $('obChecklist').innerHTML = groups.map(g=>{
+    const rows=byG[g].map(r=>{
+      const fn=r.files.length?`<span class="ck-file">${r.files.map(_we).join(', ')}</span>`:'';
+      const hint=r.arrival==='EMAILED'?' <span class="soon">emailed</span>':'';
+      return `<div class="ck-row${r.present?' on':''}"><span class="ck-box">${r.present?'✓':''}</span>`
+        +`<span class="ck-lbl">${_we(r.label)} <span class="ck-need">${_we(r.essentiality)}</span>${hint}</span>`
+        +`<span class="ck-unlk">${r.present?fn:_we(r.where||'')}</span></div>`;
+    }).join('');
+    return `<div class="ck-group"><div class="ck-gh">${g}</div>${rows}</div>`;
+  }).join('') || '<div class="obi-load">Drop your reports above — we recognize each one and tick it off here.</div>';
+}
+function addObFiles(fileList){
+  const fresh=[...fileList].filter(f=>!obFileMap.has(f.name));
+  fresh.forEach(f=>obFileMap.set(f.name,f));
+  if(!obFileMap.size){ renderObChecklist(null); return; }
+  const gen=obGen;                                  // this batch is void if the panel is reset/switched mid-flight
+  paintChecks();                                    // ensure the report rows are present
+  recoOn(); logoOn();                               // logo + starburst animate while recognizing (ref-counted)
+  // Per-file recognition: each row's ✓ flips the MOMENT its own file is recognized — not after the
+  // whole batch. The aggregate pass (identifyObFiles) then finalizes cross-file overlaps + readiness.
+  Promise.all(fresh.map(f=>identifyOne(f, gen))).then(()=>identifyObFiles(gen));
+}
+async function identifyOne(file, gen){
+  const fd=new FormData(); fd.append('f0', file, file.name);
+  try{
+    const d=await fetch('/api/ingest/identify',{method:'POST',body:fd}).then(r=>r.json());
+    if(gen!==obGen) return;                         // reset/channel-switch happened mid-flight — ignore stale result
+    _obApplyRecognized(d.files);                     // tick matching checklist rows + attach this filename
+    paintChecks();                                  // incremental flip for this file
+  }catch(e){}
+}
+async function identifyObFiles(gen){
+  if(!obFileMap.size){ if(gen===obGen) renderObChecklist(null); recoOff(); logoOff(); return; }
+  const fd=new FormData(); let i=0;
+  obFileMap.forEach(f=>fd.append('f'+(i++), f, f.name));
+  let d, failed=false;
+  try{ d=await fetch('/api/ingest/identify',{method:'POST',body:fd}).then(r=>r.json()); }
+  catch(e){ failed=true; }
+  recoOff(); logoOff();                             // always balance the ref-count, even if stale/failed
+  if(gen!==obGen) return;                           // panel was reset/switched — don't touch the now-different view
+  if(failed){ $('obInfo').innerHTML='<div class="obi-warn">Recognized what we could, but couldn\'t finish reading every file — try re-adding them.</div>'; return; }
+  renderObChecklist(d);
+}
+/* ===== SHARED conflict-file zip (Phase 1 item) — byte-identical in login.html & frontend.html.
+   Bundles the in-memory File objects for the named conflicting files into a single STORE-method zip
+   (no lib; hand-rolled CRC32) and downloads it, so the seller can reconcile offline and re-upload.
+   The page provides window.rfResolveFiles(names) -> File[] (obFileMap here; _lastUploadFiles in the app). */
+function _rfCrc32(bytes){
+  let crc=0xFFFFFFFF;
+  for(let i=0;i<bytes.length;i++){ let c=(crc^bytes[i])&0xFF;
+    for(let k=0;k<8;k++) c=c&1?(c>>>1)^0xEDB88320:c>>>1;
+    crc=(crc>>>8)^c; }
+  return (crc^0xFFFFFFFF)>>>0;
+}
+async function rfZipConflicts(names){
+  const files=((window.rfResolveFiles&&window.rfResolveFiles(names))||[]).filter(Boolean);
+  if(!files.length){ alert('Those files are no longer loaded in the browser — re-add them, then download.'); return; }
+  const enc=new TextEncoder(), counts={}, chunks=[], central=[]; let offset=0, count=0;
+  for(const f of files){
+    let name=f.name;                                    // disambiguate a shared filename with (1)/(2)
+    if(counts[f.name]!=null){ counts[f.name]++; const dot=name.lastIndexOf('.');
+      name=(dot>0?name.slice(0,dot):name)+` (${counts[f.name]})`+(dot>0?name.slice(dot):''); }
+    else counts[f.name]=0;
+    const bytes=new Uint8Array(await f.arrayBuffer()), nameB=enc.encode(name), crc=_rfCrc32(bytes), sz=bytes.length;
+    const lh=new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true); lh.setUint16(4,20,true); lh.setUint16(6,0x0800,true);
+    lh.setUint32(14,crc,true); lh.setUint32(18,sz,true); lh.setUint32(22,sz,true); lh.setUint16(26,nameB.length,true);
+    chunks.push(new Uint8Array(lh.buffer),nameB,bytes);
+    const cd=new DataView(new ArrayBuffer(46));
+    cd.setUint32(0,0x02014b50,true); cd.setUint16(4,20,true); cd.setUint16(6,20,true); cd.setUint16(8,0x0800,true);
+    cd.setUint32(16,crc,true); cd.setUint32(20,sz,true); cd.setUint32(24,sz,true);
+    cd.setUint16(28,nameB.length,true); cd.setUint32(42,offset,true);
+    central.push(new Uint8Array(cd.buffer),nameB);
+    offset+=30+nameB.length+sz; count++;
+  }
+  const cdStart=offset; let cdLen=0; central.forEach(c=>cdLen+=c.length);
+  const eo=new DataView(new ArrayBuffer(22));
+  eo.setUint32(0,0x06054b50,true); eo.setUint16(8,count,true); eo.setUint16(10,count,true);
+  eo.setUint32(12,cdLen,true); eo.setUint32(16,cdStart,true);
+  const blob=new Blob([...chunks,...central,new Uint8Array(eo.buffer)],{type:'application/zip'});
+  const d=new Date(), p=x=>String(x).padStart(2,'0');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`realify-conflicts-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.zip`; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+/* ===== SHARED "Resolve conflicts" component (Phase 1) — byte-identical to the copy in frontend.html.
+   rfConflicts(conflicts) -> {html, resolutions, wire(root,onChange), summaryLine()}. resolutions
+   default to each conflict's recommended choice, so committing WITHOUT touching the card reproduces
+   today's numbers exactly (never blocks). ===== */
+function rfConflicts(conflicts){
+  conflicts = conflicts || [];
+  const inr = v => '₹'+Number(v||0).toLocaleString('en-IN',{maximumFractionDigits:0});
+  const esc = s => String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+  const resolutions = {};
+  conflicts.forEach(c => resolutions[c.id] = c.recommended);
+  const dot = c => `<span class="cflt-dot cflt-${c}"></span>`;
+  const short = s => { s=String(s==null?'':s); return s.length>28 ? '…'+s.slice(-27) : s; };  // keep the tail (ext + disambiguator)
+  const TAG = ['A','B','C','D','E','F'];
+  const tag = i => TAG[i] || ('#'+(i+1));
+  function fileLegend(c){
+    return c.sides.map((s,i)=>`<div class="cflt-file"><span class="cflt-tag">${tag(i)}</span>`
+      +`<span class="cflt-fn" title="${esc(s.file)}">${esc(short(s.file))}</span>`
+      +(s.period_covered?`<span class="cflt-per">${esc(s.period_covered)}</span>`:'')+`</div>`).join('');
+  }
+  function overlapHtml(c){
+    const km=c.impact.keep_latest||{}, sm=c.impact.sum||{}, dl=c.impact.delta_vs_recommended||{};
+    const metricRow=(k,lbl)=>{
+      const vals=c.sides.map(s=>(s.metrics&&s.metrics[k])||0);
+      const diff=Math.max.apply(null,vals)-Math.min.apply(null,vals);
+      const vs=c.sides.map((s,i)=>`<span class="cflt-v"><b>${tag(i)}</b>${inr((s.metrics||{})[k])}</span>`).join('');
+      return `<div class="cflt-metric"><div class="cflt-mname">${lbl}</div><div class="cflt-vals">${vs}`
+        +(diff>0.01?`<span class="cflt-v cflt-delta">Δ ${inr(diff)}</span>`:'')+`</div></div>`;
+    };
+    const cur=resolutions[c.id];
+    const radio=(val,lbl,note)=>`<label class="cflt-opt"><input type="radio" name="r_${c.id}" value="${esc(val)}"`
+      +`${cur===val?' checked':''}> ${lbl}${note?`<span class="cflt-optnote"> ${note}</span>`:''}</label>`;
+    let radios=radio('keep_latest','Keep most recent', inr(km.ad_spend)+(c.confidence==='high'?'':' · safest'));
+    c.sides.forEach((s,i)=> radios+=radio('keep_file:'+s.file,'Keep only '+tag(i), esc(short(s.file))));
+    if((c.options||[]).indexOf('sum')>=0) radios+=radio('sum','Add them up', inr(sm.ad_spend)+' · not recommended');
+    const impact=`Add up → <b>${inr(sm.ad_spend)}</b>; Keep most recent → <b>${inr(km.ad_spend)}</b>. `
+      +(dl.ad_spend?`Difference ${inr(dl.ad_spend)}${dl.pct_of_total!=null?` (${dl.pct_of_total}% of ad spend)`:''}.`:'Same either way.');
+    return `<div class="cflt" data-id="${c.id}"><div class="cflt-hd">${dot(c.confidence)}<span>Overlap · ${esc((c.report_type||'').replace('_',' '))} · ${esc(c.period)}</span></div>`
+      +`<div class="cflt-legend">${fileLegend(c)}</div>`
+      +`<div class="cflt-metrics">${metricRow('ad_spend','Ad spend')}${metricRow('ad_sales','Ad sales')}</div>`
+      +`<div class="cflt-impact">${impact}</div><div class="cflt-opts">${radios}</div>`
+      +`<div class="cflt-reason">${c.auto_reason} <span class="cflt-note">You can change this later on the Channels tab.</span></div></div>`;
+  }
+  function dupHtml(c){
+    return `<div class="cflt" data-id="${c.id}"><div class="cflt-hd">${dot(c.confidence)}<span>Duplicate file</span></div>`
+      +`<div class="cflt-legend"><div class="cflt-file"><span class="cflt-fn" title="${esc(c.sides[0].file)}">${esc(short(c.sides[0].file))}</span></div></div>`
+      +`<div class="cflt-reason">${c.auto_reason} <span class="cflt-note">Nothing to do — it was skipped so it can't double-count.</span></div></div>`;
+  }
+  const n=conflicts.length;
+  const detail=conflicts.map(c=>c.type==='duplicate_file'?dupHtml(c):overlapHtml(c)).join('');
+  const html = n?`<div class="cflt-card" data-open="0"><div class="cflt-top">`
+      +`<div class="cflt-title">${n} report conflict${n>1?'s':''} found</div>`
+      +`<div class="cflt-sub">Using the safest option (keep the most recent) — nothing is double-counted. Review or change below.</div>`
+      +`<div class="cflt-actions"><button type="button" class="cflt-resolve">Resolve now</button>`
+      +`<button type="button" class="cflt-all">Use recommended for all</button>`
+      +`<button type="button" class="cflt-dl">Download conflicting files</button></div>`
+      +`<div class="cflt-dlnote">Or reconcile offline: download the conflicting files, fix them, and re-upload — nothing changes until you do.</div></div>`
+      +`<div class="cflt-detail" style="display:none">${detail}</div></div>`:'';
+  function summaryLine(){
+    const ov=conflicts.filter(c=>c.type==='period_overlap'); if(!ov.length) return '';
+    const kept=ov.map(c=>c.period).join(', ');
+    const anySum=ov.some(c=>String(resolutions[c.id]).indexOf('sum')===0);
+    return anySum?`Applied your choices for ${kept}. Change on the Channels tab anytime.`
+                 :`Kept the most recent file for ${kept}. Change on the Channels tab anytime.`;
+  }
+  function wire(root,onChange){
+    if(!root) return; const card=root.querySelector('.cflt-card'); if(!card) return;
+    const detailEl=card.querySelector('.cflt-detail'), rb=card.querySelector('.cflt-resolve');
+    if(rb) rb.addEventListener('click',()=>{ const open=detailEl.style.display!=='none';
+      detailEl.style.display=open?'none':'block'; rb.textContent=open?'Resolve now':'Hide'; });
+    card.querySelectorAll('input[type=radio]').forEach(inp=> inp.addEventListener('change',()=>{
+      resolutions[inp.name.slice(2)]=inp.value; if(onChange) onChange(resolutions); }));
+    const ab=card.querySelector('.cflt-all');
+    if(ab) ab.addEventListener('click',()=>{ conflicts.forEach(c=>{ resolutions[c.id]=c.recommended;
+      const r=card.querySelector(`input[name=r_${c.id}][value=keep_latest]`); if(r) r.checked=true; });
+      card.classList.add('cflt-done'); if(onChange) onChange(resolutions); });
+    const dl=card.querySelector('.cflt-dl');
+    if(dl) dl.addEventListener('click',()=>{                     // bundle every distinct conflicting file
+      const names=[...new Set(conflicts.flatMap(c=>(c.sides||[]).map(s=>s.file)).filter(Boolean))];
+      rfZipConflicts(names); });
+  }
+  return { html, resolutions, wire, summaryLine };
+}
+
+function renderObChecklist(d){
+  if(!window._obTargets) window._obTargets=_obDefaultTargets();
+  const banner=window._obWizBanner||'';
+  if(!d){ obGen++; _obResetTargets(); paintChecks(); $('obInfo').innerHTML=banner; $('obConflicts').innerHTML=''; window._obCf=null; obReady=false;
+    const b=$('custProvision'); if(b){ b.disabled=true; b.textContent='Connect my data'; } return; }
+  _obResetTargets(); _obApplyRecognized(d.files); paintChecks();   // full re-tick against the current file set
+  // info + warnings (recognized/ignored/overlaps/cogs) + stated-vs-detected reconcile prompts
+  let info=banner;
+  if(d&&d.files&&d.files.length){
+    const rec=d.files.filter(f=>f.recognized), un=d.files.filter(f=>!f.recognized);
+    const months=[...new Set(d.files.flatMap(f=>f.periods||[]))].sort();
+    info+=`<div class="obi-ok">Recognized ${rec.length} report${rec.length!==1?'s':''}${months.length?` · ${months.length} month${months.length>1?'s':''} (${months.join(', ')})`:''}.</div>`;
+    if(un.length) info+=`<div class="obi-dim">Ignored ${un.length} file${un.length>1?'s':''} we don't use (${un.map(f=>f.filename).join(', ')}).</div>`;
+    // ad-report overlaps are handled by the inline "Resolve conflicts" card below (accurate copy);
+    // transaction/returns overlaps genuinely sum, so keep the honest note for those.
+    (d.overlaps||[]).filter(o=>o.report_type!=='ad_report').forEach(o=>{ info+=`<div class="obi-warn">Two ${o.report_type.replace(/_/g,' ')} reports overlap (${o.shared_periods.join(', ')}) — we'll add them up. Upload one, or resolve it later on Channels.</div>`; });
+    if(!d.has_cogs) info+=`<div class="obi-dim">No COGS file yet — add it to unlock margin & Profit&amp;Ads.</div>`;
+  }
+  (d&&d.reconcile||[]).forEach(p=>{ info+=`<div class="obi-warn">${_we(p.headline)}</div>`; });   // RC-1..RC-8
+  $('obInfo').innerHTML=info;
+  const obCf=rfConflicts((d&&d.conflicts)||[]);        // inline conflict card (ad overlaps + duplicates)
+  $('obConflicts').innerHTML=obCf.html; obCf.wire($('obConflicts'), null); window._obCf=obCf;
+  obReady = !!(d&&d.ready);
+  const btn=$('custProvision'); btn.disabled=!obReady;
+  btn.textContent = obReady? 'Connect my data' : 'Add a sales/listings report to continue';
+}
+// One shared CTA button-state helper: idle -> working(spinning logo, locked) -> ready("Go inside").
+function ctaWorking(){ const b=$('custProvision'); b.style.minHeight=b.offsetHeight+'px';   // freeze height (no jump)
+  b.dataset.busy='1'; b.disabled=true; b.setAttribute('aria-disabled','true');
+  b.classList.add('btn-working'); b.innerHTML='<span class="rf-burst rf-btnlogo">✳</span>'; }
+function ctaReady(){ const b=$('custProvision'); b.dataset.busy=''; b.dataset.mode='go';
+  b.disabled=false; b.removeAttribute('aria-disabled'); b.classList.remove('btn-working'); b.style.minHeight='';
+  b.textContent='Go inside'; }
+function ctaReset(){ const b=$('custProvision'); b.dataset.busy=''; b.dataset.mode='';
+  b.classList.remove('btn-working'); b.style.minHeight=''; b.removeAttribute('aria-disabled');
+  b.disabled=!obReady; b.textContent='Connect my data'; }
+$('custProvision').addEventListener('click', async ()=>{
+  const cta=$('custProvision');
+  if(cta.dataset.busy) return;                          // locked while animating — no double-submit
+  if(cta.dataset.mode==='go'){                          // PHASE B: enter the dashboard
+    ctaWorking();                                       // spin until navigation commits (the real ready signal)
+    location.href='/'; return;
+  }
+  if(!obReady) return;
+  $('custErr').textContent='';
+  const _confirmMsg = window.__addData
+    ? "Add or replace reports for this brand? New periods merge into your existing data and overlapping periods are replaced — nothing else is wiped."
+    : "Set up this account as a CUSTOMER? Your dashboard is built from these reports — nothing is synthesized.";
+  if(!confirm(_confirmMsg)) return;
+  const fd=new FormData(); fd.append('country', $('custCountry').value); let i=0;
+  obFileMap.forEach(f=>fd.append('f'+(i++), f, f.name));
+  fd.append('resolutions', JSON.stringify((window._obCf && window._obCf.resolutions) || {}));  // inline conflict choices
+  $('custProg').classList.add('show'); $('custFill').style.width='20%'; $('custStage').textContent='Reading your reports…';
+  ctaWorking(); logoOn();                               // PHASE A: button becomes the spinning logo (locked)
+  let data, ok;
+  try{ const r=await fetch('/api/onboard/reports',{method:'POST',body:fd}); data=await r.json(); ok=r.ok; }
+  catch(e){ ok=false; data={error:'Upload failed.'}; }
+  logoOff();
+  if(!(ok && data.ok && data.provisioned)){
+    ctaReset();                                         // re-enable to retry
+    $('custProg').classList.remove('show');
+    $('custErr').textContent=(data&&data.error)||'Could not process your data.'; return;
+  }
+  $('custFill').style.width='100%'; $('custStage').textContent=`Ready — ${data.skus_written} SKUs.`;
+  ctaReady();                                           // ingest done → "Go inside" (clickable)
+});
+
+let synSrc='sample';         // 'sample' | 'upload'
+let seedByChannel={};        // channel -> File (one catalog export per store)
+
+function refreshProvisionLabel(){
+  $('provision').textContent = synSrc==='sample' ? 'Use demo SKUs' : 'Connect & synthesize';
+}
+// the two choices
+// Demo catalog is India-only; lock the market to IN on Demo, free it on Upload.
+function lockMarket(toIN){
+  const sel=$('country'); if(!sel) return;
+  const usOpt=sel.querySelector('option[value="US"]');
+  if(toIN){ sel.value='IN'; if(usOpt) usOpt.disabled=true; sel.title='Demo catalog is India-only'; }
+  else { if(usOpt) usOpt.disabled=false; sel.title=''; }
+}
+$('optDemo').addEventListener('click',()=>{ synSrc='sample';
+  $('optDemo').classList.add('sel'); $('optUpload').classList.remove('sel');
+  $('uploadArea').style.display='none'; lockMarket(true); refreshProvisionLabel(); });
+$('optUpload').addEventListener('click',()=>{ synSrc='upload';
+  $('optUpload').classList.add('sel'); $('optDemo').classList.remove('sel');
+  $('uploadArea').style.display='block'; lockMarket(false); renderObGrid(); refreshProvisionLabel(); });
+lockMarket(true);   // Demo is selected by default on load
+
+// CSV template
+$('tmpl').addEventListener('click',(e)=>{ e.preventDefault();
+  const csv='sku,cogs,category,price\nB0EXAMPLE01,420,Car Accessories,1299\nB0EXAMPLE02,180,Bike Accessories,649\n';
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='realify_sku_template.csv'; a.click();
+});
+
+// Channel grid — same channel model as the Cross-Channel tab (/api/ingest/reports),
+// but each channel takes a real catalog export wired to /api/onboard/upload.
+function updateSeedStat(){
+  const n=Object.keys(seedByChannel).length;
+  $('seedStat').textContent = n? `${n} store${n>1?'s':''} ready` : '';
+  $('seedStat').style.color = 'var(--positive)';
+}
+async function renderObGrid(){
+  const grid=$('obChannelGrid'); if(grid.dataset.loaded) return;
+  grid.innerHTML='<div style="color:var(--faint);font-size:12px">Loading channels…</div>';
+  let d; try{ d=await fetch('/api/ingest/reports').then(r=>r.json()); }catch(e){ d={reports:{amazon:[]},labels:{amazon:'Amazon'}}; }
+  grid.innerHTML=Object.keys(d.reports).map(ch=>{
+    const lbl=(d.labels&&d.labels[ch])||ch;
+    return `<div class="ob-ch" data-ch="${ch}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px">
+      <span style="font-size:12.5px;font-weight:600">${lbl}</span>
+      <span style="display:flex;align-items:center;gap:8px">
+        <span class="ob-ch-stat" style="font-size:11px;color:var(--faint);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+        <input type="file" accept=".csv,.xlsx,.xlsm" data-ch="${ch}" style="display:none">
+        <button type="button" class="ob-ch-btn" data-ch="${ch}" style="font-size:11.5px;padding:4px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer">Upload export</button>
+      </span></div>`;
+  }).join('');
+  grid.dataset.loaded='1';
+  grid.querySelectorAll('.ob-ch-btn').forEach(b=>b.addEventListener('click',()=>
+    grid.querySelector(`input[data-ch="${b.dataset.ch}"]`).click()));
+  grid.querySelectorAll('input[type=file]').forEach(inp=>inp.addEventListener('change',(e)=>{
+    const ch=inp.dataset.ch, f=(e.target.files||[])[0];
+    const row=grid.querySelector(`.ob-ch[data-ch="${ch}"]`), stat=row.querySelector('.ob-ch-stat');
+    if(f){ seedByChannel[ch]=f; stat.textContent=f.name; stat.style.color='var(--positive)';
+           row.querySelector('.ob-ch-btn').textContent='Replace'; }
+    else { delete seedByChannel[ch]; stat.textContent=''; }
+    updateSeedStat();
+  }));
+}
+
+const JOKES = [
+  "Why don't skeletons fight each other? They don't have the <b>guts</b>.",
+  "I only know 25 letters of the alphabet. I don't know <b>y</b>.",
+  "What do you call a fake noodle? An <b>impasta</b>.",
+  "Why did the scarecrow win an award? He was <b>outstanding</b> in his field.",
+  "I'm reading a book about anti-gravity. It's <b>impossible to put down</b>.",
+  "What do you call cheese that isn't yours? <b>Nacho cheese</b>.",
+  "Why did the bicycle fall over? It was <b>two-tired</b>.",
+  "I used to hate facial hair, but then it <b>grew on me</b>.",
+  "What does a sea seller do best? She <b>sells by the seashore</b> — margins included.",
+  "Why did the merchant bring a ladder? To reach the <b>high-margin</b> shelf.",
+  "I told my warehouse a joke about inventory. It didn't <b>stock up</b> on laughs.",
+  "What's a pirate's favorite KPI? The <b>arr-O-A-S</b>.",
+  "Why don't eggs tell jokes? They'd <b>crack each other up</b>.",
+  "I made a pencil with two erasers. It was <b>pointless</b>.",
+  "Why did the coffee file a police report? It got <b>mugged</b>.",
+  "What do you call a belt made of watches? A <b>waist of time</b>.",
+  "Why was the math book sad? It had too many <b>problems</b>.",
+  "What do you call a SKU that won't sell? A <b>shelf-help</b> book.",
+  "Why did the spreadsheet go to therapy? Too many <b>unresolved cells</b>.",
+  "I'd tell you a chemistry joke but I know I wouldn't get a <b>reaction</b>."
+];
+let jokeTimer=null, pollTimer=null, jokeIx=0;
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function startJokes(){
+  const j=$('joke'); if(j) j.style.display='block'; shuffle(JOKES); jokeIx=0;
+  const show=()=>{ j.style.opacity=0; setTimeout(()=>{ j.innerHTML=JOKES[jokeIx % JOKES.length]; j.style.opacity=1; jokeIx++; },300); };
+  show(); jokeTimer=setInterval(show, 5000);
+}
+function stopTimers(){ if(jokeTimer)clearInterval(jokeTimer); if(pollTimer)clearInterval(pollTimer); const j=$('joke'); if(j) j.style.display='none'; }
+
+// Dad-jokes panel above the FAQ (item 2). Baked-in rotation from JOKES — no external calls
+// (honors the no-scrape / official-sources rule). Rotates on an interval and on "Another one".
+(function initDadJokes(){
+  const el=$('djText'); if(!el) return;
+  const pool=shuffle([...JOKES]); let ix=0, t=null;
+  const show=()=>{ el.style.opacity=0; setTimeout(()=>{ el.innerHTML=pool[ix%pool.length]; el.style.opacity=1; ix++; },250); };
+  const arm=()=>{ if(t) clearInterval(t); t=setInterval(show, 7000); };
+  show(); arm();
+  const btn=$('djBtn'); if(btn) btn.addEventListener('click',()=>{ show(); arm(); });   // next joke, reset timer
+})();
+
+$('provision').addEventListener('click', async ()=>{
+  $('oberr').textContent='';
+  const country = ($('country')? $('country').value : 'IN');
+  if(!confirm("Set up this account as a TESTER? Once your data is provisioned, the account type is locked to tester for this account.")) return;
+  $('provision').style.display='none';
+  $('prog').classList.add('show'); $('pfill').style.width='5%'; $('pstage').textContent='Starting…';
+  startJokes();
+  let ok, data;
+  if(synSrc==='upload'){
+    const chs=Object.keys(seedByChannel);
+    if(!chs.length){
+      stopTimers(); $('prog').classList.remove('show'); $('provision').style.display='block';
+      $('oberr').textContent='Upload at least one store export to continue.'; return; }
+    const fd=new FormData(); fd.append('country', country);
+    chs.forEach((ch,i)=>{ const f=seedByChannel[ch]; fd.append('f'+i, f, f.name);
+      fd.append('channel:'+f.name, ch); });
+    const r=await fetch('/api/onboard/upload',{method:'POST',body:fd});
+    data=await r.json(); ok=r.ok;
+  } else {
+    const res=await postJSON('/api/onboard',{mode:'synthetic', source:'sample', country});
+    ok=res.ok; data=res.data;
+  }
+  if(!(ok && data.ok && data.started)){
+    stopTimers(); $('prog').classList.remove('show'); $('provision').style.display='block';
+    $('oberr').textContent=(data&&data.error)||'Provisioning failed.'; return;
+  }
+  // poll the background job for real progress
+  pollTimer=setInterval(async ()=>{
+    try{
+      const s=await fetch('/api/onboard/status').then(r=>r.json());
+      if(s.error){ stopTimers(); $('prog').classList.remove('show'); $('provision').style.display='block';
+        $('oberr').textContent=s.error; return; }
+      $('pfill').style.width=Math.max(5,Math.min(100,s.pct||0))+'%';
+      if(s.stage) $('pstage').textContent=s.stage;
+      if(s.done){ stopTimers(); $('pfill').style.width='100%'; $('pstage').textContent='Ready — opening your workspace…';
+        setTimeout(()=>location.href='/', 500); }
+    }catch(e){}
+  }, 1200);
+});
+// if already authed, skip straight in
+async function initJoin(){
+  try{
+    const r=await fetch('/api/invite/preview?token='+encodeURIComponent(joinToken)).then(x=>x.json());
+    const banner=$('joinBanner'); banner.style.display='block';
+    if(!r.ok){ banner.style.background='#fbeaea'; banner.style.borderColor='#e3b0b0'; banner.style.color='#9e2b25';
+      banner.textContent=r.error||'This invite link is invalid or expired.'; return; }
+    mode='join';
+    document.querySelector('.tabs').style.display='none';
+    $('acctWrap').style.display='none';
+    banner.textContent=`You've been invited to join ${r.org}. Set a password to accept.`;
+    $('email').value=r.email; $('email').readOnly=true; $('email').style.opacity='.7';
+    $('go').textContent=`Join ${r.org}`;
+    if($('note')) $('note').style.display='none';
+  }catch(e){}
+}
+// add-data mode: an ALREADY-provisioned brand adding / replacing reports from the in-app upload buttons.
+// Reuse the EXACT onboarding uploader + /api/onboard/reports path (full pipeline incl. campaign ad-graph),
+// but reframe the copy as add/replace, pre-select the brand's real marketplace (so a US brand isn't flipped
+// to IN by the default), and show a Cancel → back-to-dashboard control.
+if(window.__addData){
+  const h=$('obCustHead'), s=$('obCustSub'), b=$('custProvision'), c=$('addCancel');
+  if(h) h.textContent='Add or replace reports';
+  if(s) s.textContent='Upload new or updated reports. We recognize each file and merge it into your existing data — nothing is wiped. Re-uploading a report for a period you already have replaces that period.';
+  if(b) b.textContent='Upload reports';
+  if(c) c.style.display='inline-block';
+  if(window.__brandCountry){ const sel=$('custCountry'); if(sel) sel.value=window.__brandCountry; }
+}
+if(joinToken){ initJoin(); }
+else if(window.__agencyBrand || window.__addData){ showCustomerOnboarding(); }   // agency drill-in OR add-data: straight to Connect-your-data, no sign-in flash, no account-type gate
+else { fetch('/api/me').then(r=>r.json()).then(m=>{ if(m.authed && m.provisioned) location.href='/'; else if(m.authed) routeAfterAuth(); }); }
+
+// ---- ambient sound (generated; default OFF, browsers block autoplay-with-sound) ----
+(function(){
+  const btn=document.getElementById('musicBtn'), icon=document.getElementById('musicIcon');
+  if(!btn) return;
+  let ctx, master, voices=[], timer, playing=false, ci=0;
+  const chords=[[146.83,220.00,293.66],[130.81,196.00,261.63],[164.81,246.94,329.63],[174.61,261.63,349.23]];
+  function mkVoice(freq){
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='sine'; o.frequency.value=freq; g.gain.value=0;
+    o.connect(g); g.connect(master); o.start();
+    g.gain.linearRampToValueAtTime(0.045, ctx.currentTime+2.6);
+    return {o,g};
+  }
+  function nextChord(){
+    voices.forEach(v=>{ try{ v.g.gain.cancelScheduledValues(ctx.currentTime); v.g.gain.linearRampToValueAtTime(0, ctx.currentTime+2.2); const o=v.o; setTimeout(()=>{try{o.stop()}catch(e){}},2400);}catch(e){} });
+    voices = chords[ci].map(mkVoice); ci=(ci+1)%chords.length;
+  }
+  function start(){
+    try{ ctx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; }
+    master=ctx.createGain(); master.gain.value=0;
+    const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=850;
+    master.connect(lp); lp.connect(ctx.destination);
+    master.gain.linearRampToValueAtTime(0.6, ctx.currentTime+3);
+    nextChord(); timer=setInterval(nextChord, 9000);
+    playing=true; if(window.AMBIENT_ON_ICON) icon.innerHTML=AMBIENT_ON_ICON; btn.style.borderColor='var(--competitive)';
+  }
+  function stop(){
+    playing=false; if(window.AMBIENT_OFF_ICON) icon.innerHTML=AMBIENT_OFF_ICON; btn.style.borderColor='';
+    if(timer) clearInterval(timer);
+    if(master) master.gain.linearRampToValueAtTime(0, ctx.currentTime+1.2);
+    setTimeout(()=>{ try{ctx.close()}catch(e){} ctx=null; voices=[]; }, 1400);
+  }
+  btn.addEventListener('click', ()=> playing?stop():start());
+})();
+// FAQ: animate visuals when scrolled into view; replay when a question opens
+const _io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+}, {threshold:0.25});
+document.querySelectorAll('.faq .viz').forEach(v=>_io.observe(v));
+document.querySelectorAll('.faq .qa').forEach(d=>d.addEventListener('toggle',()=>{
+  if(d.open){
+    document.querySelectorAll('.faq .qa').forEach(o=>{ if(o!==d) o.open=false; });
+    const v=d.querySelector('.viz');
+    if(v){ v.classList.remove('in'); void v.offsetWidth; v.classList.add('in'); _io.observe(v); }
+  }
+}));
+const _cue=document.querySelector('.scrollcue');
+if(_cue){ _cue.style.cursor='pointer'; _cue.addEventListener('click',()=>document.querySelector('.faq').scrollIntoView({behavior:'smooth'})); }
+</script>
+</body></html>

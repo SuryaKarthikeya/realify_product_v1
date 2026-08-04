@@ -1,0 +1,14 @@
+.env
+*.db
+*.db-*
+*.db-wal
+*.db-shm
+__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.git/
+.gitignore
+realify-mc.zip
+*.bak
+*.bak-*

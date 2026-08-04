@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Realify — Interior Reskin</title>
+<style>
+  :root{
+    --ink:#1A1A1A; --paper:#F7F4EE; --card:#FFFFFF; --panel2:#FBF9F4; --sand:#EFE7D9;
+    --terra:#C4785B; --terra-d:#A9603F; --slate:#5B7B94; --sage:#7A9E7E; --gold:#B98A2E; --alert:#B3402E;
+    --line:#E4DDD0; --line2:#EEE8DC; --mut:#6E675C; --faint:#9A9182;
+    --sans:-apple-system,BlinkMacSystemFont,"system-ui","Segoe UI",Inter,Roboto,sans-serif;
+    --serif:Georgia,"Times New Roman",serif;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+    --shadow:0 1px 2px rgba(26,26,26,.04),0 8px 26px rgba(26,26,26,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#E9E3D8;color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.5}
+  #shell{display:flex;min-height:100vh}
+  #nav{width:230px;flex-shrink:0;background:var(--ink);color:#EDE7DB;padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto}
+  #nav h1{font-size:15px;margin:0 0 4px;font-family:var(--serif)}
+  #nav .sub{font-size:11.5px;color:#9C9483;margin-bottom:16px}
+  #nav .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--terra);margin:14px 0 6px}
+  #nav button{display:block;width:100%;text-align:left;background:none;border:none;color:#CFC8BA;font-size:12.5px;padding:7px 10px;border-radius:8px;cursor:pointer;font-family:var(--sans)}
+  #nav button:hover{background:#2A2A2A;color:#fff}
+  #nav button.on{background:var(--terra);color:#fff;font-weight:600}
+  #stage{flex:1;padding:22px 26px 60px;max-width:1180px}
+  .annot{background:#FBF7EF;border:1px dashed var(--terra);border-radius:10px;padding:10px 14px;font-size:12.5px;color:#7A5A47;margin-bottom:14px}
+  .annot b{color:#9C4F30}
+  .screen{display:none}.screen.on{display:block}
+
+  /* app chrome */
+  .app{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+  .topnav{display:flex;align-items:center;gap:14px;padding:14px 24px;background:var(--paper);border-bottom:1px solid var(--line)}
+  .logo{font-family:var(--serif);font-weight:700;font-size:19px;letter-spacing:-.02em;display:flex;align-items:center;gap:7px}
+  .logo .mk{color:var(--terra);font-size:16px}
+  .ctx-pill{font-family:var(--mono);font-size:10px;letter-spacing:.12em;background:var(--sand);color:#7A6A4F;border-radius:100px;padding:3px 10px}
+  .greet{margin-left:auto;text-align:right}
+  .greet .hi{font-family:var(--serif);font-size:15px}
+  .greet .sub{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.06em}
+  .navbtn{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:7px 13px;font-size:12.5px;color:var(--ink);cursor:pointer;margin-left:8px}
+  .navbtn.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .statusbar{display:flex;justify-content:space-between;padding:9px 24px;font-size:12px;color:var(--mut);background:var(--panel2);border-bottom:1px solid var(--line)}
+  .statusbar .ok{color:var(--sage);font-weight:600}
+
+  .tabs{display:flex;gap:0;padding:0 18px;background:var(--paper);border-bottom:1px solid var(--line)}
+  .tab{padding:14px 16px 13px;font-size:14px;cursor:pointer;color:var(--mut);border-bottom:2.5px solid transparent;display:flex;gap:7px;align-items:baseline}
+  .tab .t2{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .tab.on{color:var(--ink);border-bottom-color:var(--terra);font-weight:600}
+  .tab.on .t2{color:var(--terra)}
+
+  .body{padding:24px}
+  .lens-h{font-family:var(--serif);font-size:22px;font-weight:700;letter-spacing:-.01em;margin:0 0 3px}
+  .lens-sub{font-size:12.5px;color:var(--mut);margin:0 0 16px}
+  .kick{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+
+  .btn{border-radius:9px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--sans)}
+  .btn.p{background:var(--terra);color:#fff}.btn.p:hover{background:var(--terra-d)}
+  .btn.g{background:var(--card);border:1px solid var(--line);color:var(--ink)}
+  .btn.sm{padding:7px 12px;font-size:12px}
+
+  /* metric cards */
+  .metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .metric{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 16px;cursor:pointer;box-shadow:var(--shadow)}
+  .metric.sel{border-color:var(--terra);box-shadow:0 0 0 1px var(--terra),var(--shadow)}
+  .metric .m-k{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .metric .m-v{font-family:var(--serif);font-size:26px;font-weight:700;margin:6px 0 2px}
+  .metric .m-s{font-size:11.5px;color:var(--mut)}
+  .metric .m-tag{font-family:var(--mono);font-size:9px;letter-spacing:.06em;background:var(--sand);color:#7A6A4F;border-radius:100px;padding:2px 8px;display:inline-block;margin-top:8px}
+
+  /* tables */
+  .tw{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--card);box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);font-weight:600}
+  td{padding:12px 14px;border-bottom:1px solid var(--line2)}
+  tbody tr:last-child td{border-bottom:none}
+  td.r,th.r{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .sku{font-family:var(--mono);color:var(--terra);font-weight:600;font-size:12.5px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:4px}
+  .dot.g{background:var(--sage)}.dot.a{background:var(--gold)}.dot.r{background:var(--alert)}
+  .spark{height:2px;background:var(--slate);opacity:.4;border-radius:2px;width:60px;display:inline-block}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px}
+  .search{border:1px solid var(--line);border-radius:9px;padding:9px 14px;font-size:13px;color:var(--mut);background:var(--card);width:280px}
+
+  /* action tint cards (Profit&Ads) — harmonized warm */
+  .tintcards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+  .tint{border-radius:13px;padding:16px;border:1px solid}
+  .tint .tv{font-family:var(--serif);font-size:28px;font-weight:700}
+  .tint .tk{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+  .tint.scale{background:#EDF3EC;border-color:#CBDCC9;color:#3F6B45}
+  .tint.fixads{background:#F8EFD9;border-color:#E7D5A6;color:#8A6A12}
+  .tint.fixmargin{background:#F6E9E2;border-color:#E3C4B4;color:#9C4F30}
+  .tint.cut{background:#F3E0DC;border-color:#DDB3AA;color:var(--alert)}
+  .tint.sel{box-shadow:0 0 0 2px currentColor}
+
+  .banner{border-radius:11px;padding:13px 16px;font-size:13px;margin-bottom:16px}
+  .banner.info{background:#EDF1F4;border:1px solid #CFDBE3;color:#3E566A}
+  .banner.warm{background:var(--sand);border:1px solid var(--line);color:#7A5A47}
+  .bigstat{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:20px 22px;display:flex;justify-content:space-between;box-shadow:var(--shadow);margin-bottom:14px}
+  .bigstat .bv{font-family:var(--serif);font-size:34px;font-weight:700;color:var(--alert)}
+  .bigstat .bk{font-size:12.5px;color:var(--mut);margin-top:2px}
+  .bigstat .side{text-align:right;font-size:12px;color:var(--mut);line-height:1.9}
+
+  .select{border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:13px;background:var(--card);font-family:var(--sans)}
+  .fieldlabel{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:5px}
+
+  /* dark brief panel — warmed to charcoal */
+  .brief{background:var(--ink);color:#EDE7DB;border-radius:14px;padding:24px 26px}
+  .brief .bk{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--terra)}
+  .brief h3{font-family:var(--serif);font-size:19px;font-weight:600;margin:8px 0 10px;line-height:1.3}
+  .brief p{margin:0;font-size:13px;color:#B7AE9E}
+  .badge{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;border-radius:100px;padding:3px 9px}
+  .badge.coming{background:#F8EFD9;color:#8A6A12}.badge.official{background:#EDF3EC;color:#3F6B45}.badge.live{background:#EDF3EC;color:#3F6B45}
+
+  /* category pulse / channel cards */
+  .pulse{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:12px}
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px;box-shadow:var(--shadow)}
+  .pcard .pn{font-size:13px;font-weight:600}.pcard .pm{font-family:var(--mono);font-size:11px;color:var(--mut);margin-top:2px}
+  .pcard .pf{display:flex;justify-content:space-between;font-size:11px;color:var(--faint);margin-top:10px}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+  .chip{border:1px solid var(--line);border-radius:100px;padding:6px 13px;font-size:12.5px;cursor:pointer;background:var(--card)}
+  .chip.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chip .cd{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
+  .period{display:inline-flex;background:var(--sand);border-radius:100px;padding:3px;font-size:12px}
+  .period span{padding:5px 12px;border-radius:100px;cursor:pointer;color:var(--mut)}
+  .period span.on{background:var(--ink);color:#fff;font-weight:600}
+  .flownext{margin-top:16px}
+</style>
+</head>
+<body>
+<div id="shell">
+  <nav id="nav">
+    <h1>Interior Reskin</h1>
+    <div class="sub">The five lenses, in the site's<br>warm system · mockup v1</div>
+    <div class="grp">Before → after</div>
+    <button data-s="i0" class="on">0 · The system (before/after)</button>
+    <div class="grp">The five lenses</div>
+    <button data-s="i1">1 · Product Catalog (SKUs)</button>
+    <button data-s="i2">2 · Profit &amp; Ads</button>
+    <button data-s="i3">3 · Intelligence</button>
+    <button data-s="i4">4 · Category Analyst</button>
+    <button data-s="i5">5 · Cross-channel</button>
+  </nav>
+  <main id="stage">
+
+  <!-- ============ 0. SYSTEM ============ -->
+  <section class="screen on" id="i0">
+    <div class="annot"><b>Principal-designer note.</b> The interior currently runs a <b>cool-gray / navy / Inter</b> system with heavy drop-shadows — a different visual world from the marketing site's <b>warm paper / charcoal / terracotta / Georgia-serif</b> language (extracted live: ink #1A1A1A, paper #F7F4EE, terracotta #C4785B, 9px radius, sand pills). This reskin brings the interior into that one system so a prospect who loved the site doesn't feel like they logged into a different product. Content, data, and layout are unchanged — only the skin. Semantic colors (scale/fix/cut, health bands) are kept but re-tuned to the warm family. Click through the five lenses.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="app" style="border-radius:12px">
+        <div style="background:#EDEFF3;padding:16px 18px;color:#15233B;font-family:Inter,sans-serif">
+          <div style="font-size:11px;color:#8A93A5;text-transform:uppercase;letter-spacing:.08em;font-family:monospace">Before</div>
+          <div style="background:#fff;border-radius:16px;box-shadow:0 24px 70px rgba(26,26,26,.18);padding:16px;margin-top:10px">
+            <div style="font-size:11px;color:#6B7688;text-transform:uppercase">Revenue</div>
+            <div style="font-size:26px;font-weight:700">₹1.07cr</div>
+            <div style="font-size:11px;color:#8A93A5">2,930 units</div>
+          </div>
+          <div style="font-size:11px;color:#8A93A5;margin-top:10px">Inter · cool gray #EDEFF3 · navy #15233B · indigo accent · 16px radius · heavy shadow</div>
+        </div>
+      </div>
+      <div class="app" style="border-radius:12px">
+        <div style="background:var(--paper);padding:16px 18px">
+          <div class="kick" style="color:var(--terra)">After</div>
+          <div class="metric" style="margin-top:10px;cursor:default">
+            <div class="m-k">Revenue</div>
+            <div class="m-v">₹1.07cr</div>
+            <div class="m-s">2,930 units</div>
+            <div class="m-tag">reports</div>
+          </div>
+          <div style="font-size:11px;color:var(--mut);margin-top:10px">Georgia headline · warm paper #F7F4EE · charcoal #1A1A1A · terracotta accent · soft shadow · sand tag</div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn p" onclick="go('i1')">See the lenses reskinned →</button></div>
+  </section>
+
+  <!-- ============ APP CHROME (shared, rendered per screen) ============ -->
+  <!-- 1. PRODUCT CATALOG -->
+  <section class="screen" id="i1">
+    <div class="annot"><b>Product Catalog (SKUs).</b> Reskinned: Georgia section title, warm table with terracotta SKU links, health dots in sage/gold/terracotta, sand-pill controls. Same columns and data (SB-017 Dashcam ₹3,299…). The heavy card shadow is gone; borders + soft shadow do the work.</div>
+    <div class="app">
+      <div class="topnav"><span class="logo"><span class="mk">✦</span>realify</span><span class="ctx-pill">Catalog</span>
+        <div class="greet"><div class="hi">Good morning, Shiva</div><div class="sub">Wed Jul 15 2026 · live · amazon.in</div></div>
+        <button class="navbtn">◉ Pulse</button><button class="navbtn">☷ Activity</button><button class="navbtn">Rules</button><button class="navbtn">Account</button></div>
+      <div class="statusbar"><span><span class="ok">Workspace ready ✓</span> · Market feeds 2/4 current · waiting: Keepa · market, BIS / recalls</span><span>Updated 05:54 PM</span></div>
+      <div class="tabs">
+        <div class="tab on">Product Catalog <span class="t2">your skus</span></div>
+        <div class="tab" onclick="go('i2')">Profit &amp; Ads <span class="t2">margin vs spend</span></div>
+        <div class="tab" onclick="go('i3')">Intelligence <span class="t2">your products</span></div>
+        <div class="tab" onclick="go('i4')">Category Analyst <span class="t2">overnight memo</span></div>
+        <div class="tab" onclick="go('i5')">Channels <span class="t2">cross-channel</span></div>
+      </div>
+      <div class="body">
+        <div class="toolbar">
+          <div><h2 class="lens-h">Product Catalog</h2><p class="lens-sub">24 SKUs · avg 4/7 fields filled · 0 missing COGS</p></div>
+          <div><button class="btn g sm">⭳ Download CSV</button> <button class="btn p sm">+ Add / replace channel reports</button></div>
+        </div>
+        <div class="toolbar"><span class="search">🔍 Search SKU or title…</span><span class="lens-sub" style="margin:0">Showing 1–24 of 24 SKUs</span></div>
+        <div class="tw">
+          <table>
+            <thead><tr><th></th><th>SKU</th><th>Title</th><th class="r">Price</th><th class="r">COGS</th><th class="r">Margin %</th><th class="r">Units/mo</th><th class="r">Buy Box</th><th>Sales trend</th></tr></thead>
+            <tbody>
+              <tr><td><span class="dot r"></span></td><td class="sku">SB-017 ›</td><td>Dashcam 017</td><td class="r">₹3,299</td><td class="r">₹1,343</td><td class="r">—</td><td class="r">196</td><td class="r">70%</td><td><span class="spark"></span></td></tr>
+              <tr><td><span class="dot a"></span></td><td class="sku">SB-003 ›</td><td>Seat organizer 003</td><td class="r">₹1,899</td><td class="r">₹636</td><td class="r">—</td><td class="r">194</td><td class="r">95%</td><td><span class="spark"></span></td></tr>
+              <tr><td><span class="dot a"></span></td><td class="sku">SB-005 ›</td><td>LED kit 005</td><td class="r">₹3,299</td><td class="r">₹1,479</td><td class="r">—</td><td class="r">189</td><td class="r">95%</td><td><span class="spark"></span></td></tr>
+              <tr><td><span class="dot a"></span></td><td class="sku">SB-014 ›</td><td>Floor mats 014</td><td class="r">₹1,499</td><td class="r">₹706</td><td class="r">—</td><td class="r">189</td><td class="r">85%</td><td><span class="spark"></span></td></tr>
+              <tr><td><span class="dot a"></span></td><td class="sku">SB-007 ›</td><td>Charger 007</td><td class="r">₹2,499</td><td class="r">₹922</td><td class="r">—</td><td class="r">186</td><td class="r">95%</td><td><span class="spark"></span></td></tr>
+              <tr><td><span class="dot a"></span></td><td class="sku">SB-011 ›</td><td>Seat organizer 011</td><td class="r">₹5,999</td><td class="r">₹2,327</td><td class="r">—</td><td class="r">177</td><td class="r">95%</td><td><span class="spark"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn p" onclick="go('i2')">Next: Profit &amp; Ads →</button></div>
+  </section>
+
+  <!-- 2. PROFIT & ADS -->
+  <section class="screen" id="i2">
+    <div class="annot"><b>Profit &amp; Ads.</b> The four action-tint cards (Scale / Fix Ads / Fix Margin / Cut) are the one place semantic color must survive — kept, but re-tuned from the cool set to a warm sage→gold→terracotta→red family so they belong to this palette. The big recoverable-$ stat gets the serif treatment.</div>
+    <div class="app">
+      <div class="topnav"><span class="logo"><span class="mk">✦</span>realify</span><span class="ctx-pill">CMAA</span>
+        <div class="greet"><div class="hi">Good morning, Shiva</div><div class="sub">Wed Jul 15 2026 · live · amazon.in</div></div>
+        <button class="navbtn">◉ Pulse</button><button class="navbtn">☷ Activity</button><button class="navbtn">Rules</button><button class="navbtn">Account</button></div>
+      <div class="statusbar"><span><span class="ok">Workspace ready ✓</span> · Market feeds 2/4 current · waiting: Keepa</span><span>Updated 05:54 PM</span></div>
+      <div class="tabs">
+        <div class="tab" onclick="go('i1')">Product Catalog <span class="t2">your skus</span></div>
+        <div class="tab on">Profit &amp; Ads <span class="t2">margin vs spend</span></div>
+        <div class="tab" onclick="go('i3')">Intelligence <span class="t2">your products</span></div>
+        <div class="tab" onclick="go('i4')">Category Analyst <span class="t2">overnight memo</span></div>
+        <div class="tab" onclick="go('i5')">Channels <span class="t2">cross-channel</span></div>
+      </div>
+      <div class="body">
+        <h2 class="lens-h">Profit &amp; Ads</h2>
+        <div style="display:flex;gap:18px;margin:12px 0 16px;align-items:flex-end">
+          <div><span class="fieldlabel">Category</span><select class="select"><option>All categories</option></select></div>
+          <div><span class="fieldlabel">Price band</span><select class="select"><option>All price bands</option></select></div>
+          <div style="margin-left:auto;text-align:right;font-size:12px;color:var(--mut)">Timeframe · aggregated over<br>your full ad-report window</div>
+        </div>
+        <div class="banner info">Demo data — synthesized for exploration. This tester workspace runs on a synthetic catalog so you can try every feature. A customer account loads your real reports instead.</div>
+        <p class="lens-sub">Showing SKU-level view — no campaign-level ad data for this account yet.</p>
+        <div class="bigstat">
+          <div><div class="bv">₹0</div><div class="bk"><b>recoverable now</b> — overspending above break-even</div><div style="font-size:11px;color:var(--faint);margin-top:4px">across 0 FIX ADS SKUs · ₹0 certain, ₹0 rests on estimated inputs</div></div>
+          <div class="side"><b>₹0</b> ad spend above break-even, portfolio-wide<br><b>₹0</b> scale upside (dir.) · <b>₹0</b> bleed to stop<br>0 below cost · portfolio TACoS — 0 cannibalization risk</div>
+        </div>
+        <div class="tintcards">
+          <div class="tint scale"><div class="tv">0</div><div class="tk">Scale</div></div>
+          <div class="tint fixads sel"><div class="tv">0</div><div class="tk">Fix Ads</div></div>
+          <div class="tint fixmargin"><div class="tv">0</div><div class="tk">Fix Margin</div></div>
+          <div class="tint cut"><div class="tv">0</div><div class="tk">Cut / Divest</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn p" onclick="go('i3')">Next: Intelligence →</button></div>
+  </section>
+
+  <!-- 3. INTELLIGENCE -->
+  <section class="screen" id="i3">
+    <div class="annot"><b>Intelligence.</b> The tappable performance metrics become the warm metric card from screen 0 (serif value, sand tag, terracotta selected-ring). Category Pulse cards and the family-filter chips adopt the sand/charcoal chip system. This is the screen that most sells the "one product" feeling.</div>
+    <div class="app">
+      <div class="topnav"><span class="logo"><span class="mk">✦</span>realify</span><span class="ctx-pill">Intelligence</span>
+        <div class="greet"><div class="hi">Good morning, Shiva</div><div class="sub">Wed Jul 15 2026 · live · amazon.in</div></div>
+        <button class="navbtn">◉ Pulse</button><button class="navbtn">☷ Activity</button><button class="navbtn">Rules</button><button class="navbtn">Account</button></div>
+      <div class="statusbar"><span><span class="ok">Workspace ready ✓</span> · Market feeds 2/4 current</span><span>Updated 05:54 PM</span></div>
+      <div class="tabs">
+        <div class="tab" onclick="go('i1')">Product Catalog <span class="t2">your skus</span></div>
+        <div class="tab" onclick="go('i2')">Profit &amp; Ads <span class="t2">margin vs spend</span></div>
+        <div class="tab on">Intelligence <span class="t2">your products</span></div>
+        <div class="tab" onclick="go('i4')">Category Analyst <span class="t2">overnight memo</span></div>
+        <div class="tab" onclick="go('i5')">Channels <span class="t2">cross-channel</span></div>
+      </div>
+      <div class="body">
+        <div class="toolbar"><span class="kick">Your performance — tap a metric to filter insights below</span><span class="period"><span>60d</span><span class="on">30d</span><span>7d</span></span></div>
+        <div class="metrics">
+          <div class="metric sel"><div class="m-k">Revenue</div><div class="m-v">₹1.07cr</div><div class="m-s">2,930 units</div><div class="m-tag">reports</div></div>
+          <div class="metric"><div class="m-k">Margin</div><div class="m-v">₹0</div><div class="m-s">0% of revenue</div><div class="m-tag">reports</div></div>
+          <div class="metric"><div class="m-k">Cash received</div><div class="m-v" style="color:var(--faint)">—</div><div class="m-s">add settlement report</div><div class="m-tag">reports</div></div>
+          <div class="metric"><div class="m-k">Inventory value</div><div class="m-v" style="color:var(--faint)">—</div><div class="m-s">add inventory report</div><div class="m-tag">snapshot</div></div>
+          <div class="metric"><div class="m-k">Ad spend</div><div class="m-v">₹0</div><div class="m-s">TACoS 0%</div><div class="m-tag">modeled</div></div>
+        </div>
+        <div class="toolbar" style="margin-top:22px"><span class="kick">Category pulse — tap to filter</span><span class="lens-sub" style="margin:0">8 categories followed</span></div>
+        <div class="pulse">
+          <div class="pcard"><div class="pn">Car cover</div><div class="pm">3 SKUs · ₹0.0cr</div><div class="pf"><span>→ stable</span><span>—</span></div></div>
+          <div class="pcard"><div class="pn">Charger</div><div class="pm">3 SKUs · ₹0.0cr</div><div class="pf"><span>→ stable</span><span>—</span></div></div>
+          <div class="pcard"><div class="pn">Dashcam</div><div class="pm">3 SKUs · ₹0.0cr</div><div class="pf"><span>→ stable</span><span>—</span></div></div>
+          <div class="pcard"><div class="pn">Floor mats</div><div class="pm">3 SKUs · ₹0.0cr</div><div class="pf"><span>→ stable</span><span>—</span></div></div>
+          <div class="pcard"><div class="pn">LED kit</div><div class="pm">3 SKUs · ₹0.0cr</div><div class="pf"><span>→ stable</span><span>—</span></div></div>
+        </div>
+        <div class="toolbar" style="margin-top:22px"><span class="kick">Intelligence feed · 0 insights &amp; signals</span></div>
+        <div class="chips">
+          <span class="chip sel">All families</span>
+          <span class="chip"><span class="cd" style="background:var(--slate)"></span>Competitive</span>
+          <span class="chip"><span class="cd" style="background:var(--sage)"></span>Demand</span>
+          <span class="chip"><span class="cd" style="background:#8A6FA8"></span>Opportunity</span>
+          <span class="chip"><span class="cd" style="background:var(--terra)"></span>News &amp; Risk</span>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn p" onclick="go('i4')">Next: Category Analyst →</button></div>
+  </section>
+
+  <!-- 4. CATEGORY ANALYST -->
+  <section class="screen" id="i4">
+    <div class="annot"><b>Category Analyst.</b> The dark "THE BRIEF" panel is kept — dark panels are good for an overnight-memo feel — but warmed from navy to charcoal #1A1A1A with a terracotta kicker and serif headline, so it matches the marketing site's dark sections. The coming/official/partial legend badges move to the warm badge set.</div>
+    <div class="app">
+      <div class="topnav"><span class="logo"><span class="mk">✦</span>realify</span><span class="ctx-pill">Category Analyst</span>
+        <div class="greet"><div class="hi">Good morning, Shiva</div><div class="sub">Wed Jul 15 2026 · live · amazon.in</div></div>
+        <button class="navbtn">◉ Pulse</button><button class="navbtn">☷ Activity</button><button class="navbtn">Rules</button><button class="navbtn">Account</button></div>
+      <div class="statusbar"><span><span class="ok">Workspace ready ✓</span> · Market feeds 2/4 current</span><span>Updated 05:54 PM</span></div>
+      <div class="tabs">
+        <div class="tab" onclick="go('i1')">Product Catalog <span class="t2">your skus</span></div>
+        <div class="tab" onclick="go('i2')">Profit &amp; Ads <span class="t2">margin vs spend</span></div>
+        <div class="tab" onclick="go('i3')">Intelligence <span class="t2">your products</span></div>
+        <div class="tab on">Category Analyst <span class="t2">overnight memo</span></div>
+        <div class="tab" onclick="go('i5')">Channels <span class="t2">cross-channel</span></div>
+      </div>
+      <div class="body">
+        <div style="display:flex;gap:18px;align-items:flex-end;margin-bottom:12px">
+          <div><span class="fieldlabel">Category</span><select class="select"><option>Car cover</option></select></div>
+          <div><span class="fieldlabel">Price band</span><select class="select"><option>Mid (₹1,000–2,500)</option></select></div>
+          <div style="margin-left:auto;font-size:12px;color:var(--mut)">Your share of band — <span class="badge coming">coming</span> · Category rank — <span class="badge coming">coming</span> · Velocity today <b>0.0 units/day</b> <span class="badge official">official</span></div>
+        </div>
+        <div style="font-size:11.5px;color:var(--mut);margin-bottom:14px"><span style="border-bottom:2px solid var(--sage);padding-bottom:1px">solid = live</span> &nbsp; <span style="color:var(--gold)">– – dashed amber = coming</span> &nbsp; <span style="border-left:3px solid var(--terra);padding-left:5px">left-accent = partial</span></div>
+        <div class="brief">
+          <div class="bk">The brief · live</div>
+          <h3>No live category signals across Car cover yet. Whitespace and Voice of Customer join the brief in a later phase.</h3>
+          <p>Coverage: category/competitive signals only (own-SKU margin/Buy Box findings live on Profit &amp; Ads; Whitespace / Voice of Customer join later).</p>
+        </div>
+        <div class="tw" style="margin-top:16px;padding:18px 20px">
+          <h3 style="font-family:var(--serif);font-size:17px;margin:0 0 3px">Signal feed</h3>
+          <p class="lens-sub" style="margin:0">Materiality-ranked change — what moved and the play. Click a number for its derivation.</p>
+        </div>
+        <div class="tw" style="margin-top:12px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
+          <div><b style="font-family:var(--serif)">Whitespace</b><div class="lens-sub" style="margin:0">Ranked expansion concepts against your adjacencies + margin.</div></div>
+          <span class="badge coming">coming</span>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn p" onclick="go('i5')">Next: Cross-channel →</button></div>
+  </section>
+
+  <!-- 5. CROSS-CHANNEL -->
+  <section class="screen" id="i5">
+    <div class="annot"><b>Cross-channel.</b> Channel cards (Amazon / Shopify / Walmart / eBay / TikTok) reskinned to the warm card with mono fee lines and serif values; the four KPI tiles match the metric-card system. Same content, one visual family across all five lenses now.</div>
+    <div class="app">
+      <div class="topnav"><span class="logo"><span class="mk">✦</span>realify</span><span class="ctx-pill">Channels</span>
+        <div class="greet"><div class="hi">Good morning, Shiva</div><div class="sub">Wed Jul 15 2026 · live · amazon.in</div></div>
+        <button class="navbtn">◉ Pulse</button><button class="navbtn">☷ Activity</button><button class="navbtn">Rules</button><button class="navbtn">Account</button></div>
+      <div class="statusbar"><span><span class="ok">Workspace ready ✓</span> · Market feeds 2/4 current</span><span>Updated 05:54 PM</span></div>
+      <div class="tabs">
+        <div class="tab" onclick="go('i1')">Product Catalog <span class="t2">your skus</span></div>
+        <div class="tab" onclick="go('i2')">Profit &amp; Ads <span class="t2">margin vs spend</span></div>
+        <div class="tab" onclick="go('i3')">Intelligence <span class="t2">your products</span></div>
+        <div class="tab" onclick="go('i4')">Category Analyst <span class="t2">overnight memo</span></div>
+        <div class="tab on">Channels <span class="t2">cross-channel</span></div>
+      </div>
+      <div class="body">
+        <h2 class="lens-h">Cross-channel</h2>
+        <div class="banner warm" style="margin-top:12px">▾ How we're reading your channels (0) — Upload a transaction report and we'll classify each sales channel here.</div>
+        <div class="metrics" style="grid-template-columns:repeat(4,1fr)">
+          <div class="metric" style="cursor:default"><div class="m-k">Revenue across channels</div><div class="m-v">₹0</div></div>
+          <div class="metric" style="cursor:default"><div class="m-k">Channels live</div><div class="m-v">0</div></div>
+          <div class="metric" style="cursor:default"><div class="m-k">SKUs with price drift</div><div class="m-v">0</div></div>
+          <div class="metric" style="cursor:default"><div class="m-k">Inventory pooling risks</div><div class="m-v">0</div></div>
+        </div>
+        <div class="toolbar" style="margin-top:20px"><span class="kick">By channel</span><button class="btn p sm">+ Connect channels / upload reports</button></div>
+        <div class="pulse">
+          <div class="pcard"><div class="pn">Amazon</div><div class="pm">FBA · 15.5% fee</div><div class="m-v" style="font-family:var(--serif);font-size:22px;margin:8px 0 0">₹0</div><div class="pf"><span>margin <b style="color:var(--alert)">0%</b></span></div><div class="lens-sub" style="margin:6px 0 0;font-size:11px">0 SKUs · 0 units/mo</div></div>
+          <div class="pcard"><div class="pn">Shopify</div><div class="pm">Self/3PL · 2.9% fee</div><div class="m-v" style="font-family:var(--serif);font-size:22px;margin:8px 0 0">₹0</div><div class="pf"><span>margin <b style="color:var(--alert)">0%</b></span></div><div class="lens-sub" style="margin:6px 0 0;font-size:11px">0 SKUs · 0 units/mo</div></div>
+          <div class="pcard"><div class="pn">Walmart</div><div class="pm">WFS/Self · 15% fee</div><div class="m-v" style="font-family:var(--serif);font-size:22px;margin:8px 0 0">₹0</div><div class="pf"><span>margin <b style="color:var(--alert)">0%</b></span></div><div class="lens-sub" style="margin:6px 0 0;font-size:11px">0 SKUs · 0 units/mo</div></div>
+          <div class="pcard"><div class="pn">eBay</div><div class="pm">Self · 12.5% fee</div><div class="m-v" style="font-family:var(--serif);font-size:22px;margin:8px 0 0">₹0</div><div class="pf"><span>margin <b style="color:var(--alert)">0%</b></span></div><div class="lens-sub" style="margin:6px 0 0;font-size:11px">0 SKUs · 0 units/mo</div></div>
+          <div class="pcard"><div class="pn">TikTok Shop</div><div class="pm">FBT/Self · 8% fee</div><div class="m-v" style="font-family:var(--serif);font-size:22px;margin:8px 0 0">₹0</div><div class="pf"><span>margin <b style="color:var(--alert)">0%</b></span></div><div class="lens-sub" style="margin:6px 0 0;font-size:11px">0 SKUs · 0 units/mo</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn p" onclick="go('i0')">↻ Back to before/after</button></div>
+  </section>
+
+  </main>
+</div>
+<script>
+  function go(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+    document.getElementById(id).classList.add('on');
+    document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.s===id));
+    window.scrollTo({top:0});
+  }
+  document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
+  document.querySelectorAll('.metric,.chip,.tint,.period span').forEach(c=>c.addEventListener('click',function(){
+    if(this.classList.contains('period')||this.parentElement.classList.contains('period')){this.parentElement.querySelectorAll('span').forEach(s=>s.classList.remove('on'));this.classList.add('on');return;}
+    this.classList.toggle('sel');
+  }));
+</script>
+</body>
+</html>

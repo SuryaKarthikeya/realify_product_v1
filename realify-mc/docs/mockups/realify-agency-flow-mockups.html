@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Realify for Agencies — UX Flow Mockups</title>
+<style>
+  :root{
+    --charcoal:#1A1A1A; --sand:#E8DFD0; --terracotta:#C4785B; --slate:#5B7B94;
+    --sage:#7A9E7E; --alert:#B3402E;
+    --paper:#F4F0E8; --panel:#FFFFFF; --ink:#1A1A1A; --muted:#6B6459; --line:#DDD5C6;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55}
+  .mono{font-family:var(--mono)}
+
+  /* ===== mockup shell (navigation around the screens) ===== */
+  #shell{display:flex;min-height:100vh}
+  #nav{width:250px;flex-shrink:0;background:var(--charcoal);color:#EDE7DB;padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto}
+  #nav h1{font-size:15px;margin:0 0 4px;letter-spacing:-.01em}
+  #nav .sub{font-size:11.5px;color:#9C9483;margin-bottom:18px}
+  #nav .actor{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--terracotta);margin:16px 0 6px}
+  #nav button{display:block;width:100%;text-align:left;background:none;border:none;color:#CFC8BA;font-size:13px;
+    padding:7px 10px;border-radius:8px;cursor:pointer;font-family:var(--sans)}
+  #nav button:hover{background:#2A2A2A;color:#fff}
+  #nav button.on{background:var(--terracotta);color:#fff;font-weight:600}
+  #nav .num{display:inline-block;width:20px;color:#8A8272;font-family:var(--mono);font-size:11px}
+  #nav button.on .num{color:#F3D9CD}
+
+  #stage{flex:1;padding:26px 34px 60px;max-width:1100px}
+  .annot{background:#FBF7EF;border:1px dashed var(--terracotta);border-radius:10px;padding:10px 14px;
+    font-size:13px;color:#7A5A47;margin-bottom:18px}
+  .annot b{color:#9C4F30}
+  .screen{display:none}
+  .screen.on{display:block}
+  .flownext{margin-top:22px}
+  .flownext button{background:var(--charcoal);color:#fff;border:none;border-radius:100px;padding:9px 18px;
+    font-size:13px;cursor:pointer}
+  .flownext button:hover{background:#333}
+
+  /* ===== shared mock components ===== */
+  .browser{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    box-shadow:0 2px 6px rgba(26,26,26,.06),0 14px 40px rgba(26,26,26,.07)}
+  .browser .bar{display:flex;align-items:center;gap:8px;background:#EFEAE0;border-bottom:1px solid var(--line);padding:9px 14px}
+  .browser .dots span{display:inline-block;width:9px;height:9px;border-radius:50%;background:#CFC8BA;margin-right:5px}
+  .browser .url{flex:1;background:#fff;border:1px solid var(--line);border-radius:100px;font-family:var(--mono);
+    font-size:11.5px;color:var(--muted);padding:4px 14px}
+  .page{padding:28px 34px}
+
+  .wordmark{font-weight:700;font-size:16px;letter-spacing:-.02em}
+  .wordmark .dot{color:var(--terracotta)}
+  .tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    background:var(--sand);color:#7A6A4F;border-radius:100px;padding:3px 10px;margin-left:10px;vertical-align:middle}
+
+  h2.pg{font-size:24px;margin:18px 0 6px;letter-spacing:-.02em}
+  p.lede{color:var(--muted);margin:0 0 22px;max-width:56ch}
+
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px}
+  .field label .req{color:var(--terracotta)}
+  .field input[type=text],.field input[type=email],.field select,.field textarea{
+    width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:14px;
+    font-family:var(--sans);background:#FDFCF9;color:var(--ink)}
+  .field .hint{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+  .checks{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid var(--line);border-radius:100px;padding:6px 13px;font-size:13px;cursor:pointer;background:#FDFCF9;user-select:none}
+  .chip.sel{background:var(--charcoal);color:#fff;border-color:var(--charcoal)}
+  .btn{display:inline-block;background:var(--terracotta);color:#fff;border:none;border-radius:9px;
+    padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans)}
+  .btn:hover{filter:brightness(.95)}
+  .btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+  .btn.danger{background:#fff;color:var(--alert);border:1px solid var(--alert)}
+  .btn.slate{background:var(--slate)}
+  .btn.sage{background:var(--sage)}
+
+  /* status chips */
+  .st{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.04em;
+    border-radius:100px;padding:3px 10px}
+  .st.new{background:#EAF0F5;color:var(--slate)}
+  .st.appr{background:#EDF3EC;color:#4E7A52}
+  .st.prov{background:#F6E9E2;color:#9C4F30}
+  .st.rej{background:#F5E7E4;color:var(--alert)}
+  .st.wait{background:#F3EFE5;color:#8A7A55}
+
+  table.mock{border-collapse:collapse;width:100%;font-size:13.5px}
+  table.mock th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-weight:600}
+  table.mock td{padding:11px 12px;border-bottom:1px solid #EFEAE0;vertical-align:middle}
+  table.mock tr.click:hover{background:#FBF8F1;cursor:pointer}
+
+  .emailwrap{max-width:620px;margin:0 auto}
+  .email{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .email .ehead{background:#F7F3EA;border-bottom:1px solid var(--line);padding:14px 20px;font-size:13px}
+  .email .ehead div{margin:2px 0}
+  .email .ehead b{display:inline-block;width:62px;color:var(--muted);font-weight:600;font-size:12px}
+  .email .ebody{padding:26px 30px}
+
+  .kv{display:grid;grid-template-columns:180px 1fr;gap:7px 14px;font-size:13.5px}
+  .kv dt{color:var(--muted)}
+  .kv dd{margin:0;font-weight:500}
+
+  .panelbox{background:#FDFCF9;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+  .panelbox h4{margin:0 0 10px;font-size:13px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+  ul.checklist{list-style:none;padding:0;margin:0}
+  ul.checklist li{padding:8px 0 8px 30px;position:relative;border-bottom:1px solid #EFEAE0;font-size:14px}
+  ul.checklist li:last-child{border-bottom:none}
+  ul.checklist li::before{content:"✓";position:absolute;left:2px;top:7px;width:19px;height:19px;border-radius:50%;
+    background:var(--sage);color:#fff;font-size:12px;text-align:center;line-height:19px}
+  ul.checklist li .mono{color:var(--muted);font-size:12px}
+
+  .steps{display:flex;gap:8px;margin-bottom:26px}
+  .steps .s{flex:1;text-align:center;font-size:12px;padding:8px 4px;border-radius:9px;background:#F1ECE1;color:var(--muted);cursor:pointer}
+  .steps .s.on{background:var(--charcoal);color:#fff;font-weight:600}
+  .steps .s.done{background:var(--sand);color:#6B5B3E}
+  .steps .s .n{font-family:var(--mono);font-size:10px;display:block;opacity:.7}
+
+  .envcard{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;background:#FDFCF9}
+  .envcard.sel{border-color:var(--terracotta);background:#FBF3EE;box-shadow:0 0 0 1px var(--terracotta)}
+  .envcard h5{margin:0 0 3px;font-size:14px}
+  .envcard p{margin:0;font-size:12.5px;color:var(--muted)}
+
+  .lensrow{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #EFEAE0;font-size:13.5px}
+  .lensrow:last-child{border-bottom:none}
+  .dial{display:flex;gap:6px}
+  .dial span{font-size:11.5px;border:1px solid var(--line);border-radius:100px;padding:3px 11px;cursor:pointer;background:#fff}
+  .dial span.on{background:var(--slate);color:#fff;border-color:var(--slate)}
+  .dial span.off{opacity:.35;cursor:not-allowed;text-decoration:line-through}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+  .kpi{background:#FDFCF9;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .kpi .v{font-family:var(--mono);font-size:22px;font-weight:600}
+  .kpi .k{font-size:11px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+
+  .banner{background:#EAF0F5;border:1px solid #C9D6E0;border-radius:10px;padding:12px 16px;font-size:13.5px;color:#3E566A;margin-bottom:18px}
+  .banner.sagey{background:#EDF3EC;border-color:#CBDCC9;color:#456A49}
+  .center{text-align:center}
+  .bigcheck{width:58px;height:58px;border-radius:50%;background:var(--sage);color:#fff;font-size:28px;
+    line-height:58px;text-align:center;margin:0 auto 16px}
+  .note-inline{font-size:12px;color:var(--muted)}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .toolbar .search{border:1px solid var(--line);border-radius:100px;padding:7px 16px;font-size:13px;color:var(--muted);background:#FDFCF9;width:260px}
+  .hydema{display:inline-block;width:8px;height:8px;border-radius:50%;background:#D9A441;margin-right:6px;animation:pulse 1.4s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* connection tiles + csv upload */
+  .conn{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #EFEAE0}
+  .conn:last-child{border-bottom:none}
+  .conn .nm{font-weight:600;font-size:13.5px}
+  .conn .nm small{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
+  .conn.soon{opacity:.5}
+  .btn.sm{padding:6px 14px;font-size:12.5px;border-radius:8px}
+  .drop{border:2px dashed #CCC2AE;border-radius:12px;padding:26px 16px;text-align:center;color:var(--muted);background:#FBF9F4;margin-bottom:14px;font-size:13.5px}
+  .drop b{color:var(--ink)}
+
+  /* admin metrics */
+  .meter{height:7px;border-radius:100px;background:#EDE7DA;overflow:hidden;min-width:70px}
+  .meter i{display:block;height:100%;border-radius:100px;background:var(--sage)}
+  .meter.warn i{background:#D9A441}
+  .meter.bad i{background:var(--alert)}
+  .gate{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #EFEAE0;font-size:13.5px}
+  .gate:last-child{border-bottom:none}
+  .gate .g-pass{color:#4E7A52;font-weight:600;font-size:12px}
+  .gate .g-fail{color:var(--alert);font-weight:600;font-size:12px}
+  .gate .g-wait{color:#8A7A55;font-weight:600;font-size:12px}
+  .delta-up{color:#4E7A52;font-family:var(--mono);font-size:11px}
+  .delta-dn{color:var(--alert);font-family:var(--mono);font-size:11px}
+  .prov{font-family:var(--mono);font-size:9px;letter-spacing:.06em;border-radius:100px;padding:2px 7px;
+    background:#EEF0F3;color:#5B6572;margin-left:6px;vertical-align:middle}
+  .prov.att{background:#F8EFDD;color:#8A6A12}
+  .phone{width:344px;margin:0 auto;border:11px solid var(--charcoal);border-radius:38px;overflow:hidden;
+    background:var(--panel);box-shadow:0 18px 50px rgba(26,26,26,.18)}
+  .phone .pstatus{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;
+    color:var(--muted);padding:8px 18px 4px;background:#F7F3EA}
+  .phone .pbody{padding:18px 18px 22px}
+  .btn.full{display:block;width:100%;text-align:center;padding:14px;font-size:15px;margin-bottom:9px}
+
+  /* sandbox / tester */
+  .sandbar{background:repeating-linear-gradient(-45deg,#F3E2C6,#F3E2C6 12px,#EED7B2 12px,#EED7B2 24px);
+    border-bottom:1px solid #DDC391;padding:7px 16px;font-size:12px;color:#6B5320;display:flex;justify-content:space-between;align-items:center}
+  .sandbar b{font-family:var(--mono);letter-spacing:.08em}
+  .persona{border:1px solid var(--line);border-radius:14px;padding:18px;cursor:pointer;background:#FDFCF9;text-align:left}
+  .persona:hover{border-color:var(--terracotta)}
+  .persona .p-role{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--terracotta);margin-bottom:6px}
+  .persona h5{margin:0 0 4px;font-size:15px}
+  .persona p{margin:0;font-size:12.5px;color:var(--muted)}
+  .scenario{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #EFEAE0;font-size:13.5px}
+  .scenario:last-child{border-bottom:none}
+  .script-step{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid #EFEAE0;font-size:13px}
+  .script-step:last-child{border-bottom:none}
+  .script-step .n{font-family:var(--mono);font-size:11px;color:var(--terracotta);font-weight:600}
+  .script-step .who{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+  /* work queue items */
+  .qitem{display:grid;grid-template-columns:92px 1fr auto;gap:14px;align-items:start;padding:14px 16px;
+    border:1px solid var(--line);border-radius:12px;background:#FDFCF9;margin-bottom:10px}
+  .qitem .imp{font-family:var(--mono);font-weight:700;font-size:16px;color:#4E7A52}
+  .qitem .imp small{display:block;font-weight:400;font-size:10px;color:var(--muted);letter-spacing:.04em}
+  .qitem h5{margin:0 0 3px;font-size:14px}
+  .qitem p{margin:0;font-size:12.5px;color:var(--muted)}
+  .qitem .acts{display:flex;gap:6px;align-items:flex-start}
+  .qitem.dim{opacity:.6}
+  .lens{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;background:var(--sand);border-radius:100px;padding:2px 8px;color:#7A6A4F;margin-left:6px;vertical-align:middle}
+  .conf{font-family:var(--mono);font-size:10.5px;color:var(--slate)}
+  .timeline{display:flex;gap:0;margin:18px 0}
+  .timeline .t{flex:1;text-align:center;font-size:12px;color:var(--muted);position:relative;padding-top:20px}
+  .timeline .t::before{content:"";position:absolute;top:5px;left:50%;transform:translateX(-50%);width:11px;height:11px;border-radius:50%;background:#D8CFBC}
+  .timeline .t::after{content:"";position:absolute;top:10px;left:calc(50% + 8px);right:calc(-50% + 8px);height:2px;background:#E5DDCB}
+  .timeline .t:last-child::after{display:none}
+  .timeline .t.done::before{background:var(--sage)}
+  .timeline .t.now::before{background:var(--terracotta);box-shadow:0 0 0 4px #F3DCD0}
+  .timeline .t.now{color:var(--ink);font-weight:600}
+
+  /* ===== dark mode ===== */
+  #themeToggle{position:fixed;bottom:14px;right:14px;z-index:60;font-family:var(--mono);font-size:11px;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--panel);
+    border:1px solid var(--line);border-radius:100px;padding:7px 13px;cursor:pointer}
+  #themeToggle:hover{color:var(--ink)}
+  :root[data-theme="dark"]{
+    --paper:#131110; --panel:#1D1A17; --ink:#EDE7DC; --muted:#A79D8E; --line:#383329;
+    --sand:#2E2820; --terracotta:#D28A68; --slate:#7FA3BC; --sage:#8FB893; --alert:#E07B63;
+  }
+  [data-theme="dark"] .panelbox,[data-theme="dark"] .kpi,[data-theme="dark"] .envcard,
+  [data-theme="dark"] .qitem,[data-theme="dark"] .chip,[data-theme="dark"] .persona{background:#211D18}
+  [data-theme="dark"] .chip.sel{background:#EDE7DC;color:#131110;border-color:#EDE7DC}
+  [data-theme="dark"] .field input,[data-theme="dark"] .field select,[data-theme="dark"] .field textarea,
+  [data-theme="dark"] .gate select{background:#171411;color:var(--ink);border-color:var(--line)}
+  [data-theme="dark"] .browser .bar{background:#161310;border-color:var(--line)}
+  [data-theme="dark"] .browser .dots span{background:#3A342C}
+  [data-theme="dark"] .url{background:#1D1A17;border-color:var(--line)}
+  [data-theme="dark"] .email{background:#1D1A17;border-color:var(--line)}
+  [data-theme="dark"] .email .ehead{background:#171411;border-color:var(--line)}
+  [data-theme="dark"] .annot{background:#271F15;color:#CBA687}
+  [data-theme="dark"] .annot b{color:#DDA477}
+  [data-theme="dark"] .banner{background:#1E2730;border-color:#31404D;color:#A9C4DA}
+  [data-theme="dark"] .banner.sagey{background:#1C2620;border-color:#2E4237;color:#A5C8AB}
+  [data-theme="dark"] .steps .s{background:#221E19;color:var(--muted)}
+  [data-theme="dark"] .steps .s.done{background:#2A2520;color:#C0AE83}
+  [data-theme="dark"] .drop{background:#1A1713;border-color:#4A4235}
+  [data-theme="dark"] .dial span{background:#1D1A17;border-color:var(--line)}
+  [data-theme="dark"] .search{background:#1D1A17;border-color:var(--line)}
+  [data-theme="dark"] .meter{background:#2A251F}
+  [data-theme="dark"] table.mock tr.click:hover{background:#221E19}
+  [data-theme="dark"] td,[data-theme="dark"] ul.checklist li,[data-theme="dark"] .gate,
+  [data-theme="dark"] .conn,[data-theme="dark"] .scenario,[data-theme="dark"] .script-step,
+  [data-theme="dark"] .lensrow,[data-theme="dark"] .card .metric{border-color:#2A251F}
+  [data-theme="dark"] .timeline .t::before{background:#3A342C}
+  [data-theme="dark"] .timeline .t::after{background:#2A251F}
+  [data-theme="dark"] .sandbar{background:repeating-linear-gradient(-45deg,#3A2F17,#3A2F17 12px,#332911 12px,#332911 24px);color:#D9B96A;border-color:#57431C}
+  [data-theme="dark"] .phone .pstatus{background:#171411}
+  [data-theme="dark"] .btn.ghost{color:var(--ink);border-color:var(--line)}
+  [data-theme="dark"] .flownext button{background:#EDE7DC;color:#131110}
+  [data-theme="dark"] [style*="background:#FBF8F1"]{background:#221E19!important}
+  [data-theme="dark"] [style*="background:#FBF3EE"]{background:#2A211B!important;border-color:#4A382E!important}
+  [data-theme="dark"] [style*="background:#F5E7E4"]{background:#2E1B16!important;border-color:#5A3A30!important;color:#E0A79A!important}
+  [data-theme="dark"] [style*="color:#0E4C63"]{color:#8FC4DC!important}
+
+</style>
+</head>
+<body>
+<div id="shell">
+  <nav id="nav">
+    <h1>Realify for Agencies</h1>
+    <div class="sub">End-to-end UX mockups · v0.1<br>Click through in order, or jump.</div>
+
+    <div class="actor">Agency · prospect</div>
+    <button data-s="s1" class="on"><span class="num">1</span>Request access form</button>
+    <button data-s="s2"><span class="num">2</span>Confirmation</button>
+    <button data-s="s18"><span class="num">3</span>Waiting &amp; decline states</button>
+
+    <div class="actor">Internal · Shiva</div>
+    <button data-s="s3"><span class="num">4</span>Notification email</button>
+    <button data-s="s4"><span class="num">5</span>Review queue</button>
+    <button data-s="s5"><span class="num">6</span>Review &amp; approve</button>
+    <button data-s="s6"><span class="num">7</span>Provisioning result</button>
+
+    <div class="actor">Agency · admin</div>
+    <button data-s="s7"><span class="num">8</span>Invite email</button>
+    <button data-s="s8"><span class="num">9</span>Onboarding wizard</button>
+    <button data-s="s17"><span class="num">10</span>Bulk migration board</button>
+
+    <div class="actor">Brand · delegator</div>
+    <button data-s="s22"><span class="num">11</span>Consent invite email</button>
+    <button data-s="s9"><span class="num">12</span>Consent + counter-offer</button>
+    <button data-s="s23"><span class="num">13</span>Day-0 baseline &amp; alerts</button>
+    <button data-s="s21"><span class="num">14</span>Brand portal · controls</button>
+    <button data-s="s28"><span class="num">15</span>Mobile approval</button>
+    <button data-s="s24"><span class="num">16</span>Offboarding · promise kept</button>
+
+    <div class="actor">Agency · data setup</div>
+    <button data-s="s11"><span class="num">17</span>Data sources · CSV · failures</button>
+
+    <div class="actor">Agency · daily work</div>
+    <button data-s="s10"><span class="num">18</span>Portfolio console</button>
+    <button data-s="s16"><span class="num">19</span>Work queue · populated</button>
+
+    <div class="actor">Agency · business</div>
+    <button data-s="s19"><span class="num">20</span>Your Realify impact</button>
+    <button data-s="s20"><span class="num">21</span>Plan &amp; billing</button>
+    <button data-s="s25"><span class="num">22</span>Approvals cockpit</button>
+    <button data-s="s26"><span class="num">23</span>Team &amp; client health</button>
+    <button data-s="s27"><span class="num">24</span>Pilot → contract</button>
+
+    <div class="actor">Internal · agency ops</div>
+    <button data-s="s12"><span class="num">25</span>Agencies overview</button>
+    <button data-s="s13"><span class="num">26</span>Agency detail &amp; gates</button>
+    <button data-s="s29"><span class="num">27</span>Recommendation quality</button>
+
+  </nav>
+
+  <main id="stage">
+
+  <!-- ============ 1. INTAKE FORM ============ -->
+  <section class="screen on" id="s1">
+    <div class="annot"><b>Why this screen:</b> structured intake replaces the free-form email. Every field maps 1:1 to the provisioning payload — nothing has to be re-asked later. Submissions write to a table; shiva@realify.ai only gets a notification.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">realify.ai/agencies/request-access</span></div>
+      <div class="page">
+        <div class="wordmark">realify<span class="dot">●</span> <span class="tag">for agencies</span></div>
+        <h2 class="pg">Run your whole book from one decision queue.</h2>
+        <p class="lede">Realify for Agencies is in pilot with selected partners. Tell us about your book — we review every request personally and respond within 2 business days.</p>
+
+        <div class="cols2">
+          <div class="field"><label>Agency name <span class="req">*</span></label><input type="text" value="BrightPeak Commerce"></div>
+          <div class="field"><label>Website <span class="req">*</span></label><input type="text" value="brightpeak.co"></div>
+          <div class="field"><label>Your name <span class="req">*</span></label><input type="text" value="Sarah Mitchell"></div>
+          <div class="field"><label>Work email <span class="req">*</span></label><input type="email" value="sarah@brightpeak.co"><div class="hint">Must match your agency domain — this becomes the admin account.</div></div>
+        </div>
+
+        <div class="field"><label>Brand accounts you manage <span class="req">*</span></label>
+          <div class="checks"><span class="chip">1–5</span><span class="chip sel">6–15</span><span class="chip">16–40</span><span class="chip">40+</span></div>
+        </div>
+        <div class="cols2">
+          <div class="field"><label>Account managers running those accounts <span class="req">*</span></label>
+            <select><option>1</option><option selected>2</option><option>3–5</option><option>6–10</option><option>10+</option></select>
+            <div class="hint">≈ 6 accounts per AM today — we'll show you exactly how much Realify lifts this.</div></div>
+          <div class="field"><label>Hours/month your team spends on client reporting</label>
+            <select><option>&lt;10</option><option selected>10–40</option><option>40–100</option><option>100+</option></select></div>
+        </div>
+        <div class="field"><label>Where is your agency based? <span class="req">*</span></label>
+          <div class="checks"><span class="chip sel">United States</span><span class="chip">India</span></div>
+          <div class="hint">Manage brands in either market from either country. Realify pricing is always in USD, wherever you are.</div>
+        </div>
+        <div class="field"><label>Marketplaces <span class="req">*</span></label>
+          <div class="checks"><span class="chip sel">Amazon US</span><span class="chip sel">Amazon IN</span><span class="chip">Walmart</span><span class="chip sel">Shopify</span><span class="chip">eBay</span><span class="chip sel">Flipkart</span><span class="chip">Shopzee</span></div>
+        </div>
+        <div class="field"><label>Ad platforms you run</label>
+          <div class="checks"><span class="chip sel">Amazon Ads</span><span class="chip sel">Google</span><span class="chip">Meta</span></div>
+        </div>
+        <div class="cols2">
+          <div class="field"><label>Current tool</label>
+            <select><option>Pacvue</option><option selected>Helium 10</option><option>Perpetua</option><option>Teikametrics</option><option>SellerStack</option><option>Spreadsheets</option><option>Other</option></select></div>
+          <div class="field"><label>Target start</label>
+            <select><option selected>Within 30 days</option><option>1–3 months</option><option>Exploring</option></select></div>
+        </div>
+        <div class="field"><label>Anything else?</label><textarea rows="2">Renewal on our current tool is in September — evaluating alternatives now.</textarea></div>
+
+        <button class="btn" onclick="go('s2')">Request access →</button>
+        <div class="note-inline" style="margin-top:10px">No card. No trial clock. A human reads this.</div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s2')">Next: what the agency sees after submitting →</button></div>
+  </section>
+
+  <!-- ============ 2. CONFIRMATION ============ -->
+  <section class="screen" id="s2">
+    <div class="annot"><b>Why this screen:</b> sets expectations (human review, 2 days, pilot call) so "no instant access" reads as exclusivity, not friction.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">realify.ai/agencies/request-access/received</span></div>
+      <div class="page center" style="padding:56px 34px">
+        <div class="bigcheck">✓</div>
+        <h2 class="pg" style="margin-top:0">Request received, Sarah.</h2>
+        <p class="lede" style="margin:0 auto 26px">Here's what happens next:</p>
+        <div style="max-width:430px;margin:0 auto;text-align:left">
+          <ul class="checklist">
+            <li><b>Within 2 business days</b> — we review your request and reply from a real inbox.</li>
+            <li><b>Pilot call</b> — 30 minutes to scope your first 5–10 accounts and pricing.</li>
+            <li><b>Same week</b> — your workspace is provisioned and your team is invited.</li>
+          </ul>
+        </div>
+        <p class="note-inline" style="margin-top:22px">Reference: <span class="mono">REQ-2026-0714-031</span> · A copy was sent to sarah@brightpeak.co</p>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s18')">Next: waiting &amp; decline states →</button></div>
+  </section>
+
+  <!-- ============ WAITING & DECLINE STATES ============ -->
+  <section class="screen" id="s18">
+    <div class="annot"><b>Fixes miss #3:</b> silence kills funnels. The applicant gets a live status page (linked from the confirmation email), and a decline is a warm, specific email that leaves the door open — and captures why, so the waitlist is a pipeline, not a graveyard.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">realify.ai/agencies/status/REQ-2026-0714-031</span></div>
+      <div class="page">
+        <h2 class="pg" style="margin-top:0">Your request status</h2>
+        <div class="timeline" style="max-width:640px">
+          <div class="t done">Received<br><span class="mono" style="font-size:10px">Jul 14, 09:41</span></div>
+          <div class="t now">In review<br><span class="mono" style="font-size:10px">Day 1 of 2 · by a human</span></div>
+          <div class="t">Decision</div>
+          <div class="t">Workspace live</div>
+        </div>
+        <p class="note-inline" style="max-width:60ch">We review in the order received. If we need anything, we'll email sarah@brightpeak.co — no action needed from you. Taking longer than 2 business days? <a href="#">Poke us</a>.</p>
+      </div>
+    </div>
+    <div class="emailwrap" style="margin-top:22px;max-width:none">
+      <div class="email">
+        <div class="ehead">
+          <div><b>From</b> Shiva at Realify &lt;shiva@realify.ai&gt;</div>
+          <div><b>To</b> hello@quicklist.xyz</div>
+          <div><b>Subject</b> Your Realify for Agencies request — not yet, and here's exactly why</div>
+        </div>
+        <div class="ebody">
+          <p>Hi Morgan,</p>
+          <p>Thank you for the detailed request. We're not able to bring QuickList Media into the pilot right now: <b>the pilot currently supports Amazon and Shopify books</b>, and your accounts are eBay-first — we'd be charging you for a product that can't see most of your data yet.</p>
+          <p><b>What changes this answer:</b> eBay support is on our connector roadmap. We've added you to the waitlist for it, and you'll be first to know — with pilot pricing honored.</p>
+          <p>If any of your clients also sell on Amazon or Shopify, the direct Realify product works for them today.</p>
+          <p style="margin-top:18px"><button class="btn ghost">Stay on the eBay waitlist</button> <button class="btn ghost" style="margin-left:8px">Tell us more about your book</button></p>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s3')">Next: what Shiva receives →</button></div>
+  </section>
+
+  <!-- ============ 3. NOTIFICATION EMAIL ============ -->
+  <section class="screen" id="s3">
+    <div class="annot"><b>Why this screen:</b> the email is a pointer, not the record. All action happens in the review queue — replying to the email is never required for provisioning.</div>
+    <div class="emailwrap">
+      <div class="email">
+        <div class="ehead">
+          <div><b>From</b> Realify Agency Intake &lt;intake@realify.ai&gt;</div>
+          <div><b>To</b> shiva@realify.ai</div>
+          <div><b>Subject</b> 🟠 New agency request — BrightPeak Commerce (6–15 accounts, Amazon US/IN + Shopify + Flipkart)</div>
+        </div>
+        <div class="ebody">
+          <dl class="kv">
+            <dt>Agency</dt><dd>BrightPeak Commerce · brightpeak.co</dd>
+            <dt>Contact</dt><dd>Sarah Mitchell · sarah@brightpeak.co</dd>
+            <dt>Book size</dt><dd>6–15 managed accounts</dd>
+            <dt>Marketplaces</dt><dd>Amazon US, Amazon IN, Shopify, Flipkart</dd>
+            <dt>Ads</dt><dd>Amazon Ads, Google</dd>
+            <dt>Current tool</dt><dd>Helium 10 <span class="st wait">renewal in Sept</span></dd>
+            <dt>Target start</dt><dd>Within 30 days</dd>
+          </dl>
+          <p style="margin:22px 0 0"><button class="btn slate" onclick="go('s4')">Open in review queue →</button></p>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s4')">Next: the review queue →</button></div>
+  </section>
+
+  <!-- ============ 4. REVIEW QUEUE ============ -->
+  <section class="screen" id="s4">
+    <div class="annot"><b>Why this screen:</b> the system of record. Statuses make the funnel visible (New → Approved → Provisioned), and nothing depends on inbox archaeology.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">admin.realify.ai/agency-requests</span></div>
+      <div class="page">
+        <div class="toolbar">
+          <h2 class="pg" style="margin:0">Agency requests</h2>
+          <span class="search">🔍 Search agencies…</span>
+        </div>
+        <table class="mock">
+          <thead><tr><th>Agency</th><th>Contact</th><th>Book</th><th>Marketplaces</th><th>Current tool</th><th>Submitted</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr class="click" onclick="go('s5')" style="background:#FBF8F1">
+              <td><b>BrightPeak Commerce</b> <span class="prov">US</span></td><td>sarah@brightpeak.co</td><td>6–15</td><td>AMZ US/IN · Shopify · Flipkart</td><td>Helium 10</td><td>Today 09:41</td><td><span class="st new">NEW</span></td>
+            </tr>
+            <tr class="click">
+              <td><b>Cartwheel Digital</b> <span class="prov att">IN</span></td><td>ops@cartwheel.in</td><td>16–40</td><td>AMZ IN · Flipkart · Shopzee</td><td>Spreadsheets</td><td>Yesterday</td><td><span class="st new">NEW</span></td>
+            </tr>
+            <tr class="click">
+              <td><b>NorthCommerce Group</b> <span class="prov">US</span></td><td>dana@northcommerce.com</td><td>40+</td><td>AMZ US · Walmart</td><td>Pacvue</td><td>Jul 11</td><td><span class="st appr">APPROVED</span></td>
+            </tr>
+            <tr class="click">
+              <td><b>Vantage Sellers Co</b> <span class="prov">US</span></td><td>mo@vantagesellers.com</td><td>1–5</td><td>AMZ US</td><td>Perpetua</td><td>Jul 10</td><td><span class="st prov">PROVISIONED</span></td>
+            </tr>
+            <tr class="click">
+              <td><b>QuickList Media</b></td><td>hello@quicklist.xyz</td><td>1–5</td><td>eBay</td><td>Other</td><td>Jul 9</td><td><span class="st rej">REJECTED</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="note-inline" style="margin-top:12px">Click BrightPeak's row to review.</p>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s5')">Next: review &amp; approve →</button></div>
+  </section>
+
+  <!-- ============ 5. REVIEW & APPROVE ============ -->
+  <section class="screen" id="s5">
+    <div class="annot"><b>Why this screen:</b> the human gate. Left = what they told us (read-only). Right = plan parameters you set. "Approve &amp; provision" runs the whole script — org, Stripe, invite — in one click. Nothing after this button is manual.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">admin.realify.ai/agency-requests/REQ-2026-0714-031</span></div>
+      <div class="page">
+        <h2 class="pg" style="margin-top:0">BrightPeak Commerce <span class="st new">NEW</span></h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:18px">
+          <div>
+            <div class="panelbox">
+              <h4>Submission · REQ-2026-0714-031</h4>
+              <dl class="kv">
+                <dt>Contact</dt><dd>Sarah Mitchell · sarah@brightpeak.co</dd>
+                <dt>Website</dt><dd>brightpeak.co ↗</dd>
+                <dt>Agency HQ</dt><dd>Austin, TX · United States</dd>
+                <dt>Book size</dt><dd>6–15 accounts</dd>
+                <dt>Marketplaces</dt><dd>Amazon US, Amazon IN, Shopify, Flipkart</dd>
+                <dt>Ad platforms</dt><dd>Amazon Ads, Google</dd>
+                <dt>Current tool</dt><dd>Helium 10 — renewal Sept</dd>
+                <dt>Target start</dt><dd>Within 30 days</dd>
+                <dt>Notes</dt><dd>"Renewal on our current tool is in September — evaluating alternatives now."</dd>
+              </dl>
+            </div>
+            <div class="banner">💡 Qualification signals: domain matches email · book size in ICP range · incumbent renewal window ≈ PRD's switching-moment thesis.</div>
+          </div>
+          <div>
+            <div class="panelbox">
+              <h4>Pilot plan parameters</h4>
+              <div class="cols2">
+                <div class="field"><label>Pilot account cap</label><select><option>5</option><option selected>10</option><option>15</option></select></div>
+                <div class="field"><label>Pilot length</label><select><option selected>90 days</option><option>60 days</option></select></div>
+                <div class="field"><label>Platform fee / mo</label><input type="text" value="$0 during pilot"></div>
+                <div class="field"><label>Per-account / mo</label><input type="text" value="$399"></div>
+                <div class="field"><label>Billing</label><select><option selected>Stripe invoice · Net-30</option><option>Payment link · card</option></select></div>
+                <div class="field"><label>Owner</label><select><option selected>Shiva</option><option>Dev</option></select></div>
+              </div>
+              <div class="field"><label><input type="checkbox" checked> Send admin invite to sarah@brightpeak.co on provision</label></div>
+              <p class="note-inline" style="margin:0">All pricing &amp; invoicing in USD — for US and Indian agencies alike. Brand books may mix USD and INR sellers.</p>
+            </div>
+            <button class="btn sage" onclick="go('s6')">✓ Approve &amp; provision</button>
+            <button class="btn danger" style="margin-left:10px" onclick="go('s18')">Decline with reason…</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s6')">Next: what one click provisions →</button></div>
+  </section>
+
+  <!-- ============ 6. PROVISIONING RESULT ============ -->
+  <section class="screen" id="s6">
+    <div class="annot"><b>Why this screen:</b> proof the script did everything, with IDs. If any step fails, it shows red with a retry — partial provisioning is visible, never silent.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">admin.realify.ai/agency-requests/REQ-2026-0714-031</span></div>
+      <div class="page">
+        <div class="banner sagey">✓ BrightPeak Commerce provisioned in 4.2s — <b>Jul 14, 2026 10:03</b> by shiva@realify.ai</div>
+        <div class="panelbox" style="max-width:640px">
+          <h4>Provisioning run · all steps</h4>
+          <ul class="checklist">
+            <li>Agency org created <span class="mono">org_bp_9f27</span> · plan <span class="mono">agency_pilot_v1</span></li>
+            <li>Plan limits applied — <span class="mono">10 accounts · 90 days · envelope templates enabled</span></li>
+            <li>Stripe customer + subscription created <span class="mono">cus_QX81 · sub_R2k4 · $399/account · Net-30 invoicing</span></li>
+            <li>Admin invite emailed to <span class="mono">sarah@brightpeak.co</span> · expires in 7 days</li>
+            <li>Audit log entry written <span class="mono">ledger#000481</span></li>
+            <li>Slack notification → <span class="mono">#agency-pipeline</span></li>
+          </ul>
+        </div>
+        <button class="btn ghost">View org</button>
+        <button class="btn ghost" style="margin-left:8px">Resend invite</button>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s7')">Next: the invite Sarah receives →</button></div>
+  </section>
+
+  <!-- ============ 7. INVITE EMAIL ============ -->
+  <section class="screen" id="s7">
+    <div class="annot"><b>Why this screen:</b> the handoff from your gate to their self-serve onboarding. States the pilot terms plainly — no surprise paywall later.</div>
+    <div class="emailwrap">
+      <div class="email">
+        <div class="ehead">
+          <div><b>From</b> Shiva at Realify &lt;shiva@realify.ai&gt;</div>
+          <div><b>To</b> sarah@brightpeak.co</div>
+          <div><b>Subject</b> Your Realify agency workspace is ready, Sarah</div>
+        </div>
+        <div class="ebody">
+          <p>Hi Sarah,</p>
+          <p>BrightPeak Commerce is approved. Your pilot workspace is live:</p>
+          <dl class="kv" style="margin:16px 0">
+            <dt>Pilot</dt><dd>Up to 10 brand accounts · 90 days</dd>
+            <dt>Pricing</dt><dd>$399 per managed account / month · invoiced Net-30</dd>
+            <dt>Platform fee</dt><dd>Waived during pilot</dd>
+          </dl>
+          <p style="margin:22px 0"><button class="btn" onclick="go('s8')">Set up your workspace →</button></p>
+          <p class="note-inline">This link is yours alone and expires in 7 days. Reply to this email and a human answers.</p>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s8')">Next: agency onboarding →</button></div>
+  </section>
+
+  <!-- ============ 8. ONBOARDING WIZARD ============ -->
+  <section class="screen" id="s8">
+    <div class="annot"><b>Why this screen:</b> four steps, ending on the thing that matters — inviting the first client brand. Steps 1–3 are clickable above the panel; step 4 is shown (the envelope template choice is the key UX moment).</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">app.realify.ai/onboarding</span></div>
+      <div class="page">
+        <div class="wordmark">realify<span class="dot">●</span> <span class="tag">BrightPeak Commerce</span></div>
+        <div class="steps" style="margin-top:18px">
+          <div class="s done" onclick="wiz(this,'w1')"><span class="n">STEP 1</span>Your account</div>
+          <div class="s done" onclick="wiz(this,'w2')"><span class="n">STEP 2</span>Agency profile</div>
+          <div class="s done" onclick="wiz(this,'w3')"><span class="n">STEP 3</span>Invite team</div>
+          <div class="s on" onclick="wiz(this,'w4')"><span class="n">STEP 4</span>Add first client</div>
+        </div>
+
+        <div id="w1" class="wstep" style="display:none">
+          <h2 class="pg" style="margin-top:0">Create your login</h2>
+          <div class="cols2" style="max-width:560px">
+            <div class="field"><label>Password</label><input type="text" value="••••••••••••"></div>
+            <div class="field"><label>Or</label><button class="btn ghost" style="width:100%">Continue with Google SSO</button></div>
+          </div>
+        </div>
+        <div id="w2" class="wstep" style="display:none">
+          <h2 class="pg" style="margin-top:0">Agency profile &amp; report branding</h2>
+          <div class="cols2" style="max-width:560px">
+            <div class="field"><label>Logo</label><button class="btn ghost" style="width:100%">Upload logo</button><div class="hint">Used on client reports &amp; portal.</div></div>
+            <div class="field"><label>Brand color</label><input type="text" value="#0E4C63"></div>
+            <div class="field"><label>Portfolio rollup currency</label>
+              <select><option selected>USD (normalized at daily locked FX)</option><option>INR</option></select>
+              <div class="hint">Your dashboard's totals. Each client's reports always render in the currency they sell in.</div></div>
+            <div class="field"><label>Locale &amp; timezone</label>
+              <select><option selected>en-US · America/Chicago</option><option>en-IN · Asia/Kolkata</option></select></div>
+          </div>
+        </div>
+        <div id="w3" class="wstep" style="display:none">
+          <h2 class="pg" style="margin-top:0">Invite your team</h2>
+          <table class="mock" style="max-width:640px">
+            <thead><tr><th>Email</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td>jake@brightpeak.co</td><td>Client Lead (AM)</td></tr>
+              <tr><td>emily@brightpeak.co</td><td>Ads Specialist</td></tr>
+              <tr><td>+ Add teammate</td><td>Analyst ▾</td></tr>
+            </tbody>
+          </table>
+          <p class="note-inline" style="margin-top:8px">Roles are agency-internal. What each person can do per client is always capped by that client's envelope.</p>
+        </div>
+        <div id="w4" class="wstep">
+          <h2 class="pg" style="margin-top:0">Add your first client</h2>
+          <p class="lede">The brand keeps ownership of its data and connections. You're requesting a scoped, revocable window into it — pick the template, the brand confirms.</p>
+          <div class="cols2" style="align-items:start">
+            <div>
+              <div class="field"><label>Brand name <span class="req">*</span></label><input type="text" value="Suncrest Home Goods"></div>
+              <div class="field"><label>Brand owner email <span class="req">*</span></label><input type="email" value="ryan@suncresthome.com"></div>
+              <div class="field"><label>Sells in</label>
+                <div class="checks"><span class="chip sel">USD — detected from Amazon US</span><span class="chip">INR</span></div>
+                <div class="hint">Everything this brand sees — reports, approvals, the portal — renders in their selling currency and locale.</div></div>
+              <div class="field"><label>Note to brand (optional)</label><textarea rows="2">Hi Ryan — moving our management of your account onto Realify, much better visibility for you.</textarea></div>
+            </div>
+            <div>
+              <label style="font-size:12.5px;font-weight:600;display:block;margin-bottom:6px">Access you're requesting</label>
+              <div class="envcard" onclick="selEnv(this)"><h5>Full Operate</h5><p>Read + execute across all five lenses, up to the autonomy ceiling the brand sets.</p></div>
+              <div class="envcard sel" onclick="selEnv(this)"><h5>Operate ex-Pricing ✓</h5><p>Everything except price changes — pricing stays suggest-only. The most common starting point.</p></div>
+              <div class="envcard" onclick="selEnv(this)"><h5>Ads Only</h5><p>Run advertising; read sales for context. Nothing else.</p></div>
+              <div class="envcard" onclick="selEnv(this)"><h5>Advise Only</h5><p>See everything, propose anything, execute nothing.</p></div>
+            </div>
+          </div>
+          <button class="btn" onclick="go('s22')">Send consent request to brand →</button>
+          <button class="btn ghost" style="margin-left:8px" onclick="go('s17')">Or import your whole book →</button>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s17')">Next: migrating the whole book at once →</button></div>
+  </section>
+
+  <!-- ============ BULK MIGRATION BOARD ============ -->
+  <section class="screen" id="s17">
+    <div class="annot"><b>Fixes miss #2:</b> the enterprise sales unlock. Upload the book as CSV → batched brand invites → a status board that makes the consent bottleneck (the honest constraint) visible and chaseable. The Migration Agent maps the incumbent tool's configs and flags what it can't map — never silently drops a rule.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">app.realify.ai/onboarding/migrate</span></div>
+      <div class="page">
+        <div class="toolbar">
+          <h2 class="pg" style="margin:0">Migrate your book</h2>
+          <span class="note-inline">Started 6 days ago · from Pacvue</span>
+        </div>
+        <div class="banner sagey">✓ <b>31 of 40 accounts live.</b> 6 hydrating · 3 waiting on brand consent. Target: the whole book in days, not months.</div>
+
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:22px;align-items:start">
+          <div class="panelbox" style="margin-bottom:0">
+            <h4>Account status board</h4>
+            <table class="mock">
+              <thead><tr><th>Brand</th><th>Consent</th><th>Data</th><th>Config migration</th><th></th></tr></thead>
+              <tbody>
+                <tr><td><b>Alpine Kitchenware</b></td><td><span class="st appr">AUTHORIZED</span></td><td><span class="st appr">LIVE</span></td><td>14/14 rules mapped</td><td></td></tr>
+                <tr><td><b>Juniper Pet Supply</b></td><td><span class="st appr">AUTHORIZED</span></td><td><span class="hydema"></span>Hydrating</td><td>12/14 · 2 need review</td><td><button class="btn ghost sm">Review</button></td></tr>
+                <tr><td><b>Corva Audio</b></td><td><span class="st rej">STALLED 8d</span></td><td>—</td><td>Parsed, waiting</td><td><button class="btn slate sm">Nudge brand</button></td></tr>
+                <tr><td><b>Meridian Toys</b></td><td><span class="st wait">INVITED 2d</span></td><td>—</td><td>Parsed, waiting</td><td><button class="btn ghost sm">Resend</button></td></tr>
+                <tr><td colspan="5" class="note-inline">+ 36 more · <a href="#">filter: needs action (5)</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <div class="panelbox">
+              <h4>1 · Import book</h4>
+              <div class="drop" style="padding:14px">⬆ <b>book.csv</b> — 40 brands detected ✓</div>
+            </div>
+            <div class="panelbox" style="margin-bottom:0">
+              <h4>2 · Migration Agent</h4>
+              <div class="gate"><span>Pacvue export parsed</span><span class="g-pass">214 bid rules</span></div>
+              <div class="gate"><span>Auto-mapped to Realify</span><span class="g-pass">198</span></div>
+              <div class="gate"><span>Need your review</span><span class="g-wait">16</span></div>
+              <div class="gate"><span>Dayparting recreated</span><span class="g-pass">9 brands</span></div>
+              <p class="note-inline" style="margin-top:8px">Nothing is dropped silently — every unmapped rule is a review item.</p>
+              <button class="btn sm" style="margin-top:8px">Review 16 gaps</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s22')">Next: the email every brand gets →</button></div>
+  </section>
+
+  <!-- ============ BRAND CONSENT INVITE EMAIL ============ -->
+  <section class="screen" id="s22">
+    <div class="annot"><b>Fixes brand-miss #1 — the highest-stakes email in the product.</b> The agency's name leads (a known sender vouching for an unknown platform), Realify explains itself in two lines, the ask is previewed before any click, money is addressed explicitly, and there's a human phone number. If this email reads like phishing, nothing downstream exists.</div>
+    <div class="emailwrap">
+      <div class="email">
+        <div class="ehead">
+          <div><b>From</b> Jake Thompson (BrightPeak Commerce) via Realify &lt;consent@realify.ai&gt;</div>
+          <div><b>To</b> ryan@suncresthome.com</div>
+          <div><b>Subject</b> Ryan — approving BrightPeak's new operating platform for Suncrest (5 min)</div>
+        </div>
+        <div class="ebody">
+          <p>Hi Ryan,</p>
+          <p>Jake here. We're moving our management of Suncrest onto <b>Realify</b> — the platform we now run all our client accounts on. Before anything changes, <b>you approve exactly what we can and can't do.</b></p>
+          <div class="panelbox" style="margin:16px 0">
+            <h4>What you'll be asked (nothing happens until you approve)</h4>
+            <dl class="kv">
+              <dt>Review our access</dt><dd>We're requesting "Operate ex-Pricing" — price changes stay suggestion-only</dd>
+              <dt>Set your limits</dt><dd>Per-area autonomy ceilings; you can tighten or revoke any time</dd>
+              <dt>Connect Amazon</dt><dd>You authorize Amazon directly — we never see or hold your credentials</dd>
+            </dl>
+          </div>
+          <p><b>What Realify is:</b> the profit-analytics platform our agency operates on. Every action we take on your account is logged and visible to you, permanently. <a href="#">Realify security &amp; data ownership (2-min read) ↗</a></p>
+          <p><b>What it costs you: nothing.</b> BrightPeak pays for Realify. You will never receive an invoice from them.</p>
+          <p style="margin:22px 0"><button class="btn" onclick="go('s9')">Review the access request →</button></p>
+          <p class="note-inline">You'll verify with a one-time code sent to this address. The link is single-use and expires in 7 days. Questions? Call me directly: +1 (415) 555-0142, or just reply.</p>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s9')">Next: the consent screen →</button></div>
+  </section>
+
+  <!-- ============ 9. BRAND CONSENT ============ -->
+  <section class="screen" id="s9">
+    <div class="annot"><b>Why this screen:</b> the trust moment for the whole model. The brand sees exactly what it's granting, sets per-lens autonomy ceilings itself, and connects Amazon directly (credentials are brand-owned, never the agency's). Revocable is stated up front.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">app.realify.ai/consent/suncrest-brightpeak</span></div>
+      <div class="page">
+        <div class="wordmark">realify<span class="dot">●</span></div>
+        <div class="banner" style="margin-top:14px">🔐 Verified: you signed in as <b>ryan@suncresthome.com</b> with a one-time code · this request is addressed to you specifically · link expires <b>Jul 21</b> and is single-use.</div>
+        <h2 class="pg">BrightPeak Commerce requests access to manage Suncrest Home Goods</h2>
+        <p class="lede">You stay the owner of your data, your marketplace connections, and your P&amp;L. You can narrow or revoke this access at any time — your history stays with you, not the agency.</p>
+        <div class="panelbox">
+          <h4>Who is Realify — and what this does and doesn't allow</h4>
+          <div class="cols2">
+            <div style="font-size:13px">
+              <b>We can never:</b> see or store your Amazon/Shopify passwords · exceed the access you set below · share your data with other brands or agencies (benchmarks are anonymous, k≥5, and opt-in) · charge you — <b>BrightPeak pays for Realify, you never get an invoice from us.</b>
+            </div>
+            <div style="font-size:13px">
+              <b>You always get:</b> a permanent log of every agency action · approval rights on sensitive changes · one-click narrow, pause, or revoke · your full data and history if this ever ends.
+              <div style="margin-top:6px"><a href="#">Security &amp; compliance (SOC 2 program, data residency) ↗</a></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
+          <div class="panelbox">
+            <h4>Requested: Operate ex-Pricing</h4>
+            <div class="lensrow"><b>Sales</b><div class="dial"><span>Read</span><span class="on">Execute</span></div></div>
+            <div class="lensrow"><b>Inventory</b><div class="dial"><span>Read</span><span class="on">Execute</span></div></div>
+            <div class="lensrow"><b>Ads</b><div class="dial"><span>Read</span><span class="on">Execute</span></div></div>
+            <div class="lensrow"><b>Margin / Pricing</b><div class="dial"><span class="on">Read</span><span class="off">Execute</span></div></div>
+            <div class="lensrow"><b>Cash</b><div class="dial"><span class="on">Read</span><span class="off">Execute</span></div></div>
+          </div>
+          <div>
+            <div class="panelbox">
+              <h4>Autonomy ceiling you allow (per lens)</h4>
+              <div class="lensrow"><b>Ads</b><div class="dial"><span>Suggest</span><span class="on">Assist</span><span>Act</span></div></div>
+              <div class="lensrow"><b>Inventory</b><div class="dial"><span class="on">Suggest</span><span>Assist</span><span>Act</span></div></div>
+              <div class="lensrow"><b>Pricing</b><div class="dial"><span class="on">Suggest</span><span class="off">Assist</span><span class="off">Act</span></div></div>
+              <p class="note-inline" style="margin-top:8px">You can raise these later as trust builds. Every agency action is logged and visible to you.</p>
+            </div>
+            <div class="panelbox">
+              <h4>Connect your accounts</h4>
+              <div class="conn"><span class="nm">Amazon Seller Central<small>Sales, inventory, fees</small></span><button class="btn slate sm">Connect →</button></div>
+              <div class="conn"><span class="nm">Shopify<small>Orders, products, sessions</small></span><button class="btn slate sm">Connect →</button></div>
+              <div class="conn"><span class="nm">Amazon Ads<small>Campaigns, spend, attribution</small></span><button class="btn slate sm">Connect →</button></div>
+              <div class="conn"><span class="nm">Google Ads</span><button class="btn slate sm">Connect →</button></div>
+              <div class="conn"><span class="nm">Meta Ads</span><button class="btn slate sm">Connect →</button></div>
+              <div class="conn soon"><span class="nm">Walmart · Flipkart · eBay · Shopzee<small>Coming soon</small></span></div>
+              <div class="hint" style="margin-top:8px">You authorize each account directly — the agency never holds your credentials. <b>Not ready to connect?</b> Grant access anyway; your agency can start from CSV exports and you can connect any time.</div>
+            </div>
+            <div class="panelbox">
+              <h4>Benchmarking</h4>
+              <div class="field" style="margin:0"><label><input type="checkbox"> Join anonymous category benchmarking (k≥5) — see how you compare, contribute the same.</label></div>
+            </div>
+          </div>
+        </div>
+        <div class="panelbox" style="margin-top:18px">
+          <h4>Not comfortable with this much access?</h4>
+          <p class="note-inline" style="margin:0 0 10px">Counter with what you're ready for today — you can always widen it later. BrightPeak sees your counter and can accept in one click.</p>
+          <div class="checks">
+            <span class="chip">Advise Only — they propose, you approve everything</span>
+            <span class="chip sel">Ads Only — they run ads, read sales, touch nothing else</span>
+            <span class="chip">Read / Report Only</span>
+          </div>
+          <button class="btn slate sm" style="margin-top:10px">Send counter-offer to BrightPeak →</button>
+        </div>
+        <button class="btn sage" onclick="go('s23')">✓ Grant access to BrightPeak</button>
+        <button class="btn ghost" style="margin-left:10px">Decline</button>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s23')">Next: the brand's first 72 hours →</button></div>
+  </section>
+
+  <!-- ============ BRAND PORTAL ============ -->
+  <section class="screen" id="s21">
+    <div class="annot"><b>Fixes miss #11:</b> the brand's permanent home — where "revocable and transparent" stops being a promise and becomes buttons. The transparency log drives the flywheel: the autonomy prompt below appears only when the agency's track record earns it. Note the pending co-sign — it's the same price-change decision the AM staged in the work queue. <b>Locale follows the brand, not the agency:</b> an INR brand sees ₹ with Indian digit grouping (₹1,31,000), IST timestamps, and en-IN dates here and in every report — even when managed by a US agency.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">portal.realify.ai/suncrest — powered by BrightPeak Commerce</span></div>
+      <div class="page">
+        <div class="toolbar">
+          <div class="wordmark" style="color:#0E4C63">BrightPeak <span style="font-weight:400;color:var(--muted)">× Suncrest Home Goods</span></div>
+          <span class="note-inline">Managed since Jul 2026 · <a href="#">monthly reports</a></span>
+        </div>
+
+        <div class="banner">⏳ <b>1 approval waiting for you:</b> BrightPeak proposes a +4% price change on 3 SKUs (projected +$1,420/mo margin, stays within Buy Box tolerance). <button class="btn sage sm">Approve</button> <button class="btn ghost sm">Decline</button><br>
+        <span class="note-inline">Expires <b>Jul 19 (5 days)</b>. If you don't respond, <b>nothing is changed</b> and BrightPeak is notified. Reminder emailed to ryan@suncresthome.com.</span></div>
+
+        <div style="display:grid;grid-template-columns:3fr 2fr;gap:22px;align-items:start">
+          <div class="panelbox" style="margin-bottom:0">
+            <h4>Everything BrightPeak did · live log</h4>
+            <div class="gate"><span><b>Lowered bids 18% on 42 ad targets</b> — Ads · Assist · you allowed this level<br><span class="note-inline">Projected +$2,340/mo · ledger #4211 · yesterday 14:02</span></span><span><button class="btn ghost sm">Detail</button> <button class="btn ghost sm">⚑ Flag</button></span></div>
+            <div class="gate"><span><b>Reordered 400 units (SKU SC-DRP-09)</b> — Inventory · approved by J. Thompson (BrightPeak)<br><span class="note-inline">Prevented projected stockout in 9d · ledger #4187 · Jul 12</span></span><span><button class="btn ghost sm">Detail</button> <button class="btn ghost sm">⚑ Flag</button></span></div>
+            <div class="gate"><span><b>Generated June report</b> — sent to you · every figure engine-verified<br><span class="note-inline">ledger #4102 · Jul 2</span></span><button class="btn ghost sm">Open</button></div>
+          </div>
+          <div>
+            <div class="panelbox">
+              <h4>Your controls</h4>
+              <div class="gate"><span>Envelope</span><span class="mono" style="font-size:12px">Operate ex-Pricing</span></div>
+              <div class="gate"><span>Ads autonomy ceiling</span><span class="mono" style="font-size:12px">Assist</span></div>
+              <div class="gate"><span>Benchmarking (k≥5)</span><span class="mono" style="font-size:12px">Opted in</span></div>
+              <div style="margin-top:10px">
+                <button class="btn danger sm" style="font-weight:700">⏸ Pause all agency actions</button>
+                <span class="note-inline" style="margin-left:6px">instant · reversible · agency notified</span>
+              </div>
+              <div style="margin-top:8px">
+                <button class="btn ghost sm">Narrow access…</button>
+                <button class="btn danger sm" style="margin-left:6px" onclick="go('s24')">Revoke access</button>
+              </div>
+              <p class="note-inline" style="margin-top:8px">Revoking is immediate. Your data, history, and connections stay with you — only BrightPeak's window closes.</p>
+            </div>
+            <div class="panelbox">
+              <h4>Access request from BrightPeak</h4>
+              <p style="font-size:13px;margin:0 0 8px">They ask to change Pricing from <b>suggest-only → execute</b> (with your co-sign on changes &gt;3%). Their pricing suggestions to date: 11 sent, 9 you approved.</p>
+              <button class="btn sm">Review request</button> <button class="btn ghost sm" style="margin-left:6px">Decline</button>
+              <p class="note-inline" style="margin-top:8px">Quarterly access reconfirmation due <b>Oct 1</b> — we'll email you a 1-minute review.</p>
+            </div>
+            <div class="panelbox">
+              <h4>Your team</h4>
+              <div class="gate"><span>ryan@suncresthome.com</span><span class="mono" style="font-size:11px">OWNER · approves</span></div>
+              <div class="gate"><span>claire@suncresthome.com</span><span class="mono" style="font-size:11px">OPS · approves</span></div>
+              <div class="gate"><span>susan.cpa@gmail.com</span><span class="mono" style="font-size:11px">FINANCE · reports only</span></div>
+              <button class="btn ghost sm" style="margin-top:8px">+ Invite teammate</button>
+            </div>
+            <div class="panelbox" style="margin-bottom:0">
+              <h4>Earned-trust prompt</h4>
+              <p style="font-size:13px;margin:0 0 8px">BrightPeak's ad recommendations on your account: <b>81% accepted, realized within ±9% of projection</b> over 60 days. Raising Ads to <b>Act</b> would clear routine bid changes ~2 days faster.</p>
+              <button class="btn sm">Raise Ads to Act</button> <button class="btn ghost sm" style="margin-left:6px">Not yet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s28')">Next: approving from a phone →</button></div>
+  </section>
+
+  <!-- ============ MOBILE APPROVAL ============ -->
+  <section class="screen" id="s28">
+    <div class="annot"><b>Exec-audit #4 — the approval-latency lever.</b> Ryan approves from a trade-show floor, not a desktop portal. The email deep link opens this page in a verified session (OTP remembered per device, 30 days). Requirement: thumb-first — one decision per page, the safe outcome (do nothing) always stated, full context two taps away, and the action lands in the same ledger as everything else.</div>
+    <div class="phone">
+      <div class="pstatus"><span>9:41</span><span>portal.realify.ai</span><span>🔋 82%</span></div>
+      <div class="pbody">
+        <div class="wordmark" style="color:#0E4C63;font-size:14px">BrightPeak <span style="font-weight:400;color:var(--muted)">× Suncrest</span></div>
+        <h3 style="margin:14px 0 4px;font-size:18px;line-height:1.3">Approve a +4% price change on 3 SKUs?</h3>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 12px">Proposed by Jake Thompson · BrightPeak</p>
+        <div class="panelbox" style="padding:12px 14px">
+          <div class="gate" style="font-size:12.5px"><span>Projected margin</span><b class="num">+$1,420/mo</b></div>
+          <div class="gate" style="font-size:12.5px"><span>Buy Box risk</span><span>Low — stays within tolerance</span></div>
+          <div class="gate" style="font-size:12.5px"><span>Simulated first</span><span>✓ Shadow Mode</span></div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin:10px 0 14px">⏳ Expires in <b>2 days</b>. If you do nothing, <b>no change is made</b> — ever.</p>
+        <button class="btn sage full" onclick="go('s24')">✓ Approve</button>
+        <button class="btn ghost full">Decline</button>
+        <button class="btn ghost full" style="margin-bottom:0">💬 Ask Jake a question</button>
+        <p class="note-inline" style="margin-top:12px;text-align:center">Your decision is signed to the ledger · <span class="mono">#4297</span></p>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s24')">Next: when it ends — the promise kept →</button></div>
+  </section>
+
+  <!-- ============ BRAND DAY-0 BASELINE & ALERTS ============ -->
+  <section class="screen" id="s23">
+    <div class="annot"><b>Fixes brand-misses #4 and #5:</b> the brand's first-value moment, 72 hours after granting — Realify finds money before the agency has done anything, which makes both the platform and the agency look good. Below it, notification setup: email-first (approvals expire in 5 days, silence never executes), with the WhatsApp slot visible but marked coming soon.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">portal.realify.ai/suncrest/welcome</span></div>
+      <div class="page">
+        <div class="toolbar">
+          <div class="wordmark" style="color:#0E4C63">BrightPeak <span style="font-weight:400;color:var(--muted)">× Suncrest Home Goods</span></div>
+          <span class="note-inline">Baseline generated 68h after you granted access</span>
+        </div>
+        <h2 class="pg" style="margin-top:6px">Ryan, here's what we found in your account</h2>
+        <div class="kpis">
+          <div class="kpi"><div class="v">82<span style="font-size:13px;color:var(--muted)">/100</span></div><div class="k">Account health</div></div>
+          <div class="kpi"><div class="v">11.4%</div><div class="k">TACoS · 90d</div></div>
+          <div class="kpi"><div class="v">$840</div><div class="k">Fee overcharges found</div></div>
+          <div class="kpi"><div class="v">2</div><div class="k">Risks being watched</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+          <div class="panelbox" style="margin-bottom:0">
+            <h4>Found in the first pass</h4>
+            <div class="gate"><span>🧾 <b>$840/yr in FBA fee overcharges</b> on 4 SKUs — reimbursement case drafted for BrightPeak to file</span><span class="g-pass">MONEY</span></div>
+            <div class="gate"><span>📦 <b>SC-DRP-09 stockout risk</b> in ~3 weeks at current velocity</span><span class="g-wait">WATCHING</span></div>
+            <div class="gate"><span>⚔ <b>Competitor undercut your hero SKU 6%</b> last Tuesday — Buy Box share dipped 4 pts</span><span class="g-wait">WATCHING</span></div>
+            <div class="gate"><span>✓ AHR healthy · listings clean · no suppressed ASINs</span><span class="g-pass">OK</span></div>
+          </div>
+          <div class="panelbox" style="margin-bottom:0">
+            <h4>How we'll reach you</h4>
+            <div class="conn"><span class="nm">Email — ryan@suncresthome.com<small>Approvals · weekly digest · urgent risk</small></span><span class="st appr">ON</span></div>
+            <div class="conn soon"><span class="nm">WhatsApp<small>Coming soon — approve with a reply</small></span><button class="btn ghost sm">Join waitlist</button></div>
+            <div class="conn"><span class="nm">Add claire@suncresthome.com<small>She can approve when you're traveling</small></span><button class="btn ghost sm">Invite</button></div>
+            <p class="note-inline" style="margin-top:8px"><b>How approvals work:</b> requests expire in 5 days. If you don't respond, nothing is changed — ever. Silence never equals consent.</p>
+          </div>
+        </div>
+        <div style="margin-top:18px"><button class="btn" onclick="go('s21')">Go to your portal →</button></div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s21')">Next: the brand's ongoing home →</button></div>
+  </section>
+
+  <!-- ============ BRAND OFFBOARDING ============ -->
+  <section class="screen" id="s24">
+    <div class="annot"><b>Fixes brand-miss #9 — the trust cornerstone, proven with buttons.</b> Access closed in seconds and it's ledgered. "Continue directly" appears <i>only because the brand ended this engagement</i> — if Realify or the agency ends it, that option is hidden for 12 months (channel protection, PRD §12). The deletion path issues a certificate: provable delete, per the tenancy model's crypto-shred.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">portal.realify.ai/suncrest</span></div>
+      <div class="page">
+        <div class="banner">Your engagement with <b>BrightPeak Commerce</b> ended <b>Jul 3, 2027 · by your decision</b>. Their access closed in 41 seconds. <span class="mono" style="font-size:11px">ledger #9412</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+          <div>
+            <div class="panelbox">
+              <h4>What stays with you — everything</h4>
+              <ul class="checklist">
+                <li>12 months of P&amp;L history, health scores, and every report</li>
+                <li>The complete action ledger — every change BrightPeak ever made</li>
+                <li>Your marketplace connections (they were always yours)</li>
+                <li>Benchmarking contribution — now paused automatically</li>
+              </ul>
+            </div>
+            <div class="panelbox" style="margin-bottom:0">
+              <h4>Take it with you</h4>
+              <button class="btn ghost sm">Export everything (CSV + JSON) ↓</button>
+              <span class="note-inline" style="margin-left:8px">P&amp;L, ledger, reports — no lock-in, no questions.</span>
+            </div>
+          </div>
+          <div class="panelbox" style="margin-bottom:0">
+            <h4>What's next — your choice</h4>
+            <div class="envcard sel"><h5>Continue on Realify directly</h5><p>Same data, same history, zero re-onboarding. You manage it yourself (or with your team) at direct pricing.</p></div>
+            <div class="envcard"><h5>Bring a new agency</h5><p>Invite them — your previous envelope terms carry over as the starting defaults. Your history does not transfer to them without your say.</p></div>
+            <div class="envcard"><h5>Do nothing for now</h5><p>We keep your data safe for 12 months, then delete it provably — you'll receive a deletion certificate. Reactivate any time before that.</p></div>
+            <button class="btn" style="margin-top:6px">Continue directly →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s11')">Next: back to the agency — wiring up data →</button></div>
+  </section>
+
+  <!-- ============ 10. DATA SOURCES / CSV UPLOAD ============ -->
+  <section class="screen" id="s11">
+    <div class="annot"><b>Why this screen:</b> consent shouldn't block data. If the brand deferred connecting, the agency starts from CSV exports the same day. Every CSV-sourced row is tagged <span class="mono">source_class: csv</span> with a confidence badge wherever it surfaces; connecting the API later upgrades the history automatically — no rework, no re-onboarding.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">app.realify.ai/clients/suncrest/data-sources</span></div>
+      <div class="page">
+        <div class="wordmark">realify<span class="dot">●</span> <span class="tag">Suncrest Home Goods · Data sources</span></div>
+        <div class="banner sagey" style="margin-top:16px">✓ Consent granted — Operate ex-Pricing · Ads ceiling: Assist · granted Jul 14 by ryan@suncresthome.com</div>
+        <div class="banner" style="background:#F5E7E4;border-color:#E0B8AF;color:#7A3527">⚠ <b>1 connection unhealthy.</b> Shopify token was revoked — data is <b>9 days stale</b>. Decisions that depend on it are <b>paused, not guessed</b>. A fix link was sent to the brand.</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+          <div class="panelbox" style="margin-bottom:0">
+            <h4>Connected accounts (preferred)</h4>
+            <div class="conn"><span class="nm">Amazon Seller Central<small>Authorized by brand during consent</small></span><span class="st appr">CONNECTED</span></div>
+            <div class="conn"><span class="nm">Shopify<small>Token revoked Jul 5 · data 9d stale · dependent decisions paused</small></span><span class="st rej">EXPIRED</span> <button class="btn slate sm">Send fix link →</button></div>
+            <div class="conn"><span class="nm">Amazon Ads</span><span class="st appr">CONNECTED</span></div>
+            <div class="conn"><span class="nm">Google Ads<small>Awaiting brand authorization</small></span><span class="st wait">PENDING</span></div>
+            <div class="conn"><span class="nm">Meta Ads</span><button class="btn slate sm">Re-send request →</button></div>
+            <div class="conn soon"><span class="nm">Walmart · Flipkart · eBay · Shopzee<small>Coming soon — tell us which you need first</small></span></div>
+            <div class="hint" style="margin-top:8px">Connection requests go to the brand — they authorize directly, you never handle their credentials.</div>
+          </div>
+
+          <div class="panelbox" style="margin-bottom:0">
+            <h4>Or upload the brand's exports (CSV)</h4>
+            <div class="drop">⬆ <b>Drop exports here</b> or browse<br><span style="font-size:12px">We auto-detect the report type from the columns.</span></div>
+            <table class="mock">
+              <thead><tr><th>File</th><th>Detected as</th><th>Rows</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td class="mono" style="font-size:12px">suncrest_sales_traffic_jun.csv</td><td>Sales &amp; Traffic (daily)</td><td>4,380</td><td><span class="st appr">VALIDATED</span></td></tr>
+                <tr><td class="mono" style="font-size:12px">suncrest_all_orders_24mo.csv</td><td>All Orders</td><td>61,204</td><td><span class="st appr">VALIDATED</span></td></tr>
+                <tr><td class="mono" style="font-size:12px">shopify_orders_export.csv</td><td>Shopify Orders</td><td>12,911</td><td><span class="st appr">VALIDATED</span></td></tr>
+                <tr><td class="mono" style="font-size:12px">google_ads_q2.csv</td><td>Google Ads campaigns</td><td>688</td><td><span class="st wait">2 WARNINGS</span></td></tr>
+              </tbody>
+            </table>
+            <div class="hint" style="margin-top:8px">Accepted: Amazon Business Reports (Sales &amp; Traffic), All Orders, ads campaign exports (Amazon / Google / Meta), Shopify orders &amp; products. <a href="#">Download templates + where-to-find guide ↗</a></div>
+            <div class="panelbox" style="margin-top:12px;background:#FBF3EE;border-color:#E3C4B4">
+              <h4>Fix google_ads_q2.csv · 2 warnings</h4>
+              <div class="gate"><span>Column <span class="mono">"Cost (INR)"</span> not recognized</span>
+                <select style="font-size:12px;border:1px solid var(--line);border-radius:7px;padding:4px 8px"><option selected>Map to: spend (currency: INR)</option><option>Map to: other…</option><option>Ignore column</option></select></div>
+              <div class="gate"><span>68 rows missing <span class="mono">campaign_status</span></span>
+                <select style="font-size:12px;border:1px solid var(--line);border-radius:7px;padding:4px 8px"><option selected>Default to: enabled</option><option>Skip those rows</option></select></div>
+              <button class="btn sm" style="margin-top:10px">Apply mapping &amp; revalidate</button>
+              <span class="note-inline" style="margin-left:10px">Mapping is remembered for future uploads of this report type.</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px">
+          <button class="btn" onclick="go('s10')">Finish setup — start hydration →</button>
+          <span class="note-inline" style="margin-left:12px">CSV-sourced metrics carry a <span class="st wait" style="font-size:9.5px">CSV</span> badge until the matching API is connected.</span>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s10')">Next: the agency's day-one console →</button></div>
+  </section>
+
+  <!-- ============ 11. PORTFOLIO CONSOLE ============ -->
+  <section class="screen" id="s10">
+    <div class="annot"><b>Why this screen:</b> the empty state is the TTFV promise made visible — the account hydrates and the queue populates within 24–72h. The console teaches the decision-queue paradigm from minute one instead of showing a blank dashboard.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">app.realify.ai/portfolio</span></div>
+      <div class="page">
+        <div class="toolbar">
+          <div class="wordmark">realify<span class="dot">●</span> <span class="tag">Portfolio · BrightPeak</span></div>
+          <button class="btn" onclick="go('s8')">+ Add client</button>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="v">1<span style="font-size:13px;color:var(--muted)">/10</span></div><div class="k">Accounts (pilot cap)</div></div>
+          <div class="kpi"><div class="v">—</div><div class="k">Portfolio GMV · USD-norm</div></div>
+          <div class="kpi"><div class="v">—</div><div class="k">Margin $</div></div>
+          <div class="kpi"><div class="v">0</div><div class="k">Decisions in queue</div></div>
+        </div>
+        <div class="panelbox">
+          <h4>Accounts</h4>
+          <table class="mock">
+            <thead><tr><th>Brand</th><th>Envelope</th><th>Health</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><b>Suncrest Home Goods</b></td><td>Operate ex-Pricing</td><td>—</td>
+                <td><span class="hydema"></span>Hydrating — Amazon + Amazon Ads via API, Shopify &amp; Google from CSV <span class="st wait" style="font-size:9.5px">CSV</span>. First decisions expected <b>within 24–72h</b>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panelbox center" style="padding:36px">
+          <h3 style="margin:0 0 6px">Your work queue is warming up</h3>
+          <p class="note-inline" style="max-width:52ch;margin:0 auto 16px">When hydration completes, this becomes one $-ranked stream of decisions across every client — approve, schedule, or dismiss from a single view. Add the rest of your book so day one covers everyone.</p>
+          <button class="btn ghost" onclick="go('s8')">+ Invite your next client</button>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s16')">Next: the queue, populated — the product →</button></div>
+  </section>
+
+  <!-- ============ WORK QUEUE · POPULATED ============ -->
+  <section class="screen" id="s16">
+    <div class="annot"><b>Fixes miss #1 — this is the screen prospects screenshot.</b> One $-ranked stream across all clients. Every item: engine-computed $ impact + confidence, the driving signal, inline actions. Note the third item — pricing is suggest-only in Suncrest's envelope, so the button reads "Propose to brand," the permission model visible in the UI. The paused item shows stale data honestly instead of guessing. <b>Mixed-currency books:</b> each item displays the brand's selling currency (see the ₹ item — Indian digit grouping, lakh notation); ranking normalizes everything to USD at a daily locked rate, shown transparently.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">app.realify.ai/portfolio/queue</span></div>
+      <div class="page">
+        <div class="toolbar">
+          <div class="wordmark">realify<span class="dot">●</span> <span class="tag">Work queue · My book (8 clients)</span></div>
+          <span class="note-inline">23 open decisions · <b>$18.4k/mo</b> at stake · ranked by $ impact</span>
+        </div>
+
+        <div class="qitem">
+          <div class="imp">+$2,340<small>/MO MARGIN</small></div>
+          <div>
+            <h5>Lower bids 18% on 42 targets above break-even ACOS — <b>Alpine Kitchenware</b><span class="lens">ADS</span></h5>
+            <p>Driving signal: ACOS 34% vs SKU break-even 22% for 60 days · <span class="conf">confidence 91% · sim: −$96/day waste, −2% sales risk</span></p>
+          </div>
+          <div class="acts"><button class="btn sage sm">Approve</button><button class="btn ghost sm">Simulate</button><button class="btn ghost sm">Dismiss ▾</button></div>
+        </div>
+
+        <div class="qitem">
+          <div class="imp">+$1,870<small>/MO MARGIN</small></div>
+          <div>
+            <h5>Reorder 400 units of SC-DRP-09 before ads outrun stock — <b>Juniper Pet Supply</b><span class="lens">INVENTORY</span></h5>
+            <p>Driving signal: 9 days of cover at current velocity while ads accelerate · cross-lens: pausing ads instead would cost $2.9k · <span class="conf">confidence 84%</span></p>
+          </div>
+          <div class="acts"><button class="btn sage sm">Approve</button><button class="btn ghost sm">Schedule</button><button class="btn ghost sm">Dismiss ▾</button></div>
+        </div>
+
+        <div class="qitem">
+          <div class="imp">+₹1.31L<small>/MO ≈ $1,560</small></div>
+          <div>
+            <h5>Cut Flipkart CPC 14% on 3 campaigns before festival inflation — <b>Deccan Decor</b><span class="lens">ADS · IN</span></h5>
+            <p>Driving signal: CPC up 22% in 2 weeks ahead of Diwali; TACoS 9% above break-even · shown as ₹1,31,000 to the brand · ranked at $1,560 (locked FX, Jul 14) · <span class="conf">confidence 87%</span></p>
+          </div>
+          <div class="acts"><button class="btn sage sm">Approve</button><button class="btn ghost sm">Simulate</button><button class="btn ghost sm">Dismiss ▾</button></div>
+        </div>
+
+        <div class="qitem">
+          <div class="imp">+$1,420<small>/MO MARGIN</small></div>
+          <div>
+            <h5>Raise price 4% on 3 SKUs, within Buy Box tolerance — <b>Suncrest Home Goods</b><span class="lens">PRICING</span></h5>
+            <p>Driving signal: elasticity curve flat at +4%, competitor raised 6% last week · <span class="conf">confidence 78%</span> · <b>pricing is suggest-only in Suncrest's envelope</b></p>
+          </div>
+          <div class="acts"><button class="btn slate sm">Propose to brand →</button><button class="btn ghost sm">Dismiss ▾</button></div>
+        </div>
+
+        <div class="qitem dim">
+          <div class="imp" style="color:var(--muted)">PAUSED</div>
+          <div>
+            <h5>2 decisions held — <b>Suncrest Home Goods</b><span class="lens">SHOPIFY</span></h5>
+            <p>Shopify data is 9 days stale (token revoked). We pause rather than recommend on stale numbers. <a href="#">Fix connection</a></p>
+          </div>
+          <div class="acts"><button class="btn ghost sm">View anyway</button></div>
+        </div>
+
+        <div class="panelbox" style="margin-top:16px">
+          <h4>Auto-cleared while you slept · accounts at Act level</h4>
+          <div class="gate"><span>3 routine bid adjustments executed autonomously on <b>Alpine Kitchenware</b> · projected +$610/mo · all within guardrails</span><span><button class="btn ghost sm">Review</button> <button class="btn ghost sm">Undo</button></span></div>
+        </div>
+        <p class="note-inline">Dismissals ask for a reason — "impact too optimistic," "client said no," "bad timing" — and train the ranker on your book.</p>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s19')">Next: what Realify earned the agency →</button></div>
+  </section>
+
+  <!-- ============ AGENCY ROI ============ -->
+  <section class="screen" id="s19">
+    <div class="annot"><b>Fixes miss #9 — the renewal weapon.</b> The agency proves ROI to brands; this screen proves Realify's ROI to the agency principal. Same engines, same ledger, same counterfactual method as the client reports — just aimed at our own customer. Exportable as a QBR pack for the agency's own leadership.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">app.realify.ai/impact</span></div>
+      <div class="page">
+        <div class="toolbar">
+          <h2 class="pg" style="margin:0">Your Realify impact — pilot, day 31</h2>
+          <button class="btn ghost sm">Export QBR pack ↓</button>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="v">38 hrs</div><div class="k">Team hours saved <span class="delta-up">reports + triage</span></div></div>
+          <div class="kpi"><div class="v">$24.6k</div><div class="k">Client margin vs do-nothing</div></div>
+          <div class="kpi"><div class="v">412</div><div class="k">Decisions executed</div></div>
+          <div class="kpi"><div class="v">13.9</div><div class="k">Accounts per AM <span class="delta-up">▲ from 12.0</span></div></div>
+        </div>
+        <div class="panelbox">
+          <h4>Where the value landed · by client</h4>
+          <table class="mock">
+            <thead><tr><th>Client</th><th>Decisions</th><th>Margin vs counterfactual</th><th>Hours saved</th><th>Your fee to them</th></tr></thead>
+            <tbody>
+              <tr><td><b>Alpine Kitchenware</b></td><td>118</td><td class="num">$9,840</td><td class="num">9.5</td><td class="note-inline">their QBR writes itself →</td></tr>
+              <tr><td><b>Juniper Pet Supply</b></td><td>96</td><td class="num">$7,120</td><td class="num">8</td><td class="note-inline"><a href="#">open client report</a></td></tr>
+              <tr><td><b>Suncrest Home Goods</b></td><td>64</td><td class="num">$4,310</td><td class="num">6</td><td class="note-inline"><a href="#">open client report</a></td></tr>
+              <tr><td colspan="5" class="note-inline">+ 5 more</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note-inline">Every figure is engine-computed from the Autonomy Ledger — the same numbers your clients see, so your QBR and theirs can never disagree. Per-client values render in each brand's selling currency (₹ for INR sellers); totals normalize to USD at a monthly locked rate, with the rate shown.</p>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s20')">Next: plan &amp; billing →</button></div>
+  </section>
+
+  <!-- ============ AGENCY BILLING ============ -->
+  <section class="screen" id="s20">
+    <div class="annot"><b>Fixes miss #10 — the CFO screen.</b> Pooled Decisions with a burn projection (no overage surprises), per-client cost allocation so the agency can defend its own margins, and books-ready export. If their CFO can reconcile us in five minutes, their CFO stops being our churn vector.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">app.realify.ai/settings/billing</span></div>
+      <div class="page">
+        <div class="toolbar">
+          <h2 class="pg" style="margin:0">Plan &amp; billing</h2>
+          <button class="btn ghost sm">Download CSV for your books ↓</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+          <div>
+            <div class="panelbox">
+              <h4>Pilot plan · day 31 of 90</h4>
+              <div class="gate"><span>Managed accounts</span><span class="mono" style="font-size:12px">8 × $399 = $3,192/mo</span></div>
+              <div class="gate"><span>Platform fee</span><span class="mono" style="font-size:12px">Waived during pilot</span></div>
+              <div class="gate"><span>Billing</span><span class="mono" style="font-size:12px">Stripe invoice · Net-30</span></div>
+              <div class="gate"><span>Decisions pool</span><span><div class="meter warn" style="display:inline-block;width:110px;vertical-align:middle"><i style="width:64%"></i></div> <span class="mono" style="font-size:12px">640 / 1,000</span></span></div>
+              <p class="note-inline" style="margin-top:8px">On pace for ~940 this cycle. Overage: $0.90/decision — we'll warn at 85%, never surprise-bill.</p>
+            </div>
+            <div class="panelbox" style="margin-bottom:0">
+              <h4>Invoices</h4>
+              <div class="gate"><span>June 2026 · $3,192</span><span class="g-pass">PAID</span></div>
+              <div class="gate"><span>July 2026 · $3,192 · due Aug 13</span><span class="g-wait">OPEN · NET-30</span></div>
+              <p class="note-inline" style="margin-top:8px">All invoices in USD, for US and Indian agencies. Indian agencies receive export-of-services GST-compliant invoices with an INR reference total at the invoice-date RBI rate.</p>
+            </div>
+          </div>
+          <div class="panelbox" style="margin-bottom:0">
+            <h4>Cost per client · defend your margin</h4>
+            <table class="mock">
+              <thead><tr><th>Client</th><th>Decisions</th><th>Allocated cost</th><th>Value delivered</th></tr></thead>
+              <tbody>
+                <tr><td><b>Alpine Kitchenware</b></td><td>118</td><td class="num">$481</td><td class="num">$9,840</td></tr>
+                <tr><td><b>Juniper Pet Supply</b></td><td>96</td><td class="num">$430</td><td class="num">$7,120</td></tr>
+                <tr><td><b>Suncrest Home Goods</b></td><td>64</td><td class="num">$399</td><td class="num">$4,310</td></tr>
+                <tr><td colspan="4" class="note-inline">Allocation = per-account fee + pooled-decision share. Use it in your own client pricing.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s25')">Next: unblocking client approvals →</button></div>
+  </section>
+
+  <!-- ============ APPROVALS COCKPIT ============ -->
+  <section class="screen" id="s25">
+    <div class="annot"><b>Agency-owner need #6.</b> Requirement: the brand's 5-day expiry protects brands; this screen protects agency velocity. Every pending brand approval across the book in one place, sorted by expiry, with $-blocked totals and one-click nudge/escalate. Rule: a nudge is agency-initiated but Realify-delivered (consistent sender, capped at 2 per request — the agency can't spam its own clients into approval fatigue).</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">app.realify.ai/approvals</span></div>
+      <div class="page">
+        <div class="toolbar">
+          <h2 class="pg" style="margin:0">Approvals cockpit</h2>
+          <span class="note-inline">7 pending · <b>$6.8k/mo blocked</b> · avg client response 2.1 days</span>
+        </div>
+        <table class="mock">
+          <thead><tr><th>Client</th><th>Waiting on</th><th>$ impact</th><th>Requested</th><th>Expires</th><th>Signal</th><th></th></tr></thead>
+          <tbody>
+            <tr style="background:#FBF3EE">
+              <td><b>Suncrest Home Goods</b></td><td>Price +4% on 3 SKUs (co-sign)</td><td class="num">$1,420/mo</td><td>Jul 14</td>
+              <td><span class="st rej">2 DAYS</span></td><td class="note-inline">Ryan viewed it · didn't act</td>
+              <td><button class="btn slate sm">Nudge (1 of 2)</button> <button class="btn ghost sm">Escalate → call</button></td></tr>
+            <tr>
+              <td><b>Alpine Kitchenware</b></td><td>Budget +$40/day on 2 campaigns</td><td class="num">$2,100/mo</td><td>Yesterday</td>
+              <td><span class="st wait">4 DAYS</span></td><td class="note-inline">Not yet viewed</td>
+              <td><button class="btn slate sm">Nudge</button></td></tr>
+            <tr>
+              <td><b>Corva Audio</b></td><td>Raise Ads autonomy to Act</td><td class="num">~$900/mo</td><td>Jul 6</td>
+              <td><span class="st rej">EXPIRED</span></td><td class="note-inline">No response · nothing executed</td>
+              <td><button class="btn ghost sm">Re-request</button> <button class="btn ghost sm">Discuss at QBR</button></td></tr>
+            <tr>
+              <td><b>Juniper Pet Supply</b></td><td>Promotion setup (Fall event)</td><td class="num">$1,700/mo</td><td>Jul 13</td>
+              <td><span class="st appr">5 DAYS</span></td><td class="note-inline">Claire approves when Ryan travels ✓</td>
+              <td><button class="btn ghost sm">Wait</button></td></tr>
+          </tbody>
+        </table>
+        <p class="note-inline" style="margin-top:12px">Expired = not executed, ever. Re-requests carry the full prior context so the client never sees the same ask cold twice.</p>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s26')">Next: your team &amp; client health →</button></div>
+  </section>
+
+  <!-- ============ TEAM & CLIENT HEALTH ============ -->
+  <section class="screen" id="s26">
+    <div class="annot"><b>Agency-owner needs #7 and #8.</b> Requirements: (a) the AM-performance view Realify built for itself, mirrored to the agency owner — queue clearance and acceptance per AM, atomic book reassignment (grants transfer as one operation, brands auto-notified, ledger records the handover), and a staff training sandbox rented from the demo infrastructure. (b) Churn radar built from relationship <i>metadata</i> the agency is entitled to see — portal engagement, approval latency, autonomy direction — never the brand's private data. Alerts fire before the termination email does.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">app.realify.ai/team</span></div>
+      <div class="page">
+        <div class="toolbar">
+          <h2 class="pg" style="margin:0">Team &amp; client health</h2>
+          <button class="btn ghost sm">Open training sandbox →</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+          <div class="panelbox" style="margin-bottom:0">
+            <h4>Your team · 30 days</h4>
+            <table class="mock">
+              <thead><tr><th>AM</th><th>Accounts</th><th>Cleared/wk</th><th>Acceptance</th><th></th></tr></thead>
+              <tbody>
+                <tr><td><b>Jake Thompson</b></td><td>5</td><td class="num">31</td><td class="num">78%</td><td></td></tr>
+                <tr><td><b>Emily Carter</b></td><td>3</td><td class="num">26</td><td class="num">83%</td><td></td></tr>
+                <tr><td><b>Dan Foley</b> <span class="st wait">NEW · WK 2</span></td><td>0</td><td class="num">— in sandbox</td><td class="num">—</td><td><button class="btn ghost sm">Assign first account</button></td></tr>
+              </tbody>
+            </table>
+            <div class="panelbox" style="margin-top:12px;background:#FBF8F1">
+              <h4>Reassign a book</h4>
+              <p style="font-size:13px;margin:0 0 8px">Jake leaving? Transfer his 5 accounts to Emily in one operation — grants move atomically, nothing is ever unowned, brands get a warm handover note you approve first.</p>
+              <button class="btn slate sm">Transfer Jake's book…</button>
+            </div>
+          </div>
+          <div class="panelbox" style="margin-bottom:0">
+            <h4>Client relationship radar</h4>
+            <div class="gate"><span>🔴 <b>Corva Audio</b> — no portal login in 30d · approval latency 4× slower · flagged 1 action last week<br><span class="note-inline">Save-play suggested: share their impact report ($3.1k found) + book a QBR this week</span></span><span><button class="btn sm">Run save-play</button></span></div>
+            <div class="gate"><span>🟠 <b>Meridian Toys</b> — onboarded 3 weeks ago, hasn't opened the portal once<br><span class="note-inline">First-value email with their day-0 baseline never re-sent</span></span><span><button class="btn ghost sm">Re-send baseline</button></span></div>
+            <div class="gate"><span>🟢 <b>Suncrest Home Goods</b> — raised Ads autonomy to Act last month · approves in &lt;1 day</span><span class="note-inline">expansion-ready</span></div>
+            <div class="gate"><span>🟢 <b>Alpine Kitchenware</b> — steady engagement · 81% acceptance</span><span class="note-inline">healthy</span></div>
+            <p class="note-inline" style="margin-top:8px">Signals are engagement metadata only — never the brand's private financials. The same ethics rule as the Signal Graph: visibility is earned by role, not taken.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s27')">Next: day 76 — the pilot pays off →</button></div>
+  </section>
+
+  <!-- ============ PILOT → CONTRACT ============ -->
+  <section class="screen" id="s27">
+    <div class="annot"><b>Exec-audit #2 — the revenue climax, auto-assembled.</b> Every number is pulled from the ledger and the gates the agency already watched itself pass; the proposal writes itself from evidence. Requirement: <b>no silent auto-convert</b> — consistent with "silence never executes," an unanswered pilot lapses to read-only at day 90, then offers export. Acceptance is an e-sign whose terms version is recorded in the ledger (the legal spine, applied).</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">app.realify.ai/plan/convert</span></div>
+      <div class="page">
+        <div class="banner sagey">🎯 <b>Pilot day 76 of 90.</b> You've passed every gate you set out to. Here's the case — and the contract.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+          <div class="panelbox" style="margin-bottom:0">
+            <h4>What your pilot proved · from your ledger</h4>
+            <div class="gate"><span>Accounts per AM</span><span class="g-pass">12.0 → 19.4 · 1.6× ✓</span></div>
+            <div class="gate"><span>Team hours saved</span><span class="g-pass">96 hrs over 76 days</span></div>
+            <div class="gate"><span>Client margin vs do-nothing</span><span class="g-pass">$61,300</span></div>
+            <div class="gate"><span>Decisions executed · acceptance</span><span class="mono" style="font-size:12px">1,240 · 74%</span></div>
+            <div class="gate"><span>Clients raised autonomy</span><span class="mono" style="font-size:12px">4 of 8 at Assist+</span></div>
+            <p class="note-inline" style="margin-top:8px">Same numbers your clients see in their reports. Export this page as your own board update.</p>
+          </div>
+          <div class="panelbox" style="margin-bottom:0">
+            <h4>Your contract · pilot pricing honored</h4>
+            <div class="gate"><span>Platform fee</span><span class="mono" style="font-size:12px">$2,000/mo (was waived)</span></div>
+            <div class="gate"><span>Per managed account</span><span class="mono" style="font-size:12px">$449/mo · list $499 · locked 12 mo</span></div>
+            <div class="gate"><span>Decisions pool</span><span class="mono" style="font-size:12px">2,500/mo pooled · $0.90 overage</span></div>
+            <div class="gate"><span>Terms</span><span class="mono" style="font-size:12px">12 months · Net-30 · add accounts anytime</span></div>
+            <div style="margin-top:14px">
+              <button class="btn sage">✓ Accept &amp; e-sign</button>
+              <button class="btn ghost" style="margin-left:8px">Talk to Shiva first</button>
+              <button class="btn ghost" style="margin-left:8px">Proposal PDF ↓</button>
+            </div>
+            <p class="note-inline" style="margin-top:10px">E-sign records terms v2.3 to the ledger. <b>No auto-convert:</b> if you do nothing, the pilot ends day 90, your workspace goes read-only for 14 days, and we offer a full export. Silence never signs anything.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s12')">Next: how Realify watches all of this →</button></div>
+  </section>
+
+  <!-- ============ 12. ADMIN: AGENCIES OVERVIEW ============ -->
+  <section class="screen" id="s12">
+    <div class="annot"><b>Why this screen:</b> your fleet view of the channel. Every column is a PRD §14 metric — the leverage ratio (THE bet) is front and center with the 1.5× gate colored in. The "Needs attention" list turns metric breaches into a worklist, same decision-queue philosophy you sell to agencies.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">admin.realify.ai/agencies</span></div>
+      <div class="page">
+        <div class="toolbar">
+          <h2 class="pg" style="margin:0">Agencies</h2>
+          <span><a href="realify-tester-sandbox.html" class="btn ghost sm" style="text-decoration:none">🧪 Sandbox console ↗</a> <span class="note-inline">admin key required · Last 30 days</span></span>
+        </div>
+        <div class="kpis" style="grid-template-columns:repeat(5,1fr)">
+          <div class="kpi"><div class="v">4</div><div class="k">Agencies live</div></div>
+          <div class="kpi"><div class="v">61</div><div class="k">Managed accounts</div></div>
+          <div class="kpi"><div class="v">$38.4k</div><div class="k">Agency MRR <span class="delta-up">▲ 12%</span></div></div>
+          <div class="kpi"><div class="v">18.7</div><div class="k">Avg AM:account <span class="delta-up">▲ from 13.1</span></div></div>
+          <div class="kpi"><div class="v">0</div><div class="k">Isolation incidents</div></div>
+        </div>
+
+        <table class="mock">
+          <thead><tr><th>Agency</th><th>Phase</th><th>Accounts</th><th>AM:acct (gate ≥1.5× norm)</th><th>Decisions used / pool</th><th>Acceptance</th><th>MRR</th><th>Signals</th></tr></thead>
+          <tbody>
+            <tr class="click" onclick="go('s13')" style="background:#FBF8F1">
+              <td><b>NorthCommerce Group</b> <span class="prov">US</span></td><td><span class="st appr">PHASE 2</span></td><td>34 / 40</td>
+              <td><div class="meter"><i style="width:82%"></i></div><span class="mono" style="font-size:11px">24.3 · 1.9× ✓</span></td>
+              <td>4,120 / 5,000</td><td>71%</td><td>$21.2k</td><td>—</td></tr>
+            <tr class="click">
+              <td><b>BrightPeak Commerce</b> <span class="prov">US</span></td><td><span class="st prov">PILOT · day 31/90</span></td><td>8 / 10</td>
+              <td><div class="meter warn"><i style="width:48%"></i></div><span class="mono" style="font-size:11px">13.9 · 1.2× ↗</span></td>
+              <td>640 / 1,000</td><td>64%</td><td>$3.2k</td><td><span class="st wait">GATE AT RISK</span></td></tr>
+            <tr class="click">
+              <td><b>Vantage Sellers Co</b> <span class="prov">US</span></td><td><span class="st prov">PILOT · day 62/90</span></td><td>4 / 5</td>
+              <td><div class="meter"><i style="width:70%"></i></div><span class="mono" style="font-size:11px">16.0 · 1.6× ✓</span></td>
+              <td>310 / 500</td><td>77%</td><td>$1.6k</td><td>—</td></tr>
+            <tr class="click">
+              <td><b>Cartwheel Digital</b> <span class="prov att">IN</span></td><td><span class="st new">ONBOARDING</span></td><td>3 / 25</td>
+              <td><span class="mono" style="font-size:11px">— hydrating</span></td>
+              <td>12 / 2,500</td><td>—</td><td>$1.2k</td><td><span class="st rej">CONSENT STALLED ×5</span></td></tr>
+          </tbody>
+        </table>
+
+        <div class="panelbox" style="margin-top:18px">
+          <h4>Needs attention</h4>
+          <div class="gate"><span>🟠 <b>BrightPeak</b> — leverage at 1.2× on day 31; queue acceptance 64% and falling. Top dismiss reason: "impact estimate too optimistic" (ads lens).</span><button class="btn ghost sm" onclick="go('s29')">Review dismissals</button></div>
+          <div class="gate"><span>🔴 <b>Cartwheel</b> — 5 of 8 brand consent invites stalled &gt;7 days. Bulk-migration promise at risk.</span><button class="btn ghost sm">Nudge sequence</button></div>
+          <div class="gate"><span>🟠 <b>NorthCommerce</b> — Decisions pool 82% consumed with 9 days left in cycle. Overage conversation before it surprises them.</span><button class="btn ghost sm">Draft note</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s13')">Next: single-agency drill →</button></div>
+  </section>
+
+  <!-- ============ 13. ADMIN: AGENCY DETAIL ============ -->
+  <section class="screen" id="s13">
+    <div class="annot"><b>Why this screen:</b> one agency, judged against its phase gates (PRD §16) — each gate is pass/fail with live numbers, so "should this pilot expand, extend, or stop" is read off the screen, not debated. Ops signals (guardrail blocks, break-glass, factuality) sit next to commercial ones because trust incidents kill this channel faster than churn.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">admin.realify.ai/agencies/org_nc_4b81</span></div>
+      <div class="page">
+        <h2 class="pg" style="margin-top:0">NorthCommerce Group <span class="st appr">PHASE 2</span></h2>
+        <p class="note-inline" style="margin:0 0 18px">Migrated from Pacvue · live 142 days · owner: Shiva · 6 AM seats · 34 brands</p>
+
+        <div class="kpis">
+          <div class="kpi"><div class="v">24.3</div><div class="k">AM:account <span class="delta-up">▲ was 12.8 pre-Realify</span></div></div>
+          <div class="kpi"><div class="v">74%</div><div class="k">Top-10 queue precision</div></div>
+          <div class="kpi"><div class="v">$412k</div><div class="k">Client margin $ vs counterfactual</div></div>
+          <div class="kpi"><div class="v">118%</div><div class="k">NRR (book) <span class="delta-up">▲ 2 brands added</span></div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+          <div>
+            <div class="panelbox">
+              <h4>Phase 2 → GA gates</h4>
+              <div class="gate"><span>AM:account ≥ 1.5× prior norm <span class="prov">AUTO</span></span><span class="g-pass">PASS · 1.9×</span></div>
+              <div class="gate"><span>Top-10 queue precision ≥ 70% <span class="prov">AUTO</span></span><span class="g-pass">PASS · 74%</span></div>
+              <div class="gate"><span>Simulation accuracy ±20% at p50 <span class="prov">AUTO</span></span><span class="g-pass">PASS · ±14%</span></div>
+              <div class="gate"><span>Reporting time-saved validated <span class="prov att">ATTESTED</span></span><span class="g-wait">PENDING · survey out</span></div>
+              <div class="gate"><span>Zero isolation incidents <span class="prov">AUTO</span></span><span class="g-pass">PASS · 0 in 142d</span></div>
+              <div class="gate"><span>Security review <span class="prov att">ATTESTED</span></span><span class="g-fail">NOT SCHEDULED</span></div>
+              <p class="note-inline" style="margin-top:8px"><span class="prov">AUTO</span> = computed from ledger/config, refreshed continuously. <span class="prov att">ATTESTED</span> = human sign-off with evidence, expires.</p>
+            </div>
+            <div class="panelbox" style="margin-bottom:0">
+              <h4>Record attestation · internal</h4>
+              <div class="cols2">
+                <div class="field"><label>Gate</label>
+                  <select><option selected>Security review (tenancy + envelope⊗grant)</option><option>Pen-test</option><option>Reporting time-saved (survey evidence)</option><option>DPA on file</option></select></div>
+                <div class="field"><label>Scope</label>
+                  <select><option selected>Platform-wide</option><option>This agency only</option></select></div>
+                <div class="field"><label>Status</label>
+                  <select><option>Scheduled</option><option selected>Passed</option><option>Failed</option></select></div>
+                <div class="field"><label>Valid until</label><input type="text" value="Jul 14, 2027 (12 months)"></div>
+              </div>
+              <div class="field"><label>Evidence link <span class="req">*</span></label><input type="text" value="drive.realify.ai/security/tenancy-review-2026-07.pdf"></div>
+              <button class="btn sm">Sign &amp; record — shiva@realify.ai</button>
+              <p class="note-inline" style="margin-top:8px">Writes an immutable ledger entry (who, when, evidence). On expiry the gate flips to <b>EXPIRED</b> automatically. Attestations can never overwrite an <span class="prov">AUTO</span> gate — humans attest what machines can't measure, nothing else.</p>
+            </div>
+          </div>
+
+          <div>
+            <div class="panelbox">
+              <h4>Trust &amp; ops signals · 30d</h4>
+              <div class="gate"><span>Guardrail blocks (bulk actions)</span><span class="mono" style="font-size:12px">41 blocked / 1,860 executed</span></div>
+              <div class="gate"><span>Break-glass events</span><span class="mono" style="font-size:12px">1 · time-boxed · brand notified ✓</span></div>
+              <div class="gate"><span>Report factuality gate</span><span class="g-pass">100% · 96 reports</span></div>
+              <div class="gate"><span>Brands at Assist/Act autonomy</span><span class="mono" style="font-size:12px">21 of 34 (62%) ▲</span></div>
+              <div class="gate"><span>Signal Graph opt-in</span><span class="mono" style="font-size:12px">28 of 34 (82%)</span></div>
+            </div>
+            <div class="panelbox" style="margin-bottom:0">
+              <h4>Commercial</h4>
+              <div class="gate"><span>Subscription</span><span class="mono" style="font-size:12px">$2k platform + 34 × $549 · Net-30</span></div>
+              <div class="gate"><span>Decisions pool</span><span class="mono" style="font-size:12px">4,120 / 5,000 · overage $0.90/ea</span></div>
+              <div class="gate"><span>Invoices</span><span class="mono" style="font-size:12px">4 paid · 1 open (12d) · 0 overdue</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panelbox" style="margin-top:18px">
+          <h4>Brands under management (34)</h4>
+          <table class="mock">
+            <thead><tr><th>Brand</th><th>Envelope</th><th>Autonomy</th><th>Decisions 30d</th><th>Accepted</th><th>Health</th></tr></thead>
+            <tbody>
+              <tr><td><b>Alpine Kitchenware</b></td><td>Full Operate</td><td>Act (Ads, Inv)</td><td>212</td><td>81%</td><td><span class="st appr">HEALTHY</span></td></tr>
+              <tr><td><b>Juniper Pet Supply</b></td><td>Operate ex-Pricing</td><td>Assist</td><td>164</td><td>76%</td><td><span class="st appr">HEALTHY</span></td></tr>
+              <tr><td><b>Corva Audio</b></td><td>Ads Only</td><td>Assist (Ads)</td><td>98</td><td>59%</td><td><span class="st wait">AHR WATCH</span></td></tr>
+              <tr><td colspan="6" class="note-inline">+ 31 more…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s29')">Next: when the queue's quality wobbles →</button></div>
+  </section>
+
+  <!-- ============ RECOMMENDATION QUALITY CONSOLE ============ -->
+  <section class="screen" id="s29">
+    <div class="annot"><b>Exec-audit #6 — the falsifiable bet's diagnostic tool.</b> This is where "GATE AT RISK" leads. Precision by action class, dismissal reasons aggregated, per-agency drift — so a wobbling gate becomes a specific fix ("suppress price_up below 0.85 confidence"), not a debate. Requirement: every metric derives from <span class="mono">queue.item.*</span> events reconciled against realized ledger impact; mitigations applied here are themselves ledgered config changes, never model hand-edits.</div>
+    <div class="browser">
+      <div class="bar"><span class="dots"><span></span><span></span><span></span></span><span class="url">admin.realify.ai/quality</span></div>
+      <div class="page">
+        <div class="toolbar">
+          <h2 class="pg" style="margin:0">Recommendation quality</h2>
+          <span class="note-inline">All agencies · last 30 days · refreshed hourly</span>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="v">71%</div><div class="k">Top-10 precision · gate 70%</div></div>
+          <div class="kpi"><div class="v">68%</div><div class="k">Acceptance rate <span class="delta-dn">▼ 3pts</span></div></div>
+          <div class="kpi"><div class="v">±16%</div><div class="k">Realized vs projected · p50</div></div>
+          <div class="kpi"><div class="v">84%</div><div class="k">Dismissals with reason</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:3fr 2fr;gap:22px;align-items:start">
+          <div class="panelbox" style="margin-bottom:0">
+            <h4>Precision by action class</h4>
+            <table class="mock">
+              <thead><tr><th>Action class</th><th>Items 30d</th><th>Precision</th><th>Status</th><th>Mitigation</th></tr></thead>
+              <tbody>
+                <tr><td class="mono" style="font-size:12px">bid_down</td><td>1,840</td><td class="num">81%</td><td><span class="st appr">OK</span></td><td>—</td></tr>
+                <tr><td class="mono" style="font-size:12px">budget_pace</td><td>920</td><td class="num">77%</td><td><span class="st appr">OK</span></td><td>—</td></tr>
+                <tr><td class="mono" style="font-size:12px">reorder</td><td>410</td><td class="num">76%</td><td><span class="st appr">OK</span></td><td>—</td></tr>
+                <tr style="background:#FBF3EE"><td class="mono" style="font-size:12px">price_up</td><td>380</td><td class="num">58%</td><td><span class="st rej">BELOW GATE</span></td><td><span class="note-inline">conf gate → 0.85 (auto) · ledger #c118</span></td></tr>
+                <tr><td class="mono" style="font-size:12px">catalog_fix</td><td>260</td><td class="num">64%</td><td><span class="st wait">WATCH</span></td><td><span class="note-inline">eval set expanded</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <div class="panelbox">
+              <h4>Why AMs dismiss · aggregated</h4>
+              <div class="gate"><span>"Impact too optimistic"</span><span class="mono" style="font-size:12px">41% · concentrated in price_up, IN marketplaces</span></div>
+              <div class="gate"><span>"Client said no"</span><span class="mono" style="font-size:12px">22%</span></div>
+              <div class="gate"><span>"Bad timing"</span><span class="mono" style="font-size:12px">18% · spikes pre-Diwali</span></div>
+              <div class="gate"><span>"Duplicate / already done"</span><span class="mono" style="font-size:12px">9%</span></div>
+            </div>
+            <div class="panelbox" style="margin-bottom:0">
+              <h4>Per-agency drift</h4>
+              <div class="gate"><span><b>BrightPeak</b> — acceptance 64% ▼</span><span class="note-inline">driver: price_up items → fixed by gate above</span></div>
+              <div class="gate"><span><b>NorthCommerce</b> — 71% steady</span><span class="note-inline">—</span></div>
+              <div class="gate"><span><b>Vantage</b> — 77% ▲</span><span class="note-inline">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button onclick="go('s1')">↻ Restart the flow</button></div>
+  </section>
+
+    </main>
+</div>
+
+<script>
+  function go(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+    document.getElementById(id).classList.add('on');
+    document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.s===id));
+    window.scrollTo({top:0});
+  }
+  document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
+  function wiz(el,id){
+    document.querySelectorAll('.wstep').forEach(w=>w.style.display='none');
+    document.getElementById(id).style.display='block';
+    document.querySelectorAll('.steps .s').forEach(s=>s.classList.remove('on'));
+    el.classList.add('on');
+  }
+  function selEnv(el){
+    el.parentElement.querySelectorAll('.envcard').forEach(c=>c.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+</script>
+
+<script>
+(function(){
+  var b=document.createElement('button');b.id='themeToggle';
+  function apply(t){document.documentElement.setAttribute('data-theme',t);
+    b.textContent=(t==='dark')?'\u25D1 light mode':'\u25D0 dark mode';
+    try{localStorage.setItem('mockTheme',t);}catch(e){}}
+  b.onclick=function(){apply(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');};
+  document.body.appendChild(b);
+  var saved='light';try{saved=localStorage.getItem('mockTheme')||'light';}catch(e){}
+  apply(saved);
+})();
+</script>
+</body>
+</html>

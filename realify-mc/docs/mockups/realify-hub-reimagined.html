@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Realify — Reimagined Tester Hub</title>
+<style>
+  :root{
+    --ink:#1A1A1A; --paper:#F4F0E8; --card:#FFFFFF; --panel2:#FBF9F4;
+    --terra:#C4785B; --terra-d:#A9603F; --slate:#5B7B94; --sage:#7A9E7E; --gold:#B98A2E;
+    --line:#E1D9CB; --line2:#EDE7DA; --mut:#6E675C; --faint:#9A9182;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#E9E3D8;color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55}
+  #shell{display:flex;min-height:100vh}
+  #nav{width:250px;flex-shrink:0;background:var(--ink);color:#EDE7DB;padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto}
+  #nav h1{font-size:15px;margin:0 0 4px}
+  #nav .sub{font-size:11.5px;color:#9C9483;margin-bottom:18px}
+  #nav .grp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--terra);margin:16px 0 6px}
+  #nav button{display:block;width:100%;text-align:left;background:none;border:none;color:#CFC8BA;font-size:13px;padding:7px 10px;border-radius:8px;cursor:pointer;font-family:var(--sans)}
+  #nav button:hover{background:#2A2A2A;color:#fff}
+  #nav button.on{background:var(--terra);color:#fff;font-weight:600}
+  #stage{flex:1;padding:24px 30px 70px;max-width:1120px}
+  .annot{background:#FBF7EF;border:1px dashed var(--terra);border-radius:10px;padding:10px 14px;font-size:13px;color:#7A5A47;margin-bottom:18px}
+  .annot b{color:#9C4F30}
+  .screen{display:none}.screen.on{display:block}
+
+  .frame{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 2px 6px rgba(26,26,26,.07),0 16px 44px rgba(26,26,26,.09)}
+  .sandbar{background:repeating-linear-gradient(-45deg,#F3E2C6,#F3E2C6 12px,#EED7B2 12px,#EED7B2 24px);border-bottom:1px solid #DDC391;padding:8px 20px;font-size:12px;color:#6B5320;display:flex;justify-content:space-between;align-items:center}
+  .sandbar b{font-family:var(--mono);letter-spacing:.08em}
+  .pad{padding:26px 30px}
+  .htitle{font-size:23px;font-weight:700;letter-spacing:-.01em;margin:0}
+  .hsub{color:var(--mut);font-size:13.5px;margin:4px 0 0}
+
+  /* order toggle */
+  .ordertoggle{display:inline-flex;background:var(--line2);border-radius:100px;padding:3px;margin:18px 0 6px;font-size:12.5px}
+  .ordertoggle span{padding:6px 14px;border-radius:100px;cursor:pointer;color:var(--mut)}
+  .ordertoggle span.on{background:var(--ink);color:#fff;font-weight:600}
+
+  /* step block */
+  .step{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:16px;overflow:hidden}
+  .step.locked{opacity:.55}
+  .step-h{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line2);background:var(--panel2)}
+  .step-n{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-family:var(--mono);font-size:13px;font-weight:600;text-align:center;line-height:26px;flex-shrink:0}
+  .step.done .step-n{background:var(--sage)}
+  .step.locked .step-n{background:var(--faint)}
+  .step-h h3{margin:0;font-size:15px}
+  .step-h .st-note{margin-left:auto;font-size:12px;color:var(--mut);font-family:var(--mono)}
+  .step-body{padding:20px}
+
+  .subtabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .subtab{border:1px solid var(--line);border-radius:100px;padding:7px 15px;font-size:13px;cursor:pointer;background:#fff}
+  .subtab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
+  .field input[type=text],.field input[type=email],.field input[type=number],.field select{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:10px 12px;font-size:14px;font-family:var(--sans);background:#fff;color:var(--ink)}
+  .field .hint{font-size:11.5px;color:var(--mut);margin-top:4px}
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+  .cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 16px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{border:1.5px solid var(--line);border-radius:100px;padding:6px 13px;font-size:13px;cursor:pointer;background:#fff;user-select:none}
+  .chip.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chip.add{border-style:dashed;color:var(--mut)}
+  .rangewrap{display:flex;align-items:center;gap:14px}
+  .rangewrap input[type=range]{flex:1}
+  .rangeval{font-family:var(--mono);font-size:18px;font-weight:600;min-width:70px;text-align:right}
+
+  .btn{display:inline-block;border-radius:9px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:var(--sans)}
+  .btn.p{background:var(--terra);color:#fff}
+  .btn.p:hover{background:var(--terra-d)}
+  .btn.g{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+  .btn.dark{background:var(--ink);color:#fff}
+  .btn.sm{padding:7px 14px;font-size:12.5px;border-radius:8px}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+
+  .seedrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line2);font-size:13.5px}
+  .seedrow:last-child{border-bottom:none}
+  .seedrow .meta{color:var(--mut);font-size:12px}
+  .tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;border-radius:100px;padding:2px 9px;background:#EAF0F5;color:var(--slate);margin-left:8px}
+  .tag.live{background:#EDF3EC;color:#4E7A52}
+
+  /* role cards */
+  .roles{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .role{border:1.5px solid var(--line);border-radius:13px;padding:18px;background:#fff}
+  .role.dis{opacity:.5}
+  .role .r-role{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);margin-bottom:6px}
+  .role h4{margin:0 0 4px;font-size:16px}
+  .role p{margin:0 0 12px;font-size:12.5px;color:var(--mut)}
+  .role .pick{margin-bottom:10px}
+  .role .pick label{font-size:11px;color:var(--mut);display:block;margin-bottom:3px;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase}
+  .role .pick select{width:100%;border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;background:#fff}
+  .role .badge{font-size:11px;font-family:var(--mono);color:#4E7A52;background:#EDF3EC;border-radius:100px;padding:2px 9px}
+
+  .settingbar{display:flex;align-items:center;gap:14px;background:#EEF0F3;border:1px solid #D8DEE4;border-radius:10px;padding:12px 16px;margin-top:16px;font-size:13px}
+  .toggle{width:40px;height:23px;border-radius:100px;background:var(--terra);position:relative;cursor:pointer;flex-shrink:0}
+  .toggle::after{content:"";position:absolute;top:2px;right:2px;width:19px;height:19px;border-radius:50%;background:#fff}
+  .toggle.off{background:#C4BCB0}.toggle.off::after{right:auto;left:2px}
+
+  .backbar{background:var(--ink);color:#fff;padding:9px 20px;font-size:13px;display:flex;align-items:center;gap:14px}
+  .backbar .bk{background:#333;border:none;color:#fff;border-radius:7px;padding:6px 12px;font-size:12.5px;cursor:pointer}
+  .backbar .who{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:#B7AE9E}
+
+  /* busy modal */
+  .modalwrap{position:relative;background:#2A2620;border-radius:12px;padding:44px;text-align:center;color:#EDE7DB;margin-top:16px}
+  .spinner{width:54px;height:54px;margin:0 auto 18px;position:relative}
+  .spinner .star{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--terra);animation:pulse 1.3s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.08)}}
+  .modalwrap h4{margin:0 0 6px;font-size:17px}
+  .modalwrap p{margin:0;font-size:13px;color:#B7AE9E}
+  .modalwrap .elapsed{font-family:var(--mono);font-size:12px;color:var(--gold);margin-top:12px}
+
+  .flownext{margin-top:20px}
+  .note-s{font-size:12px;color:var(--mut)}
+  .divider-or{text-align:center;color:var(--faint);font-family:var(--mono);font-size:11px;letter-spacing:.1em;margin:12px 0}
+</style>
+</head>
+<body>
+<div id="shell">
+  <nav id="nav">
+    <h1>Reimagined Tester Hub</h1>
+    <div class="sub">Two steps: Data + Role<br>Either order · mockup v1</div>
+    <div class="grp">The hub</div>
+    <button data-s="h1" class="on">1 · Empty — choose your order</button>
+    <button data-s="h2">2 · Data step · generate</button>
+    <button data-s="h3">3 · Generating (busy)</button>
+    <button data-s="h4">4 · Loaded — pick a role</button>
+    <div class="grp">Inside a role</div>
+    <button data-s="h5">5 · Agency · onboard + short-circuit</button>
+    <button data-s="h6">6 · Back-to-hub bar (all surfaces)</button>
+    <div class="grp">Agency · multi-brand</div>
+    <button data-s="h7">7 · Fleet grid (all brands)</button>
+    <button data-s="h8">8 · Drill into one brand (scope-switch)</button>
+    <button data-s="h9">9 · Team &amp; book sharing</button>
+  </nav>
+  <main id="stage">
+
+  <!-- ============ 1. EMPTY / ORDER ============ -->
+  <section class="screen on" id="h1">
+    <div class="annot"><b>The hub, reimagined as a two-step control center.</b> Step 1 = <b>Data</b> (generate a world, pick a seed, or resynthesize). Step 2 = <b>Role</b> (who you become). The order toggle up top lets you start with either — "Data first" (generate, then choose who to be) or "Role first" (pick the seat, then feed it data). Roles stay locked until a dataset exists. This screen is the empty state: nothing loaded yet.</div>
+    <div class="frame">
+      <div class="sandbar"><span><b>SANDBOX</b> · synthetic data · writes go to mock marketplaces · signed in as shiva@realify.ai</span><span>env: staging</span></div>
+      <div class="pad">
+        <h2 class="htitle">Tester &amp; sandbox hub</h2>
+        <p class="hsub">Generate or pick a world, then step into any role in it. Nothing is loaded yet.</p>
+        <div class="ordertoggle"><span class="on">▷ Data first</span><span onclick="go('h1b')">Role first</span></div>
+
+        <div class="step done">
+          <div class="step-h"><span class="step-n">1</span><h3>Data — build or pick a world</h3><span class="st-note">start here</span></div>
+          <div class="step-body">
+            <div class="subtabs"><span class="subtab on">✦ Generate new</span><span class="subtab">◷ Pick existing seed</span><span class="subtab">↻ Resynthesize current</span></div>
+            <p class="note-s" style="margin-top:0">Choose how to get a dataset. Full form on the next screen →</p>
+            <button class="btn p" onclick="go('h2')">Open the generator →</button>
+          </div>
+        </div>
+
+        <div class="step locked">
+          <div class="step-h"><span class="step-n">2</span><h3>Role — become someone in that world</h3><span class="st-note">🔒 load a dataset first</span></div>
+          <div class="step-body">
+            <div class="roles">
+              <div class="role dis"><div class="r-role">Direct brand · $20/mo</div><h4>Direct Brand Owner</h4><p>The classic five-lens seller product — a paying direct customer.</p></div>
+              <div class="role dis"><div class="r-role">Agency · paying</div><h4>Agency operator</h4><p>Portfolio queue; onboard &amp; manage client brands.</p></div>
+              <div class="role dis"><div class="r-role">Agency-managed brand</div><h4>Managed Brand Owner</h4><p>The brand portal — how a managed client sees Realify.</p></div>
+              <div class="role dis"><div class="r-role">Realify · internal</div><h4>Realify Admin</h4><p>Fleet ops console — agencies, gates, provisioning.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn dark" onclick="go('h1b')">See "Role first" variant →</button></div>
+  </section>
+
+  <!-- ============ 1b. ROLE FIRST ============ -->
+  <section class="screen" id="h1b">
+    <div class="annot"><b>"Role first" ordering.</b> Same two steps, reversed: you pick the seat you want to test, and only the data options that make sense for it are offered. Pick "Agency operator" and Step 2 asks for a world with agencies + brands; pick "Direct Brand" and it offers a single-brand generate/seed. The steps renumber but the pieces are identical — this is just the inverse entry point for people who think "who am I testing?" before "what data?"</div>
+    <div class="frame">
+      <div class="sandbar"><span><b>SANDBOX</b> · synthetic data · writes go to mock marketplaces · signed in as shiva@realify.ai</span><span>env: staging</span></div>
+      <div class="pad">
+        <h2 class="htitle">Tester &amp; sandbox hub</h2>
+        <p class="hsub">Pick the seat you want to test, then feed it data.</p>
+        <div class="ordertoggle"><span onclick="go('h1')">Data first</span><span class="on">▷ Role first</span></div>
+
+        <div class="step done">
+          <div class="step-h"><span class="step-n">1</span><h3>Role — pick the seat</h3><span class="st-note">start here</span></div>
+          <div class="step-body">
+            <div class="roles">
+              <div class="role"><div class="r-role">Direct brand · $20/mo</div><h4>Direct Brand Owner</h4><p>The classic five-lens seller product — a paying direct customer.</p><button class="btn g sm" onclick="go('h2')">Choose →</button></div>
+              <div class="role" style="border-color:var(--terra);box-shadow:0 0 0 1px var(--terra)"><div class="r-role">Agency · paying</div><h4>Agency operator ✓</h4><p>Portfolio queue; onboard &amp; manage client brands.</p><button class="btn dark sm" onclick="go('h2')">Chosen · feed it data →</button></div>
+              <div class="role"><div class="r-role">Agency-managed brand</div><h4>Managed Brand Owner</h4><p>The brand portal — how a managed client sees Realify.</p><button class="btn g sm" onclick="go('h2')">Choose →</button></div>
+              <div class="role"><div class="r-role">Realify · internal</div><h4>Realify Admin</h4><p>Fleet ops console — agencies, gates, provisioning.</p><button class="btn g sm" onclick="go('h2')">Choose →</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">2</span><h3>Data — build the world this role needs</h3><span class="st-note">agency + brands</span></div>
+          <div class="step-body"><p class="note-s" style="margin-top:0">Because you chose <b>Agency operator</b>, the generator will scope to an agency with N client brands. Open it →</p><button class="btn p" onclick="go('h2')">Open the generator →</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn dark" onclick="go('h2')">Next: the generator →</button></div>
+  </section>
+
+  <!-- ============ 2. GENERATOR ============ -->
+  <section class="screen" id="h2">
+    <div class="annot"><b>The parametric synthesizer (STEP 1 · Generate new).</b> The new piece: dial categories, SKU count (up to 2000), how many agencies &amp; brands, channel mix, and synthesis depth — then generate a whole related world (products → orders, ads, competitors, economics, per-SKU COGS). The engine exists in the seller product; this exposes its knobs. "Fast" vs "Rich" is the depth decision from the plan — fast for volume/perf testing, rich for demos.</div>
+    <div class="frame">
+      <div class="sandbar"><span><b>SANDBOX</b> · generator</span><span>signed in as shiva@realify.ai</span></div>
+      <div class="pad">
+        <div class="subtabs"><span class="subtab on">✦ Generate new</span><span class="subtab" onclick="go('h2seed')">◷ Pick existing seed</span><span class="subtab">↻ Resynthesize current</span></div>
+
+        <div class="field"><label>Categories <span style="color:var(--terra)">*</span></label>
+          <div class="chips">
+            <span class="chip sel">Home &amp; Kitchen</span><span class="chip sel">Pet Supplies</span><span class="chip sel">Outdoor</span>
+            <span class="chip">Electronics</span><span class="chip">Beauty</span><span class="chip">Grocery</span><span class="chip">Toys</span>
+            <span class="chip add">+ add category</span>
+          </div>
+          <div class="hint">Drives product names, COGS bands, and seasonality. Selected: 3.</div>
+        </div>
+
+        <div class="field"><label>Number of SKUs (across the world)</label>
+          <div class="rangewrap"><input type="range" min="20" max="2000" value="480"><span class="rangeval">480</span></div>
+          <div class="hint">Up to 2000. Higher counts favor "Fast" synthesis. Distributed across brands below.</div>
+        </div>
+
+        <div class="cols3">
+          <div class="field"><label>Agencies</label><input type="number" value="1"></div>
+          <div class="field"><label>Brands per agency</label><input type="number" value="8"></div>
+          <div class="field"><label>+ Direct brands (no agency)</label><input type="number" value="1"></div>
+        </div>
+
+        <div class="field"><label>Country <span style="color:var(--terra)">*</span> — one world = one country</label>
+          <div class="chips"><span class="chip sel">🇺🇸 United States · USD</span><span class="chip">🇮🇳 India · ₹</span></div>
+          <div class="hint">Drives currency &amp; formatting ($1,234 vs ₹1,23,456), COGS/margin bands, product selection, and channels. All brands in this world are this country.</div></div>
+        <div class="cols2">
+          <div class="field"><label>Channels (US set)</label>
+            <div class="chips"><span class="chip sel">Amazon US</span><span class="chip sel">Shopify</span><span class="chip">Walmart</span></div>
+            <div class="hint">India would offer Amazon.in · Flipkart · Shopzee.</div></div>
+          <div class="field"><label>Synthesis depth</label>
+            <div class="chips"><span class="chip sel">Rich (demo — full cross-channel)</span><span class="chip">Fast (volume/perf)</span></div>
+            <div class="hint">Rich = orders, ads, competitors, economics. Fast = catalog + light signals.</div></div>
+        </div>
+
+        <div class="cols2">
+          <div class="field"><label>Planted moments (for demos)</label>
+            <div class="chips"><span class="chip sel">Stockout-ready SKU</span><span class="chip sel">ACOS over break-even</span><span class="chip sel">Competitor undercut</span><span class="chip">1–2 expired connections</span></div></div>
+          <div class="field"><label>Seed (determinism)</label><input type="text" value="demo-2026Q3-v4"><div class="hint">Same seed + params → byte-identical world, every time.</div></div>
+        </div>
+
+        <button class="btn p" onclick="go('h3')">✦ Generate &amp; load world →</button>
+        <span class="note-s" style="margin-left:12px">Est. ~40s at Rich · 480 SKUs</span>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn dark" onclick="go('h2seed')">Or: pick an existing seed →</button></div>
+  </section>
+
+  <!-- ============ 2seed. PICK EXISTING ============ -->
+  <section class="screen" id="h2seed">
+    <div class="annot"><b>STEP 1 · Pick existing seed / Resynthesize.</b> The other two data paths. "Pick existing" loads a saved deterministic world instantly (the pilot, or any you've generated + named). "Resynthesize" re-rolls the currently-loaded world in place — the three modes that already exist in the seller product (reroll conditions / full / coverage), surfaced here for the whole world.</div>
+    <div class="frame">
+      <div class="sandbar"><span><b>SANDBOX</b> · pick / resynthesize</span><span>signed in as shiva@realify.ai</span></div>
+      <div class="pad">
+        <div class="subtabs"><span class="subtab" onclick="go('h2')">✦ Generate new</span><span class="subtab on">◷ Pick existing seed</span><span class="subtab">↻ Resynthesize current</span></div>
+        <div class="seedrow"><span><b>US Pilot agency</b> 🇺🇸 — 8 brands, 480 SKUs, Home/Pet/Outdoor, USD <span class="tag live">saved</span><div class="meta">seed us-pilot-v1 · the BrightPeak story</div></span><button class="btn p sm" onclick="go('h4')">Load</button></div>
+        <div class="seedrow"><span><b>India Pilot agency</b> 🇮🇳 — 8 brands, 480 SKUs, Flipkart-heavy, Diwali ramp, ₹ <span class="tag">saved</span><div class="meta">seed in-pilot-v1 · lakh formatting</div></span><button class="btn g sm" onclick="go('h4')">Load</button></div>
+        <div class="seedrow"><span><b>US Enterprise book</b> 🇺🇸 — 40 brands, 1,600 SKUs, mixed health <span class="tag">saved</span><div class="meta">seed us-ent-v2 · migration mid-flight</div></span><button class="btn g sm" onclick="go('h4')">Load</button></div>
+        <div class="seedrow"><span><b>My 500-SKU test</b> — 1 agency, 6 brands, Electronics/Beauty <span class="tag">yours</span><div class="meta">seed demo-2026Q3-v4 · generated Jul 15</div></span><button class="btn g sm" onclick="go('h4')">Load</button></div>
+        <div class="divider-or">— or —</div>
+        <p class="note-s" style="text-align:center">Switch to <b>↻ Resynthesize current</b> to re-roll the loaded world (reroll conditions · full · coverage) without changing its shape.</p>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn dark" onclick="go('h3')">Next: watch a generation run →</button></div>
+  </section>
+
+  <!-- ============ 3. GENERATING ============ -->
+  <section class="screen" id="h3">
+    <div class="annot"><b>Generation is a background job with the non-blocking busy modal</b> (the R6.1 pattern — accept-then-poll, tab stays responsive). Overlay blocks the UI so you don't fire ten other buttons, animated Realify mark + elapsed counter show it's alive, and it converts to a progress chip if it runs long. At 2000 SKUs this matters — synthesis is real work.</div>
+    <div class="frame">
+      <div class="sandbar"><span><b>SANDBOX</b> · generating…</span><span>signed in as shiva@realify.ai</span></div>
+      <div class="pad">
+        <div class="modalwrap">
+          <div class="spinner"><span class="star">✦</span></div>
+          <h4>Synthesizing world — 480 SKUs across 9 brands</h4>
+          <p>Products → orders → ads → competitors → economics. Loading personas &amp; queue.</p>
+          <div class="elapsed">◷ 00:31 elapsed · usually under a minute</div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn dark" onclick="go('h4')">→ done, world loaded →</button></div>
+  </section>
+
+  <!-- ============ 4. LOADED / ROLES ============ -->
+  <section class="screen" id="h4">
+    <div class="annot"><b>STEP 2 unlocked — pick a role, and WHO in that role.</b> This is the keystone: each role has an <b>impersonation picker</b> — become <i>any</i> tenant in the loaded world, not 4 fixed cards. The global <b>email short-circuit</b> toggle (top) governs the whole session. "Enter" assumes that grant and drops you into the real surface for that role, with a persistent Back-to-hub bar (screen 6).</div>
+    <div class="frame">
+      <div class="sandbar"><span><b>SANDBOX</b> · world loaded</span><span>signed in as shiva@realify.ai</span></div>
+      <div class="pad">
+        <h2 class="htitle">Tester &amp; sandbox hub</h2>
+        <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+          <span class="tag live" style="font-size:11px">LOADED · demo-2026Q3-v4</span>
+          <span class="note-s">🇺🇸 US · 1 agency · 8 managed brands · 1 direct brand · 480 SKUs · Home/Pet/Outdoor · USD</span>
+          <button class="btn g sm" style="margin-left:auto" onclick="go('h2')">↻ Change world</button>
+        </div>
+
+        <div class="settingbar"><div class="toggle"></div><div><b>Email short-circuit: ON.</b> Consent &amp; invite emails still send — and show an inline "✓ approve as if clicked" control so you never leave the test to check an inbox. Turn off to test the real email round-trip.</div></div>
+
+        <div class="step done" style="margin-top:18px">
+          <div class="step-h"><span class="step-n">2</span><h3>Role — become someone in this world</h3></div>
+          <div class="step-body">
+            <div class="roles">
+              <div class="role">
+                <div class="r-role">Direct brand · $20/mo</div><h4>Direct Brand Owner</h4>
+                <p>The five-lens seller product, as a paying direct customer.</p>
+                <div class="pick"><label>Impersonate which direct brand</label><select><option>Northwind Home (direct · USD)</option></select></div>
+                <button class="btn p sm" onclick="go('h6')">Enter as this brand →</button>
+              </div>
+              <div class="role">
+                <div class="r-role">Agency · paying <span class="badge">Scale plan · active</span></div><h4>Agency operator</h4>
+                <p>Portfolio queue; onboard &amp; manage client brands.</p>
+                <div class="pick"><label>Impersonate which agency</label><select><option>BrightPeak Commerce (8 brands)</option></select></div>
+                <button class="btn p sm" onclick="go('h5')">Enter as agency →</button>
+              </div>
+              <div class="role">
+                <div class="r-role">Agency-managed brand</div><h4>Managed Brand Owner</h4>
+                <p>The brand portal — how a managed client sees Realify.</p>
+                <div class="pick"><label>Agency</label><select><option>BrightPeak Commerce</option></select></div>
+                <div class="pick"><label>Brand</label><select><option>Suncrest Outdoors (managed · USD)</option><option>Corva Audio (managed · USD)</option></select></div>
+                <button class="btn p sm" onclick="go('h6')">Enter as this brand →</button>
+              </div>
+              <div class="role">
+                <div class="r-role">Realify · internal</div><h4>Realify Admin</h4>
+                <p>Fleet ops console — agencies, gates, provisioning, billing.</p>
+                <div class="pick"><label>Scope</label><select><option>All agencies (fleet)</option></select></div>
+                <button class="btn p sm" onclick="go('h6')">Enter as admin →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn dark" onclick="go('h5')">Next: agency onboarding + short-circuit →</button></div>
+  </section>
+
+  <!-- ============ 5. AGENCY ONBOARD + SHORT-CIRCUIT ============ -->
+  <section class="screen" id="h5">
+    <div class="annot"><b>Flow 2 made fluid — onboard a brand, short-circuit the email, become that brand.</b> Inside the agency, "Add client" sends the real consent email to an address you type. With short-circuit ON, the same row shows a "✓ Approve as {email} (impersonate click)" button so you don't switch inboxes. Once granted, "View as this brand →" hops you straight into that brand's portal — the create→become loop that was impossible before.</div>
+    <div class="frame">
+      <div class="backbar"><button class="bk" onclick="go('h4')">← Back to hub</button> <span>Realify</span> <span class="who">▸ acting as: BrightPeak Commerce (agency) · sandbox</span></div>
+      <div class="pad">
+        <h2 class="htitle">Add a client</h2>
+        <p class="hsub">Send a consent request. With email short-circuit ON, you can approve it inline for testing.</p>
+        <div class="cols2" style="margin-top:14px">
+          <div class="field"><label>Brand name</label><input type="text" value="Cedar &amp; Co"></div>
+          <div class="field"><label>Brand owner email</label><input type="email" value="me+cedar@gmail.com"></div>
+        </div>
+        <div class="field"><label>Access requested</label><select><option>Operate ex-Pricing</option><option>Full Operate</option><option>Ads Only</option><option>Advise Only</option></select></div>
+        <button class="btn p" style="margin-bottom:20px">Send consent request →</button>
+
+        <div class="step done">
+          <div class="step-h"><span class="step-n">✓</span><h3>Pending consent — with short-circuit ON</h3><span class="st-note">sandbox only</span></div>
+          <div class="step-body">
+            <div class="seedrow"><span><b>Cedar &amp; Co</b> — me+cedar@gmail.com<div class="meta">✉ real consent email sent · awaiting click</div></span>
+              <span style="display:flex;gap:8px"><button class="btn dark sm">✓ Approve as recipient (impersonate click)</button><button class="btn g sm">Resend</button></span></div>
+            <div class="seedrow"><span><b>Suncrest Outdoors</b> — granted <span class="tag live">active</span><div class="meta">Operate ex-Pricing · granted Jul 15</div></span>
+              <button class="btn p sm" onclick="go('h6')">View as this brand →</button></div>
+          </div>
+        </div>
+        <p class="note-s" style="margin-top:12px">Turn short-circuit OFF in the hub to force the real email round-trip (click the link in the inbox) — for testing the true onboarding friction a design partner feels.</p>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn dark" onclick="go('h6')">Next: the back-to-hub bar →</button></div>
+  </section>
+
+  <!-- ============ 6. BACK-TO-HUB BAR ============ -->
+  <section class="screen" id="h6">
+    <div class="annot"><b>Every impersonated surface carries a persistent Back-to-hub bar</b> — so you're never stranded navigating by URL, and you always know which grant you're wearing. Shown here over a schematic of the real seller/brand surface (which the separate reskin work will make look like the polished five-lens app). One click returns to Step 2 to switch role or change world.</div>
+    <div class="frame">
+      <div class="backbar"><button class="bk" onclick="go('h4')">← Back to hub</button> <span>Realify</span> <span class="who">▸ acting as: Suncrest Outdoors (managed brand) · sandbox · via BrightPeak</span></div>
+      <div class="pad">
+        <div style="border:1px dashed var(--line);border-radius:12px;padding:30px;text-align:center;color:var(--mut);background:var(--panel2)">
+          <p style="margin:0 0 6px;font-weight:600;color:var(--ink)">↳ the brand's real surface renders here</p>
+          <p class="note-s" style="margin:0">Brand portal / seller five-lens app — transparency log, approvals, controls. Its look-and-feel is the separate reskin task; this bar sits above whatever surface you land on, in every role.</p>
+        </div>
+        <div class="settingbar" style="margin-top:16px;background:#EDF3EC;border-color:#CBDCC9"><div>💡 The bar's "acting as" line is your ground truth — it names the exact grant (role · tenant · sandbox · via-agency) so you never lose track of which of the four flows you're testing.</div></div>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn dark" onclick="go('h7')">Next: the fleet grid →</button></div>
+  </section>
+
+  <!-- ============ 7. FLEET GRID ============ -->
+  <section class="screen" id="h7">
+    <div class="annot"><b>The rich fleet grid — the agency's cross-brand overview.</b> Today's /agency/console is a bare 4-column table; this is the intended version: one card per managed brand with health band, top signal, top recommended action, and $-at-stake — plus the "My book vs All accounts" filter and segment controls. This is one of the agency's two cross-brand surfaces: the <b>Work queue</b> (every brand's decisions, $-ranked into one stream) and this <b>Fleet grid</b> (every brand's health at a glance). Detailed operation of any one brand happens by drilling in (screen 8) — there is no page that crams all brands' operational detail together; that's deliberate.</div>
+    <div class="frame">
+      <div class="backbar"><button class="bk" onclick="go('h4')">← Back to hub</button> <span>Realify</span> <span class="who">▸ acting as: BrightPeak Commerce (agency) · sandbox</span></div>
+      <div class="pad">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <h2 class="htitle">Fleet</h2>
+          <span class="tag live">8 brands · 2 need attention</span>
+          <span style="margin-left:auto;display:flex;gap:8px">
+            <span class="chip sel">My book (5)</span><span class="chip">All accounts (8)</span>
+            <span class="chip">Health ▾</span><span class="chip">Marketplace ▾</span>
+          </span>
+        </div>
+        <div class="hsub" style="margin-bottom:16px">Two ways in: the <b>Work queue</b> ranks every brand's decisions into one stream · this grid shows each brand's health. Click a brand to operate inside it.</div>
+
+        <div class="roles" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="role" style="cursor:pointer;border-left:4px solid var(--sage)" onclick="go('h8')">
+            <div class="r-role" style="color:var(--sage)">Healthy · Jake T.</div><h4>Suncrest Outdoors</h4>
+            <p>Top signal: 6 stockout risks flagged.<br>Next: reorder SB-010 (+$251k/mo).</p>
+            <div style="font-family:var(--mono);font-size:12px;color:var(--mut)">$1.2M GMV · TACoS 9% · 12 open</div>
+            <div style="margin-top:8px"><span class="btn dark sm">Open brand →</span></div>
+          </div>
+          <div class="role" style="cursor:pointer;border-left:4px solid var(--gold)" onclick="go('h8')">
+            <div class="r-role" style="color:var(--gold)">Watch · Jake T.</div><h4>Meridian Home</h4>
+            <p>Top signal: ACOS above break-even.<br>Next: lower bids (+$96k/mo).</p>
+            <div style="font-family:var(--mono);font-size:12px;color:var(--mut)">$860k GMV · TACoS 14% · 9 open</div>
+            <div style="margin-top:8px"><span class="btn dark sm">Open brand →</span></div>
+          </div>
+          <div class="role" style="cursor:pointer;border-left:4px solid var(--terra)" onclick="go('h8')">
+            <div class="r-role" style="color:var(--terra)">At risk · Emily C.</div><h4>Corva Audio</h4>
+            <p>⚠ amazon_ads connection expired.<br>55 decisions paused — fix connection.</p>
+            <div style="font-family:var(--mono);font-size:12px;color:var(--mut)">USD · stale 9d · 0 actionable</div>
+            <div style="margin-top:8px"><span class="btn g sm">Open brand →</span></div>
+          </div>
+          <div class="role" style="cursor:pointer;border-left:4px solid var(--sage)" onclick="go('h8')">
+            <div class="r-role" style="color:var(--sage)">Healthy · Emily C.</div><h4>Alpine Gear</h4>
+            <p>Top signal: 3 reorder opportunities.<br>Next: reorder SB-015 (+$134k/mo).</p>
+            <div style="font-family:var(--mono);font-size:12px;color:var(--mut)">$740k GMV · TACoS 11% · 8 open</div>
+            <div style="margin-top:8px"><span class="btn dark sm">Open brand →</span></div>
+          </div>
+          <div class="role" style="cursor:pointer;border-left:4px solid var(--sage)" onclick="go('h8')">
+            <div class="r-role" style="color:var(--sage)">Healthy · Jake T.</div><h4>Brightwater Kitchen</h4>
+            <p>Top signal: price headroom on 3 SKUs.<br>Next: propose +4% (brand co-sign).</p>
+            <div style="font-family:var(--mono);font-size:12px;color:var(--mut)">$690k GMV · TACoS 10% · 7 open</div>
+            <div style="margin-top:8px"><span class="btn dark sm">Open brand →</span></div>
+          </div>
+          <div class="role" style="cursor:pointer;border-left:4px solid var(--terra)" onclick="go('h8')">
+            <div class="r-role" style="color:var(--terra)">At risk · Emily C.</div><h4>Cedar Grove Home</h4>
+            <p>⚠ amazon_ads connection expired.<br>57 decisions paused — fix connection.</p>
+            <div style="font-family:var(--mono);font-size:12px;color:var(--mut)">USD · stale 9d · 0 actionable</div>
+            <div style="margin-top:8px"><span class="btn g sm">Open brand →</span></div>
+          </div>
+        </div>
+        <p class="note-s" style="margin-top:14px">+ 2 more brands. Colored left edge = health band (sage healthy · gold watch · terracotta at-risk). "My book" filters to the brands assigned to the signed-in AM.</p>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn dark" onclick="go('h8')">Next: click a brand → operate inside it →</button></div>
+  </section>
+
+  <!-- ============ 8. SCOPE-SWITCH DRILL-IN ============ -->
+  <section class="screen" id="h8">
+    <div class="annot"><b>The scope-switcher — the missing piece. THIS IS NOT BUILT TODAY.</b> Clicking a brand drops the agency into that brand's real five-lens operating screens (the same seller app the brand's own owner uses), scoped to that brand and bounded by the granted envelope. The switcher bar names where you are and lets you jump brands or return to the fleet without going back to the hub. Envelope enforcement is visible: pricing shows read-only here because BrightPeak holds "Operate ex-Pricing" on Suncrest. (Look-and-feel of the five lenses is the separate reskin task — schematic here.)</div>
+    <div class="frame">
+      <div class="backbar"><button class="bk" onclick="go('h7')">← Fleet</button> <span style="font-family:var(--mono);font-size:12.5px">Portfolio ▸ <b style="color:#fff">Suncrest Outdoors ▾</b> (switch brand)</span> <span class="who">▸ BrightPeak operating · envelope: Operate ex-Pricing</span></div>
+      <div class="pad">
+        <div style="display:flex;gap:6px;border-bottom:1px solid var(--line);padding-bottom:0;margin-bottom:18px;flex-wrap:wrap">
+          <span class="subtab on">Product Catalog</span><span class="subtab">Profit &amp; Ads</span><span class="subtab">Intelligence</span><span class="subtab">Category Analyst</span><span class="subtab" style="opacity:.5">Pricing 🔒 read-only</span>
+        </div>
+        <div style="border:1px dashed var(--line);border-radius:12px;padding:30px;text-align:center;color:var(--mut);background:var(--panel2)">
+          <p style="margin:0 0 6px;font-weight:600;color:var(--ink)">↳ Suncrest Outdoors' five-lens seller screens render here</p>
+          <p class="note-s" style="margin:0">Same product a direct brand sees — scoped to this one brand, filtered by the grant. Actions the envelope allows execute; pricing is view-only (locked tab) because this envelope excludes it. This is the PRD "scope switcher: Portfolio ↔ Account scope" — <b>net-new build</b>, and it should reuse the real five-lens app, not a copy.</p>
+        </div>
+        <div class="settingbar" style="margin-top:16px;background:#EDF3EC;border-color:#CBDCC9"><div>💡 The switcher's "Suncrest Outdoors ▾" reveals a brand picker — hop to Meridian, Alpine, etc. without leaving Account scope. "Portfolio" returns to the fleet grid.</div></div>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn dark" onclick="go('h9')">Next: how the agency team shares brands →</button></div>
+  </section>
+
+  <!-- ============ 9. TEAM & BOOK SHARING ============ -->
+  <section class="screen" id="h9">
+    <div class="annot"><b>Your question: multiple agents working multiple brands — how do they share the account?</b> The model (partly built): ONE agency org, MANY agency members, each their own login and role — never a shared password. Brands are assigned to AMs as their "book"; specialists (ads/pricing) get a lens across many brands; the lead approves the sensitive stuff (maker-checker). What EXISTS: the members table, roles, and envelope⊗grant enforcement. What's NOT built: this assignment UI, the teammate-invite flow, and the "My book" filter wiring. This screen is the intended shape.</div>
+    <div class="frame">
+      <div class="backbar"><button class="bk" onclick="go('h4')">← Back to hub</button> <span>Realify</span> <span class="who">▸ acting as: BrightPeak Commerce (agency admin) · sandbox</span></div>
+      <div class="pad">
+        <div style="display:flex;align-items:center;gap:12px"><h2 class="htitle">Team &amp; books</h2><span style="margin-left:auto"><button class="btn p sm">+ Invite teammate</button></span></div>
+        <p class="hsub" style="margin-bottom:16px">One agency, four seats. Each person signs in as themselves; what they can do on a brand = the brand's envelope ∩ their agency role.</p>
+
+        <div class="step done">
+          <div class="step-h"><span class="step-n">◷</span><h3>Members &amp; their books</h3></div>
+          <div class="step-body">
+            <div class="seedrow"><span><b>Sarah Mitchell</b> — Agency Admin <span class="tag">all brands · billing · invites</span><div class="meta">can act on any brand up to its envelope; approves co-signs</div></span><button class="btn g sm">Manage</button></div>
+            <div class="seedrow"><span><b>Jake Thompson</b> — Client Lead (AM) <span class="tag">book: Suncrest, Meridian, Brightwater +2</span><div class="meta">read + propose + execute on his book; autonomy up to ceiling</div></span><button class="btn g sm">Reassign book</button></div>
+            <div class="seedrow"><span><b>Emily Carter</b> — Ads Specialist <span class="tag">Ads lens · all brands</span><div class="meta">ads execute across the whole book; reads Sales/Inventory only</div></span><button class="btn g sm">Manage</button></div>
+            <div class="seedrow"><span><b>Dan Foley</b> — Analyst <span class="tag">read + propose · no execute</span><div class="meta">new hire — proposes; a lead approves before anything ships</div></span><button class="btn g sm">Manage</button></div>
+          </div>
+        </div>
+
+        <div class="cols2" style="margin-top:16px">
+          <div class="settingbar" style="background:var(--panel2);border-color:var(--line);align-items:flex-start"><div><b>How work is shared, not passwords.</b> Two AMs never log in as the same user. Each holds their own grant into the agency; RLS + the envelope⊗grant intersection means Jake sees his book, Emily sees the ads lens everywhere, and neither can exceed what a brand granted BrightPeak.</div></div>
+          <div class="settingbar" style="background:var(--panel2);border-color:var(--line);align-items:flex-start"><div><b>Reassigning a book (e.g. Jake leaves).</b> Transfer his brands to another AM in one move — grants move atomically, nothing is ever unowned, and the brands get a warm handover note the admin approves. <span class="note-s">(planned — not built)</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="flownext"><button class="btn dark" onclick="go('h1')">↻ Restart at the empty hub</button></div>
+  </section>
+
+  </main>
+</div>
+<script>
+  function go(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+    document.getElementById(id).classList.add('on');
+    document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.s===id));
+    window.scrollTo({top:0});
+  }
+  document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
+  // chip/subtab toggles for feel
+  document.querySelectorAll('.chip:not(.add)').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('sel')));
+  document.querySelector('input[type=range]')&&document.querySelector('input[type=range]').addEventListener('input',e=>{document.querySelector('.rangeval').textContent=e.target.value;});
+</script>
+</body>
+</html>

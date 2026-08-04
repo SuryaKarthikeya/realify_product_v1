@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Realify · Operator Console</title>
+<style>
+  :root{ --ink:#1F3864; --navy:#1F3864; --teal:#0F6E4F; --blue:#2E75B6; --line:#e4e8ef;
+         --muted:#6b7280; --faint:#9aa3b2; --bg:#f6f8fb; --critical:#b3261e; --pos:#0F6E4F; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 22px 60px}
+  h1{font-family:'Space Grotesk','Inter',sans-serif;font-size:21px;margin:0 0 2px}
+  .sub{font-size:12.5px;color:var(--muted);margin-bottom:22px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:18px}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+  .kpi{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .kpi .n{font-family:'Space Grotesk';font-size:20px;font-weight:600}
+  .kpi .l{font-size:11px;color:var(--muted);margin-top:2px}
+  .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}
+  .ok{background:#e7f4ee;color:var(--pos)} .warn{background:#fdeceb;color:var(--critical)}
+  .neutral{background:#eef1f6;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--faint);font-weight:600}
+  td.num{font-family:'IBM Plex Mono',monospace}
+  a.lnk{color:var(--blue);text-decoration:none;font-weight:600}
+  a.lnk:hover{text-decoration:underline}
+  .docrow{display:flex;gap:16px;flex-wrap:wrap}
+  .docbtn{display:block;border:1px solid var(--line);border-radius:9px;padding:12px 16px;text-decoration:none;color:var(--ink);flex:1;min-width:200px}
+  .docbtn:hover{border-color:var(--blue)}
+  .docbtn .t{font-weight:600;font-size:13px} .docbtn .d{font-size:11.5px;color:var(--muted);margin-top:3px}
+  .gate{max-width:360px;margin:80px auto;text-align:center}
+  .gate input{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font-size:14px;margin:14px 0}
+  .btn{background:var(--ink);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%}
+  .err{color:var(--critical);font-size:12.5px;margin-top:10px;min-height:16px}
+  .src{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid var(--line);font-size:12.5px}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- KEY GATE -->
+  <div class="gate" id="gate">
+    <h1>Operator Console</h1>
+    <div class="sub">Enter the admin key to continue.</div>
+    <input id="keyInput" type="password" placeholder="Admin key" autocomplete="off">
+    <button class="btn" id="keyBtn">Unlock</button>
+    <div class="err" id="gateErr"></div>
+  </div>
+
+  <!-- CONSOLE -->
+  <div id="console" class="hide">
+    <h1>Realify · Operator Console</h1>
+    <div class="sub">Internal admin view — key-gated, excluded from crawlers. <a href="#" id="lock" class="lnk">Lock</a></div>
+
+    <div class="card">
+      <h2>System health</h2>
+      <div class="grid" id="healthGrid"></div>
+      <div style="margin-top:14px">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--faint);margin-bottom:4px">Data sources</div>
+        <div id="sources"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Rollout · deployed features &amp; versions</h2>
+      <div class="sub" style="margin:-4px 0 12px">Instant, no redeploy. Pick the <b>version (build)</b> to run and its <b>scope</b> — rollback = pick a previous version or scope <i>off</i>. <b>Version</b> = presentation (safe). <b>Feature gates</b> = whether a capability may <i>act</i> (behavior; default off, independent of version).</div>
+      <div id="rolloutRows"></div>
+      <div style="margin-top:16px;padding:12px 14px;background:#FBF9F4;border:1px solid #EDE7DA;border-radius:10px;font-size:12.5px;line-height:1.65;color:#4A443B">
+        <div style="font-weight:700;margin-bottom:4px">How to turn V4 on / roll back</div>
+        <div>• <b>Dogfood privately</b> (no effect on anyone else): open the app with <code>?skin=v4</code> appended to the URL, e.g. <code>https://realifyai.app/?skin=v4</code>. Force legacy with <code>?skin=legacy</code>. The choice sticks for your session.</div>
+        <div>• <b>Roll out to everyone</b>: set <b>Seller app UI</b> build = <b>v4</b>, then scope = <b>on</b>. Use scope <b>internal</b> to keep the default legacy but allow per-session <code>?skin=v4</code> opt-in.</div>
+        <div>• <b>Roll back instantly</b>: set <b>Seller app UI</b> scope = <b>off</b> (everyone returns to legacy on their next navigation — no redeploy, no data loss). Or send anyone <code>?skin=legacy</code>.</div>
+        <div>• <b>Ask / Agents</b>: enable the gate here only after the v4 build is rolled (they grey out otherwise). Agents stay in Observe — they don't act until the models + write-back are live.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Documentation</h2>
+      <div class="docrow">
+        <a class="docbtn" id="archLink" target="_blank"><div class="t">Architecture →</div><div class="d">Two-plane design, data flow, schema, tenancy. Kept current with architectural builds.</div></a>
+        <a class="docbtn" id="logLink" target="_blank"><div class="t">Engineering logbook →</div><div class="d">Numbered build history and decisions.</div></a>
+        <a class="docbtn" id="formLink" target="_blank"><div class="t">Formulas reference →</div><div class="d">Every deterministic (L1) calculation — margin, sales, ads, ranking — and the config policy for changing them.</div></a>
+        <a class="docbtn" id="integLink" target="_blank"><div class="t">Integration guide →</div><div class="d">How partner teams integrate — conversational, competitive-data, front-end, and ML/model — with the seams, contracts, and invariants for each.</div></a>
+        <a class="docbtn" id="onbLink" target="_blank"><div class="t">Onboarding (new dev) →</div><div class="d">Set up the repo locally, run it and the tests, the project map, and how to ship a change.</div></a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Usage statistics</h2>
+      <div class="grid" id="usageGrid"></div>
+      <div style="margin-top:12px"><a class="lnk" href="/analytics" target="_blank">Open full usage dashboard →</a></div>
+    </div>
+
+    <div class="card">
+      <h2>Organizations / tenants</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Status</th><th>Members</th><th>SKUs</th><th>Cards</th><th>Created</th><th>Last activity</th><th></th></tr></thead>
+        <tbody id="tenantsBody"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Deleted accounts (audit)</h2>
+      <div class="sub" style="margin:-4px 0 12px">Full deletes performed from this console. Emails shown were freed for re-signup.</div>
+      <table>
+        <thead><tr><th>When</th><th>Account</th><th>Type</th><th>Emails freed</th><th>Members</th><th>SKUs</th><th>Cards</th><th>By</th></tr></thead>
+        <tbody id="deletionsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let KEY = sessionStorage.getItem('realify_admin_key') || "";
+const H = () => ({ "x-realify-admin": KEY });
+
+async function api(path){
+  const r = await fetch(path, { headers: H() });
+  if(r.status===403 || r.status===401){ const e=new Error("forbidden"); e.code=403; throw e; }
+  return r.json();
+}
+async function apiPost(path, body){
+  const r = await fetch(path, { method:'POST', headers:{...H(), 'Content-Type':'application/json'},
+                                body: JSON.stringify(body||{}) });
+  if(r.status===403 || r.status===401){ const e=new Error("forbidden"); e.code=403; throw e; }
+  return { status: r.status, j: await r.json().catch(()=>({})) };
+}
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+function pill(text, cls){ return `<span class="pill ${cls}">${text}</span>`; }
+
+async function delTenant(id, name){
+  const typed = prompt(`FULLY DELETE account "${name}" (id ${id}).\n\n`
+    + `This wipes ALL of its data and frees its email(s) for a fresh signup. It cannot be undone.\n\n`
+    + `Type the account name to confirm:`);
+  if(typed===null) return;
+  try{
+    const { status, j } = await apiPost(`/api/admin/tenants/${id}/delete`, { confirm: typed });
+    if(status===200 && j.ok){
+      alert(`Deleted "${name}". Freed email(s): ${(j.deleted.emails||[]).join(', ') || '—'}`);
+      await load();
+    } else { alert('Delete failed: ' + (j.error || ('HTTP '+status))); }
+  }catch(e){ alert('Delete failed (auth?).'); }
+}
+function bytes(n){ if(n==null) return "—"; if(n<1024) return n+" B"; if(n<1048576) return (n/1024).toFixed(0)+" KB"; return (n/1048576).toFixed(1)+" MB"; }
+
+async function load(){
+  // system
+  const sys = await api('/api/admin/system');
+  const c = sys.counts||{};
+  $('healthGrid').innerHTML = [
+    ['Tenants', c.tenants], ['Users', c.users], ['SKUs', c.seller_skus],
+    ['Cards', c.cards], ['Invites', c.invites], ['DB size', bytes(sys.db_bytes)]
+  ].map(([l,v])=>`<div class="kpi"><div class="n">${v??'—'}</div><div class="l">${l}</div></div>`).join('')
+    + `<div class="kpi"><div class="n">${pill(sys.mode==='live'?'LIVE':'FIXTURE', sys.mode==='live'?'ok':'neutral')}</div><div class="l">Data mode</div></div>`
+    + `<div class="kpi"><div class="n" style="font-size:12px">${['anthropic','keepa','news'].map(k=>pill(k, sys.keys[k]?'ok':'warn')).join(' ')}</div><div class="l">API keys</div></div>`;
+  $('sources').innerHTML = (sys.sources||[]).length ? sys.sources.map(s=>{
+    const cls = s.status==='ok'?'ok':(s.status?'warn':'neutral');
+    return `<div class="src"><span><b>${s.source||'—'}</b> ${s.note?('· '+s.note):''}</span>
+      <span>${pill(s.status||'no pulls', cls)} <span style="color:var(--faint);font-size:11px">${s.last_at? new Date(s.last_at).toLocaleString():''}</span></span></div>`;
+  }).join('') : '<div style="font-size:12px;color:var(--muted);padding:6px 0">No source pulls recorded yet.</div>';
+
+  // docs (key passed as query param so the doc routes can gate)
+  $('archLink').href = '/ops/architecture?k=' + encodeURIComponent(KEY);
+  $('logLink').href  = '/ops/logbook?k=' + encodeURIComponent(KEY);
+  $('formLink').href = '/ops/formulas?k=' + encodeURIComponent(KEY);
+  $('integLink').href = '/ops/integration?k=' + encodeURIComponent(KEY);
+  $('onbLink').href = '/ops/onboarding?k=' + encodeURIComponent(KEY);
+
+  // usage KPIs (reuse the analytics summary endpoint)
+  try{
+    const u = await api('/api/admin/analytics/summary?days=14');
+    const t = u.totals||{};
+    $('usageGrid').innerHTML = [
+      ['Active users', t.active_users], ['Page views', t.page_views], ['Insight clicks', t.insight_clicks],
+      ['Research', t.researched], ['Action click-outs', t.action_clickouts], ['Total events', t.events]
+    ].map(([l,v])=>`<div class="kpi"><div class="n">${v??0}</div><div class="l">${l} · 14d</div></div>`).join('');
+  }catch(e){ $('usageGrid').innerHTML = '<div style="font-size:12px;color:var(--muted)">No usage data yet.</div>'; }
+
+  // tenants
+  const tn = await api('/api/admin/tenants');
+  $('tenantsBody').innerHTML = (tn.tenants||[]).map(t=>{
+    const status = t.provisioned ? pill('provisioned','ok') : pill('onboarding','neutral');
+    const type = t.account_type ? pill(t.account_type, t.account_type==='customer'?'ok':'neutral') : pill('—','neutral');
+    return `<tr><td class="num">${t.id}</td><td>${esc(t.name)}</td><td>${type}</td>
+      <td>${status}</td><td class="num">${t.members}</td><td class="num">${t.skus}</td><td class="num">${t.cards}</td>
+      <td>${t.created_at? new Date(t.created_at).toLocaleDateString():'—'}</td>
+      <td>${t.last_activity||'—'}</td>
+      <td><a href="#" class="lnk" style="color:var(--critical)" data-del="${t.id}" data-name="${esc(t.name)}">Delete</a></td></tr>`;
+  }).join('') || '<tr><td colspan="10" style="color:var(--muted)">No tenants.</td></tr>';
+  $('tenantsBody').querySelectorAll('a[data-del]').forEach(a=>a.addEventListener('click', e=>{
+    e.preventDefault(); delTenant(a.getAttribute('data-del'), a.getAttribute('data-name')); }));
+
+  // deleted-accounts audit (survives the wipe; lists what was fully deleted)
+  try{
+    const dl = await api('/api/admin/deletions');
+    $('deletionsBody').innerHTML = (dl.deletions||[]).map(d=>
+      `<tr><td>${d.deleted_at? new Date(d.deleted_at).toLocaleString():'—'}</td>
+        <td>${esc(d.tenant_name)} <span style="color:var(--faint)">#${d.deleted_tenant_id}</span></td>
+        <td>${d.account_type? pill(esc(d.account_type),'neutral'):'—'}</td>
+        <td>${esc(d.emails)||'—'}</td><td class="num">${d.member_count??'—'}</td>
+        <td class="num">${d.sku_count??'—'}</td><td class="num">${d.card_count??'—'}</td>
+        <td>${esc(d.deleted_by)||'—'}</td></tr>`).join('')
+      || '<tr><td colspan="8" style="color:var(--muted)">No accounts deleted yet.</td></tr>';
+  }catch(e){ $('deletionsBody').innerHTML = '<tr><td colspan="8" style="color:var(--muted)">—</td></tr>'; }
+
+  await renderRollout();
+
+  $('gate').classList.add('hide'); $('console').classList.remove('hide');
+}
+
+const _SCOPE_NOTE = { off:'baseline for everyone', internal:'baseline by default — opt in with ?'+'skin=<ver> or per-tenant', on:'selected version for everyone' };
+function _sb(txt, active, attrs){   // small button
+  return `<button class="btn sm" ${attrs} style="width:auto;display:inline-block;margin-right:6px;margin-top:4px;${active?'background:var(--ink);color:#fff':'background:#fff;color:var(--ink);border:1px solid var(--line)'}">${txt}</button>`;
+}
+async function renderRollout(){
+  let r; try{ r = await api('/api/admin/rollout'); }catch(e){ return; }
+  $('rolloutRows').innerHTML = (r.features||[]).map(f=>{
+    if(f.kind==='version'){
+      const vers = f.versions.map(v=>_sb(v.label + (v.id===f.baseline?' · baseline':''),
+        f.selected===v.id, `data-feat="${f.key}" data-version="${v.id}"`)).join('');
+      const scopes = ['off','internal','on'].map(s=>_sb(s, f.scope===s, `data-feat="${f.key}" data-scope="${s}"`)).join('');
+      return `<div style="padding:10px 0;border-top:1px solid var(--line)">
+        <div style="font-weight:600">${esc(f.label)} <span style="color:var(--faint);font-size:11px">${esc(f.key)}</span></div>
+        <div style="margin-top:6px"><span style="font-size:11px;color:var(--faint);text-transform:uppercase">build</span> ${vers}</div>
+        <div style="margin-top:4px"><span style="font-size:11px;color:var(--faint);text-transform:uppercase">scope</span> ${scopes}
+          <span style="font-size:12px;color:var(--muted);margin-left:6px">${_SCOPE_NOTE[f.scope]||''}</span></div>
+      </div>`;
+    }
+    const blocked = f.available===false;   // dependency not met (e.g. requires v4 but build is legacy)
+    const g = blocked
+      ? `<button class="btn sm" disabled style="width:auto;display:inline-block;margin-right:6px;margin-top:4px;background:#fff;color:var(--faint);border:1px solid var(--line);opacity:.6;cursor:not-allowed">${f.enabled?'enabled':'disabled'}</button>`
+      : _sb(f.enabled?'enabled':'disabled', f.enabled, `data-feat="${f.key}" data-on="${f.enabled?1:0}"`);
+    const reqNote = blocked && f.requires
+      ? `<div style="font-size:12px;color:var(--warn,#B9770A);margin-top:6px">Requires the ${esc(f.requires.version)} build of <b>${esc(f.requires.feature)}</b> — roll that out first. ${f.enabled?'(toggle is on but inert until then)':''}</div>` : '';
+    return `<div style="padding:10px 0;border-top:1px solid var(--line)">
+      <div style="font-weight:600">${esc(f.label)} <span style="color:var(--faint);font-size:11px">${esc(f.key)} · gate</span></div>
+      <div style="margin-top:6px">${g} <span style="font-size:12px;color:var(--muted)">may act only when enabled (default off)${(!blocked&&f.effective===false&&f.enabled)?' · currently inert':''}</span></div>
+      ${reqNote}
+    </div>`;
+  }).join('');
+  const root = $('rolloutRows');
+  root.querySelectorAll('button[data-version]').forEach(b=>b.addEventListener('click', async()=>{
+    await apiPost('/api/admin/rollout', { feature:b.dataset.feat, version:b.dataset.version }); renderRollout(); }));
+  root.querySelectorAll('button[data-scope]').forEach(b=>b.addEventListener('click', async()=>{
+    await apiPost('/api/admin/rollout', { feature:b.dataset.feat, scope:b.dataset.scope }); renderRollout(); }));
+  root.querySelectorAll('button[data-on]').forEach(b=>b.addEventListener('click', async()=>{
+    await apiPost('/api/admin/rollout', { feature:b.dataset.feat, on: b.dataset.on!=='1' }); renderRollout(); }));
+}
+
+async function unlock(){
+  KEY = $('keyInput').value.trim();
+  if(!KEY){ return; }
+  $('gateErr').textContent='';
+  try{ sessionStorage.setItem('realify_admin_key', KEY); await load(); }
+  catch(e){ sessionStorage.removeItem('realify_admin_key'); $('gateErr').textContent='Invalid admin key.'; }
+}
+$('keyBtn').addEventListener('click', unlock);
+$('keyInput').addEventListener('keydown', e=>{ if(e.key==='Enter') unlock(); });
+$('lock').addEventListener('click', e=>{ e.preventDefault(); sessionStorage.removeItem('realify_admin_key'); location.reload(); });
+
+// auto-enter if key already in session
+if(KEY){ load().catch(()=>{ sessionStorage.removeItem('realify_admin_key'); }); }
+</script>
+</body>
+</html>

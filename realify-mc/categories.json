@@ -1,0 +1,34 @@
+[
+ {
+  "category": "Car Accessories",
+  "skus": 31,
+  "gmv": 135115559.0,
+  "buybox": 82,
+  "new": 38,
+  "alerts": 20
+ },
+ {
+  "category": "Bike Accessories",
+  "skus": 1,
+  "gmv": 22847510.0,
+  "buybox": 63,
+  "new": 3,
+  "alerts": 2
+ },
+ {
+  "category": "Car Electronics",
+  "skus": 8,
+  "gmv": 4904257.0,
+  "buybox": 83,
+  "new": 8,
+  "alerts": 7
+ },
+ {
+  "category": "Other Accessories",
+  "skus": 4,
+  "gmv": 2588391.0,
+  "buybox": 90,
+  "new": 4,
+  "alerts": 1
+ }
+]

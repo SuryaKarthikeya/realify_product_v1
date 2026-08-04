@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fix Ads — modal v3 (re-simulate + formula explainability)</title>
+<style>
+:root{--paper:#EDEFF3;--ink:#15233B;--ink2:#33415C;--muted:#5C6B82;--faint:#8A97A8;--line:#DBE0E8;--line2:#E7EAF0;--competitive:#1E5FA8;--opportunity:#6B4FBB;--positive:#0E7C66;--critical:#B0541A;}
+*{box-sizing:border-box;}
+body{font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--paper);margin:0;font-size:13px;line-height:1.45;}
+.scrim{position:fixed;inset:0;background:rgba(21,35,59,.42);display:flex;align-items:flex-start;justify-content:center;padding:28px 16px;overflow:auto;}
+.modal{width:640px;max-width:100%;background:#fff;border-radius:12px;box-shadow:0 24px 60px rgba(21,35,59,.28);overflow:hidden;}
+.mhead{padding:16px 20px;border-bottom:1px solid var(--line2);background:#F4F7FB;}
+.htop{display:flex;justify-content:space-between;align-items:flex-start;}
+.sub{color:var(--faint);font-size:11px;}
+.pill{display:inline-block;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line);border-radius:4px;padding:1px 6px;margin-top:6px;}
+.expl-toggle{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);cursor:pointer;user-select:none;}
+.expl-toggle input{accent-color:var(--competitive);}
+.mbody{padding:16px 20px;max-height:60vh;overflow:auto;}
+.sec{font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;margin:14px 0 8px;}
+.card{border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:10px;}
+.card.act{border-left:3px solid var(--positive);}
+.card.adv{border-left:3px solid var(--opportunity);background:#FBFAFE;}
+.card-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+.lever{font-weight:600;}
+.tag{font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:1px 6px;border-radius:4px;}
+.tag-a{background:#E7F1FA;color:var(--competitive);}.tag-v{background:#F1ECFA;color:var(--opportunity);}
+.acts{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:10px;}
+.btn{padding:6px 12px;border-radius:6px;font-weight:600;font-size:12px;cursor:pointer;border:1px solid transparent;}
+.btn-p{background:var(--competitive);color:#fff;}.btn-s{background:#fff;border-color:var(--line);color:var(--ink);}
+.link{color:var(--competitive);font-size:12px;cursor:pointer;text-decoration:underline dotted;}
+.pos{color:var(--positive);}.crit{color:var(--critical);}
+/* --- simulate --- */
+.simbox{margin-top:10px;border-top:1px dashed var(--line2);padding-top:10px;}
+.simctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.simctl label{font-size:11px;color:var(--muted);}
+.simctl input[type=range]{accent-color:var(--competitive);}
+.sim{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0;}
+.cell{border:1px solid var(--line);border-radius:6px;padding:7px;text-align:center;}
+/* --- formula explainability --- */
+.num{font-weight:600;}
+.fx{display:none;}                         /* hidden until explainability on */
+body.expl .fx{display:inline;}
+.ftag{cursor:pointer;color:var(--competitive);font-size:10px;border:1px solid var(--line);border-radius:3px;padding:0 3px;margin-left:3px;vertical-align:super;}
+.formula{display:none;margin:6px 0 2px;background:#F4F7FB;border:1px solid var(--line2);border-left:3px solid var(--competitive);border-radius:0 6px 6px 0;padding:8px 10px;font-size:11.5px;color:var(--ink2);}
+.formula.open{display:block;}
+.formula code{font-family:ui-monospace,Menlo,monospace;color:var(--ink);}
+.formula .src{display:block;margin-top:4px;color:var(--faint);font-size:10px;}
+.mfoot{padding:14px 20px;border-top:1px solid var(--line2);background:#FAFBFC;}
+.footproj{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+.x{color:var(--faint);cursor:pointer;font-size:18px;line-height:1;}
+</style></head>
+<body class="expl"><div class="scrim"><div class="modal">
+
+  <div class="mhead">
+    <div class="htop">
+      <div>
+        <div style="font-size:15px;font-weight:600;">Cabin Air Filter — Twin Pack</div>
+        <div class="sub" style="margin-top:2px;">SKU-CAF-11 · 7 campaigns</div>
+      </div>
+      <div style="text-align:right;">
+        <label class="expl-toggle"><input type="checkbox" id="explOn" checked onchange="document.body.classList.toggle('expl',this.checked)"> Explainability</label>
+        <div class="x" style="margin-top:8px;">✕</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:18px;margin-top:10px;flex-wrap:wrap;">
+      <div>ACOS <span class="num crit">41%</span><span class="fx ftag" onclick="tf('f-acos')">ƒ</span> <span class="sub">vs BE <span class="num">22%</span><span class="fx ftag" onclick="tf('f-be')">ƒ</span></span></div>
+      <div>CMAA <span class="num crit">−₹1,240</span><span class="fx ftag" onclick="tf('f-cmaa')">ƒ</span></div>
+      <div>Recoverable <span class="num pos">₹900</span><span class="fx ftag" onclick="tf('f-rec')">ƒ</span></div>
+    </div>
+    <div id="f-be" class="formula"><code>break_even_acos = contribution_before_ads ÷ net_settled_revenue</code><br>= ₹0.55 ÷ ₹2.50 = <b>22%</b><span class="src">formula: break_even_acos · admin registry</span></div>
+    <div id="f-acos" class="formula"><code>acos = ad_spend ÷ ad_attributed_sales</code><br>= ₹8,200 ÷ ₹20,000 = <b>41%</b><span class="src">formula: acos · admin registry</span></div>
+    <div id="f-cmaa" class="formula"><code>cmaa = settled_revenue − cogs − fees − ad_spend</code><br>= ₹42,300 − ₹22,900 − ₹6,340 − ₹8,200 = <b>−₹1,240/mo</b> (loss)<span class="src">formula: cmaa · admin registry</span></div>
+    <div id="f-rec" class="formula"><code>recoverable = ad_spend_above_breakeven × expected_reduction</code><br>= ₹3,000 × 0.30 = <b>₹900</b><span class="src">formula: recoverable · admin registry</span></div>
+    <span class="pill">Fidelity: keyword-level · CSV (derived) · coverage 92%<span class="fx ftag" onclick="tf('f-cov')">ƒ</span></span>
+    <div id="f-cov" class="formula"><code>coverage = mapped_ad_spend ÷ total_ad_spend</code> = ₹7,540 ÷ ₹8,200 = <b>92%</b><span class="src">formula: ad_coverage · admin registry</span></div>
+  </div>
+
+  <div class="mbody">
+    <div class="sec" style="color:var(--competitive);">Recommendations — each acts on its own</div>
+
+    <!-- Rec 1: interactive simulate + formula on every number -->
+    <div class="card act">
+      <div class="card-h"><span class="lever">Lower bid · Campaign A <span class="tag tag-a">bid</span></span>
+        <span class="pos" style="font-weight:600;">+<span id="r1-30">₹420</span>/mo<span class="fx ftag" onclick="tf('f-proj')">ƒ</span></span></div>
+      <div style="color:var(--muted);margin-top:3px;">Targets “cabin filter oem”, “ac filter” — bidding above what the margin returns.</div>
+
+      <div class="simbox">
+        <div class="sub" style="text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:var(--muted);margin-bottom:6px;">Simulate — adjust and re-run</div>
+        <div class="simctl">
+          <label>Bid change: <b id="bidval">−30%</b></label>
+          <input type="range" id="bid" min="10" max="50" value="30" step="5" oninput="document.getElementById('bidval').textContent='−'+this.value+'%'">
+          <label>Target ACOS: <input id="tacos" value="22%" style="width:48px;border:1px solid var(--line);border-radius:4px;padding:2px 4px;"></label>
+          <span class="btn btn-s" onclick="resim()">Re-simulate</span>
+        </div>
+        <div class="sim">
+          <div class="cell"><div class="sub">30d</div><div class="pos" style="font-weight:700;"><span id="s30">+₹420</span></div><div class="sub"><span id="p30">p≈.72</span></div></div>
+          <div class="cell"><div class="sub">60d</div><div class="pos" style="font-weight:700;"><span id="s60">+₹880</span></div><div class="sub"><span id="p60">p≈.67</span></div></div>
+          <div class="cell"><div class="sub">90d</div><div class="pos" style="font-weight:700;"><span id="s90">+₹1,300</span></div><div class="sub"><span id="p90">p≈.61</span></div></div>
+        </div>
+        <div class="crit" style="font-size:11px;">⚠ Tripwire: units/wk drop &gt;15% → auto-revert.<span class="fx ftag" onclick="tf('f-trip')">ƒ</span></div>
+        <div id="f-trip" class="formula"><code>tripwire = units_wk &lt; baseline_units_wk × (1 − 0.15)</code><span class="src">formula: tripwire_units · admin registry</span></div>
+        <div id="f-proj" class="formula"><code>proj_cmaa_gain(t) = saved_spend(bid,t) − lost_margin_from_volume(bid,t)</code><br>recomputed by <code>project()</code> on each Re-simulate.<span class="src">formula: cmaa_projection · admin registry</span></div>
+      </div>
+
+      <div class="acts"><span class="btn btn-p">Apply this change</span><span class="btn btn-s">Preview</span><span class="btn btn-s">Open in Amazon ↗</span><span class="link">Why</span></div>
+    </div>
+
+    <div class="card act">
+      <div class="card-h"><span class="lever">Add negative exact · Campaign B <span class="tag tag-a">neg-kw</span></span><span class="pos" style="font-weight:600;">+₹310/mo<span class="fx ftag" onclick="tf('f-r2')">ƒ</span></span></div>
+      <div style="color:var(--muted);margin-top:3px;">“car perfume”, “dashboard clean” — spend, no conversions.</div>
+      <div id="f-r2" class="formula"><code>proj = wasted_spend_on_terms × (1 − keep_rate)</code> = ₹360 × 0.86 ≈ ₹310<span class="src">formula: cmaa_projection · admin registry</span></div>
+      <div class="acts"><span class="btn btn-p">Apply this change</span><span class="btn btn-s">Preview</span><span class="link">Simulate</span><span class="link">Why</span></div>
+    </div>
+
+    <div class="card act">
+      <div class="card-h"><span class="lever">Remove SKU from Campaign E <span class="tag tag-a">remove-ad</span></span><span class="pos" style="font-weight:600;">+₹170/mo<span class="fx ftag" onclick="tf('f-r3')">ƒ</span></span></div>
+      <div style="color:var(--muted);margin-top:3px;">Shared campaign — this SKU drags 4 healthy ones.</div>
+      <div id="f-r3" class="formula"><code>proj = sku_spend_in_campaign − sku_attributed_contribution</code><span class="src">formula: cmaa_projection · admin registry</span></div>
+      <div class="acts"><span class="btn btn-p">Apply this change</span><span class="btn btn-s">Preview</span><span class="link">Simulate</span><span class="link">Why</span></div>
+    </div>
+
+    <div class="sec" style="color:var(--opportunity);">Advisory — you do this yourself</div>
+    <div class="card adv">
+      <div class="card-h"><span class="lever">Split Campaign A to isolate this SKU <span class="tag tag-v">advisory</span></span></div>
+      <div style="color:var(--ink2);margin-top:3px;">Structural change — Realify won’t auto-execute. <span class="link">How to</span> · <span class="link">Open in Amazon ↗</span></div>
+    </div>
+  </div>
+
+  <div class="mfoot">
+    <div class="footproj">
+      <div><b>Projected if all applied</b> · <span class="sub">net CMAA gain</span>
+        <span class="pos" style="font-weight:700;"> +<span id="combo">₹900</span>/mo</span><span class="fx ftag" onclick="tf('f-combo')">ƒ</span></div>
+      <div style="display:flex;gap:8px;"><span class="btn btn-s">Export</span><span class="btn btn-p">Apply all 3 changes</span></div>
+    </div>
+    <div id="f-combo" class="formula"><code>combined = Σ proj_gain(recommendation_i)</code> = ₹420 + ₹310 + ₹170 = <b>₹900</b><span class="src">formula: combined_projection · admin registry</span></div>
+    <div class="sub">Guardrails: max −30% bid · budget floor on · rollback ready</div>
+  </div>
+
+</div></div>
+
+<script>
+function tf(id){var e=document.getElementById(id); if(e) e.classList.toggle('open');}
+function resim(){
+  var cut=+document.getElementById('bid').value;           // 10..50
+  var base=cut/30;                                          // illustrative model
+  var s30=Math.round(420*base), s60=Math.round(880*base), s90=Math.round(1300*base);
+  document.getElementById('s30').textContent='+₹'+s30;
+  document.getElementById('s60').textContent='+₹'+s60;
+  document.getElementById('s90').textContent='+₹'+s90;
+  document.getElementById('r1-30').textContent='₹'+s30;
+  // probabilities fall as the cut gets more aggressive
+  var p=(0.80-cut*0.004);
+  document.getElementById('p30').textContent='p≈'+p.toFixed(2).slice(1);
+  document.getElementById('p60').textContent='p≈'+(p-0.05).toFixed(2).slice(1);
+  document.getElementById('p90').textContent='p≈'+(p-0.11).toFixed(2).slice(1);
+  document.getElementById('combo').textContent='₹'+(s30+310+170);
+}
+</script>
+</body></html>

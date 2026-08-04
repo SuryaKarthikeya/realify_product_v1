@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Realify · Multi-Channel Commerce Intelligence — Architecture</title>
+<style>
+  :root{
+    --navy:#1F3864; --blue:#2E75B6; --green:#0F6E4F; --purple:#6A1B9A;
+    --grey:#5b6675; --ink:#16202e; --line:#dbe2ec; --bg:#ffffff; --panel:#f6f8fb;
+    --panel2:#eef3f9; --code:#0b1f3a; --amber:#9a6a00; --red:#9e2b25;
+    --l1:#2E75B6; --mdl:#0F6E4F; --l2:#6A1B9A;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:15px; line-height:1.62; letter-spacing:.002em;
+  }
+  .wrap{max-width:980px; margin:0 auto; padding:64px 40px 120px}
+  code,.mono{font-family:"SF Mono",ui-monospace,"JetBrains Mono","Roboto Mono",Menlo,Consolas,monospace}
+  code{background:var(--panel2); color:var(--code); padding:1px 5px; border-radius:4px; font-size:.86em}
+  h1,h2,h3,h4{line-height:1.2; color:var(--navy); font-weight:700; letter-spacing:-.01em}
+  h2{font-size:25px; margin:62px 0 6px}
+  h3{font-size:18px; margin:34px 0 4px; color:#243a5e}
+  h4{font-size:14.5px; margin:22px 0 2px; color:#33405a}
+  p{margin:10px 0}
+  a{color:var(--blue)}
+  .eyebrow{font:600 11px/1 "SF Mono",ui-monospace,monospace; letter-spacing:.18em; text-transform:uppercase; color:var(--blue)}
+  /* memo header */
+  .memo{border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-top:30px}
+  .memo .bar{height:6px; background:linear-gradient(90deg,var(--l1) 0 33%,var(--mdl) 33% 66%,var(--l2) 66% 100%)}
+  .memo .body{padding:26px 30px; background:var(--panel)}
+  .memo h1{font-size:30px; margin:0 0 4px; color:var(--navy)}
+  .memo .sub{color:var(--grey); font-size:14px; margin:0 0 18px}
+  .memo dl{display:grid; grid-template-columns:84px 1fr; gap:4px 14px; margin:0; font-size:13.5px}
+  .memo dt{color:var(--blue); font:600 11px/1.5 "SF Mono",monospace; letter-spacing:.1em; text-transform:uppercase; padding-top:2px}
+  .memo dd{margin:0; color:var(--ink)}
+  /* layout helpers */
+  .lede{font-size:17px; line-height:1.6; color:#26344c}
+  .rule{height:1px; background:var(--line); border:0; margin:30px 0}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px}
+  .card{border:1px solid var(--line); border-radius:11px; padding:16px 18px; background:#fff}
+  .card.l1{border-top:3px solid var(--l1)} .card.mdl{border-top:3px solid var(--mdl)} .card.l2{border-top:3px solid var(--l2)}
+  .card h4{margin-top:0}
+  .tag{display:inline-block; font:600 10.5px/1.6 "SF Mono",monospace; letter-spacing:.06em; padding:1px 7px; border-radius:20px; border:1px solid var(--line); color:var(--grey); background:var(--panel)}
+  .tag.l1{color:var(--l1); border-color:#bcd4ec; background:#f0f6fc}
+  .tag.mdl{color:var(--mdl); border-color:#b9dccb; background:#eef7f2}
+  .tag.l2{color:var(--l2); border-color:#d8c4e8; background:#f7f1fb}
+  ul{margin:8px 0; padding-left:20px} li{margin:5px 0}
+  .fig{margin:26px 0 8px; border:1px solid var(--line); border-radius:12px; background:#fff; padding:14px 14px 8px; overflow:hidden}
+  .fig svg{display:block; width:100%; height:auto}
+  .cap{font-size:12.5px; color:var(--grey); margin:6px 4px 2px} .cap b{color:var(--navy)}
+  table{border-collapse:collapse; width:100%; font-size:13px; margin:14px 0}
+  th,td{border:1px solid var(--line); padding:7px 10px; text-align:left; vertical-align:top}
+  th{background:var(--panel2); color:var(--navy); font-weight:600; font-size:11.5px; letter-spacing:.04em; text-transform:uppercase}
+  td.mono,th.mono{font-family:"SF Mono",ui-monospace,monospace; font-size:12px}
+  .callout{border-left:3px solid var(--blue); background:var(--panel); padding:12px 16px; border-radius:0 8px 8px 0; margin:16px 0; font-size:14px}
+  .callout.warn{border-color:var(--amber); background:#fbf7ee}
+  .callout.green{border-color:var(--green); background:#eff7f2}
+  .toc{columns:2; column-gap:34px; font-size:13.5px; margin:18px 0 0}
+  .toc a{display:block; color:#33405a; text-decoration:none; padding:3px 0; border-bottom:1px solid transparent}
+  .toc a:hover{border-bottom-color:var(--line)}
+  .toc .n{color:var(--blue); font:600 11px "SF Mono",monospace; margin-right:8px}
+  .foot{margin-top:70px; padding-top:18px; border-top:1px solid var(--line); color:var(--grey); font-size:12px}
+  @media print{ .wrap{padding:0 0 0} body{font-size:12px} .fig{break-inside:avoid} h2{break-after:avoid} .memo{break-inside:avoid} }
+  @media (max-width:720px){ .grid2,.grid3,.toc{grid-template-columns:1fr; columns:1} .wrap{padding:36px 18px 80px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Engineering memorandum · confidential</div>
+  <div class="memo">
+    <div class="bar"></div>
+    <div class="body">
+      <h1>Realify — Multi-Channel Commerce Intelligence</h1>
+      <p class="sub">System architecture, design language, data model, and the model layer — as built.</p>
+      <dl>
+        <dt>To</dt><dd>Chief Technology Officer</dd>
+        <dt>From</dt><dd>Product / Architecture (Shiva)</dd>
+        <dt>Re</dt><dd>Reference architecture for the <code>realify_mc</code> multi-channel build (prototype, port 8001)</dd>
+        <dt>Status</dt><dd>As-built. Single-tenant-per-deploy prototype; synthetic + uploaded data; deterministic core with an additive model layer.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <p class="lede" style="margin-top:26px">
+    Realify turns a marketplace seller's own economics and the surrounding market into a ranked feed of
+    decisions. The defining architectural choice is a <b>strict separation of planes</b>: deterministic logic
+    decides every number and every threshold; a model layer <em>informs</em> with forecasts but never overrides;
+    and a language model only <em>phrases</em> what the deterministic layer already decided. Numbers are never
+    authored by an LLM. This memo documents that system end to end.
+  </p>
+
+  <h3 style="margin-top:30px">Contents</h3>
+  <nav class="toc">
+    <a href="#thesis"><span class="n">01</span>Architectural thesis &amp; invariants</a>
+    <a href="#patterns"><span class="n">02</span>Design language &amp; patterns</a>
+    <a href="#rules"><span class="n">03</span>What drives rules</a>
+    <a href="#components"><span class="n">04</span>Component block diagram</a>
+    <a href="#pipeline"><span class="n">05</span>Intelligence pipeline flow</a>
+    <a href="#sequence"><span class="n">06</span>Sequence: onboard → feed → drill-down</a>
+    <a href="#models"><span class="n">07</span>Models &amp; model architecture</a>
+    <a href="#explain"><span class="n">08</span>Explainability (L1 · Model · L2)</a>
+    <a href="#ingest"><span class="n">09</span>Ingestion &amp; multi-channel</a>
+    <a href="#schema"><span class="n">10</span>Database schema</a>
+    <a href="#tenancy"><span class="n">11</span>Tenancy, security &amp; compliance</a>
+    <a href="#roadmap"><span class="n">12</span>Constraints &amp; model lifecycle</a>
+  </nav>
+
+  <!-- ============================================================ 01 -->
+  <h2 id="thesis"><span class="eyebrow" style="display:block;color:var(--blue);margin-bottom:6px">01</span>Architectural thesis &amp; invariants</h2>
+  <p>
+    The product is a pipeline that ingests a seller's data, runs deterministic detectors over it, and renders the
+    results as research cards. Three planes are kept rigorously distinct, and the boundaries between them are the
+    load-bearing invariants of the whole system.
+  </p>
+  <div class="grid3">
+    <div class="card l1">
+      <span class="tag l1">L1 · Deterministic</span>
+      <h4>Decides the numbers</h4>
+      <p style="font-size:13.5px;margin-bottom:0">Rules-as-data evaluate the seller's own economics + market facts. Every threshold, value, exposure figure and severity is computed here. Fully auditable; no ML, no LLM.</p>
+    </div>
+    <div class="card mdl">
+      <span class="tag mdl">Model · Forecast</span>
+      <h4>Informs, never decides</h4>
+      <p style="font-size:13.5px;margin-bottom:0">Reads metric history, returns <code>{value, confidence, top_features}</code>. Confidence-gated: thin data ⇒ low confidence ⇒ L1 stays authoritative. Adds forecasts &amp; urgency.</p>
+    </div>
+    <div class="card l2">
+      <span class="tag l2">L2 · Language</span>
+      <h4>Phrases it</h4>
+      <p style="font-size:13.5px;margin-bottom:0">An LLM writes the human-facing narrative from locked numbers. It may never introduce a figure. Deterministic fallback copy if no key / offline.</p>
+    </div>
+  </div>
+
+  <h4>Invariants (enforced, not aspirational)</h4>
+  <ul>
+    <li><b>Numbers originate in L1 only.</b> Models and the LLM receive locked figures; they cannot mint new ones.</li>
+    <li><b>Models inform, the detector decides.</b> A forecast can raise a card's rank or annotate it, but cannot make a card fire or change its threshold.</li>
+    <li><b>Confidentiality boundary.</b> Customers tune thresholds; the <em>interpretation</em> logic (gates, priorities, phrasing pools) is Realify-managed and never serialized to the client.</li>
+    <li><b>Tenant isolation.</b> Every row is keyed by <code>tenant_id</code>; every query is tenant-scoped. No cross-tenant read path exists.</li>
+    <li><b>Compliance.</b> Amazon is never scraped. Market data comes only from Keepa and official seller APIs / public feeds.</li>
+    <li><b>Graceful degradation.</b> Live market pulls, the LLM, and the models are each optional; the app is fully functional on deterministic own-data alone.</li>
+  </ul>
+
+  <!-- ============================================================ 02 -->
+  <h2 id="patterns"><span class="eyebrow" style="display:block;color:var(--blue);margin-bottom:6px">02</span>Design language &amp; patterns</h2>
+  <table>
+    <tr><th style="width:200px">Pattern</th><th>Where &amp; why</th></tr>
+    <tr><td><b>Rules as data</b></td><td>Detectors are rows in a <code>rules</code> table (condition, params, bounds, action, severity) plus per-tenant overrides — not hard-coded branches. Editing a threshold changes the feed on the next run without a deploy.</td></tr>
+    <tr><td><b>Source seam / adapters</b></td><td>Every data origin implements a small interface: <code>SyntheticSource</code>, the CSV/XLSX <code>upload_parse</code>, the report-aware <code>report_ingest</code>/<code>report_writer</code> engine, and the market <code>collectors</code> (Keepa, Tier-C) all write the <em>same canonical tables</em>. Swapping fixture ↔ live changes nothing downstream.</td></tr>
+    <tr><td><b>Detector → Interpretation → Language</b></td><td>A three-stage refinement: a detector fires on a metric; an <em>interpretation</em> selects the sharpest reading via data gates (e.g. "Returns eroding margin"); a phrasing pool renders non-duplicate copy. Each stage is independently configurable.</td></tr>
+    <tr><td><b>Canonical collapse</b></td><td>~80 underlying rules that fire on the same <code>(field, entity, direction)</code> collapse to one canonical card, so the feed reads as ~20 detectors, not 80 near-duplicates.</td></tr>
+    <tr><td><b>Two-phase provisioning</b></td><td>Own-data provisioning is synchronous and fast (the workspace opens in seconds); market enrichment runs in the background and fills market cards in after. The UI never blocks on a network pull.</td></tr>
+    <tr><td><b>Contract-first models</b></td><td>Every model implements one signature. Serving is identical whether the prediction is a 5-point local fit today or a cohort model retrained nightly later — the contract is the seam.</td></tr>
+    <tr><td><b>Confidence gate</b></td><td>The universal mechanism that lets an immature model ship safely: low confidence ⇒ the model contributes nothing and the deterministic path is unchanged.</td></tr>
+    <tr><td><b>Provenance everywhere</b></td><td>Each card carries its inputs-by-source, formula, calculation, model trace and LLM trace, surfaced verbatim in Explanation Mode. Trust is a first-class feature.</td></tr>
+    <tr><td><b>Idempotent materialize</b></td><td>Cards are upserted on a stable <code>dedup_key</code>; re-runs update in place, compute <code>is_new</code>, and prune resolved cards while preserving dismissed/done state.</td></tr>
+  </table>
+
+  <!-- ============================================================ 03 -->
+  <h2 id="rules"><span class="eyebrow" style="display:block;color:var(--blue);margin-bottom:6px">03</span>What drives rules</h2>
+  <p>
+    Detection is table-driven. The global <code>rules</code> catalog seeds two families: <b>generic threshold rules</b>
+    (73 rows over 11 own-data fields, each <code>field · op · threshold</code> with editable bounds) and <b>special
+    detectors</b> (C1–C9 market/demand logic + the Buy-Box detector, each with bespoke params). Per-tenant edits live
+    in <code>tenant_rule_settings</code> and are merged over the defaults by <code>effective_rules()</code>.
+  </p>
+  <p>
+    Customers don't manage ~80 rules; the settings surface rolls them up to <b>~20 canonical detectors</b> (the names
+    the feed uses). This is also where the confidentiality boundary is drawn:
+  </p>
+  <div class="grid2">
+    <div class="card" style="border-top:3px solid var(--blue)">
+      <h4 style="color:var(--blue)">Customer tier — editable</h4>
+      <ul style="margin-bottom:0">
+        <li>Enable / disable a detector</li>
+        <li>Threshold(s) with validated min/max</li>
+        <li>Severity (act / watch / opportunity)</li>
+        <li>Scope &amp; mute (planned)</li>
+      </ul>
+      <p style="font-size:12.5px;color:var(--grey);margin-bottom:0"><code>GET/POST /api/settings/detectors</code></p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--purple)">
+      <h4 style="color:var(--purple)">Realify tier — confidential 🔒</h4>
+      <ul style="margin-bottom:0">
+        <li>Interpretation <b>gates</b> (the secondary conditions)</li>
+        <li>Interpretation <b>priority</b> / resolution</li>
+        <li><b>Phrasing pools</b> (the copy)</li>
+        <li>Model internals &amp; (future) cohort features</li>
+      </ul>
+      <p style="font-size:12.5px;color:var(--grey);margin-bottom:0">Admin-only; API emits only <code>label / gated / variants</code>.</p>
+    </div>
+  </div>
+  <div class="fig">
+    <svg viewBox="0 0 920 250" xmlns="http://www.w3.org/2000/svg" font-family="Inter,system-ui,sans-serif">
+      <defs>
+        <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#5b6675"/></marker>
+      </defs>
+      <!-- boxes -->
+      <g font-size="12.5">
+        <rect x="14" y="92" width="150" height="64" rx="9" fill="#f0f6fc" stroke="#2E75B6"/>
+        <text x="89" y="116" text-anchor="middle" font-weight="700" fill="#1F3864">rules catalog</text>
+        <text x="89" y="135" text-anchor="middle" fill="#5b6675" font-size="11">73 generic + C1–C9 + BB</text>
+
+        <rect x="210" y="92" width="150" height="64" rx="9" fill="#fff" stroke="#dbe2ec"/>
+        <text x="285" y="112" text-anchor="middle" font-weight="700" fill="#1F3864">effective_rules()</text>
+        <text x="285" y="130" text-anchor="middle" fill="#5b6675" font-size="11">defaults ⊕ tenant</text>
+        <text x="285" y="145" text-anchor="middle" fill="#5b6675" font-size="11">overrides</text>
+
+        <rect x="406" y="92" width="150" height="64" rx="9" fill="#fff" stroke="#2E75B6"/>
+        <text x="481" y="116" text-anchor="middle" font-weight="700" fill="#1F3864">detect_all()</text>
+        <text x="481" y="135" text-anchor="middle" fill="#5b6675" font-size="11">L1 signals</text>
+
+        <rect x="602" y="92" width="150" height="64" rx="9" fill="#fff" stroke="#2E75B6"/>
+        <text x="677" y="112" text-anchor="middle" font-weight="700" fill="#1F3864">collapse →</text>
+        <text x="677" y="130" text-anchor="middle" fill="#5b6675" font-size="11">~20 canonical</text>
+        <text x="677" y="145" text-anchor="middle" fill="#5b6675" font-size="11">detectors</text>
+
+        <rect x="784" y="56" width="122" height="64" rx="9" fill="#f7f1fb" stroke="#6A1B9A"/>
+        <text x="845" y="80" text-anchor="middle" font-weight="700" fill="#6A1B9A" font-size="12">interpretation</text>
+        <text x="845" y="98" text-anchor="middle" fill="#5b6675" font-size="11">gates · phrasing</text>
+        <text x="845" y="112" text-anchor="middle" fill="#6A1B9A" font-size="11">🔒 confidential</text>
+
+        <rect x="784" y="132" width="122" height="58" rx="9" fill="#f0f6fc" stroke="#2E75B6"/>
+        <text x="845" y="156" text-anchor="middle" font-weight="700" fill="#2E75B6" font-size="12">detector panel</text>
+        <text x="845" y="173" text-anchor="middle" fill="#5b6675" font-size="11">customer knobs</text>
+      </g>
+      <g stroke="#5b6675" stroke-width="1.4" fill="none" marker-end="url(#ar)">
+        <path d="M164,124 L206,124"/>
+        <path d="M360,124 L402,124"/>
+        <path d="M556,124 L598,124"/>
+        <path d="M752,118 L800,104"/>
+        <path d="M752,134 L800,150"/>
+      </g>
+      <text x="14" y="28" font-size="13" font-weight="700" fill="#1F3864">Rule resolution &amp; the two control tiers</text>
+      <text x="14" y="46" font-size="11.5" fill="#5b6675">Customer edits thresholds; Realify owns interpretation. Both feed the same detector, never the reverse.</text>
+    </svg>
+    <div class="cap"><b>Fig 3.</b> From a rules table to canonical detectors, split into a customer-editable surface and a confidential interpretation surface.</div>
+  </div>
+
+  <!-- ============================================================ 04 -->
+  <h2 id="components"><span class="eyebrow" style="display:block;color:var(--blue);margin-bottom:6px">04</span>Component block diagram</h2>
+  <div class="fig">
+    <svg viewBox="0 0 920 560" xmlns="http://www.w3.org/2000/svg" font-family="Inter,system-ui,sans-serif">
+      <defs><marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#9aa6b6"/></marker></defs>
+      <style>
+        .lane{fill:#f6f8fb; stroke:#e6ecf4}
+        .lt{font:600 10.5px "SF Mono",monospace; letter-spacing:.12em; fill:#8a95a6; text-transform:uppercase}
+        .bx{fill:#fff; stroke:#cfd8e6} .bt{font:600 12px Inter,sans-serif; fill:#1F3864}
+        .bs{font:11px Inter,sans-serif; fill:#5b6675}
+        .ext{fill:#fbf7ee; stroke:#d8c79a}
+      </style>
+      <!-- lanes -->
+      <rect class="lane" x="8" y="8" width="904" height="58" rx="8"/><text class="lt" x="20" y="30">Client</text>
+      <rect class="lane" x="8" y="74" width="904" height="58" rx="8"/><text class="lt" x="20" y="96">API / web · run.py (FastAPI)</text>
+      <rect class="lane" x="8" y="140" width="904" height="64" rx="8"/><text class="lt" x="20" y="162">Orchestration</text>
+      <rect class="lane" x="8" y="212" width="904" height="72" rx="8"/><text class="lt" x="20" y="234">Ingestion &amp; domain build</text>
+      <rect class="lane" x="8" y="292" width="904" height="86" rx="8"/><text class="lt" x="20" y="314">Intelligence pipeline (L1 → Model → L2)</text>
+      <rect class="lane" x="8" y="386" width="904" height="66" rx="8"/><text class="lt" x="20" y="408">Rules · models · config</text>
+      <rect class="lane" x="8" y="460" width="904" height="56" rx="8"/><text class="lt" x="20" y="482">Persistence</text>
+
+      <!-- client -->
+      <g><rect class="bx" x="150" y="20" width="200" height="34" rx="7"/><text class="bt" x="250" y="41" text-anchor="middle">login.html · onboarding</text></g>
+      <g><rect class="bx" x="380" y="20" width="240" height="34" rx="7"/><text class="bt" x="500" y="41" text-anchor="middle">frontend.html · workspace + ⚙ panels</text></g>
+
+      <!-- api -->
+      <g><rect class="bx" x="150" y="86" width="470" height="34" rx="7"/>
+        <text class="bt" x="385" y="101" text-anchor="middle">~40 JSON endpoints</text>
+        <text class="bs" x="385" y="114" text-anchor="middle">/api/onboard · /feed · /card/:id/{research,explain} · /settings/{detectors,models,interpretations} · /ingest/*</text></g>
+      <g><rect class="bx" x="636" y="86" width="120" height="34" rx="7"/><text class="bt" x="696" y="107" text-anchor="middle">auth · country</text></g>
+
+      <!-- orchestration -->
+      <g><rect class="bx" x="150" y="150" width="230" height="44" rx="7"/><text class="bt" x="265" y="170" text-anchor="middle">scheduler.py</text><text class="bs" x="265" y="186" text-anchor="middle">provision · enrich · rebuild (bg jobs)</text></g>
+      <g><rect class="bx" x="400" y="150" width="150" height="44" rx="7"/><text class="bt" x="475" y="170" text-anchor="middle">tasks.py</text><text class="bs" x="475" y="186" text-anchor="middle">action handlers</text></g>
+      <g><rect class="bx" x="568" y="150" width="188" height="44" rx="7"/><text class="bt" x="662" y="170" text-anchor="middle">statuscheck.py</text><text class="bs" x="662" y="186" text-anchor="middle">readiness / source state</text></g>
+
+      <!-- ingestion + domain -->
+      <g><rect class="bx" x="150" y="222" width="150" height="52" rx="7"/><text class="bt" x="225" y="242" text-anchor="middle">synthetic · seed</text><text class="bs" x="225" y="258" text-anchor="middle">demo catalog + synth_conditions</text></g>
+      <g><rect class="bx" x="312" y="222" width="150" height="52" rx="7"/><text class="bt" x="387" y="242" text-anchor="middle">upload_parse</text><text class="bs" x="387" y="258" text-anchor="middle">tolerant CSV/XLSX</text></g>
+      <g><rect class="bx" x="474" y="222" width="150" height="52" rx="7"/><text class="bt" x="549" y="242" text-anchor="middle">report_parse</text><text class="bs" x="549" y="258" text-anchor="middle">6 canonical kinds</text></g>
+      <g><rect class="bx ext" x="636" y="222" width="120" height="52" rx="7"/><text class="bt" x="696" y="242" text-anchor="middle">collectors</text><text class="bs" x="696" y="258" text-anchor="middle">keepa · tier-c</text></g>
+      <g><rect class="bx" x="768" y="222" width="138" height="52" rx="7"/><text class="bt" x="837" y="242" text-anchor="middle">seller · channels</text><text class="bs" x="837" y="258" text-anchor="middle">multichannel build</text></g>
+
+      <!-- pipeline -->
+      <g><rect class="bx" x="150" y="302" width="120" height="40" rx="7" stroke="#2E75B6"/><text class="bt" x="210" y="326" text-anchor="middle" fill="#2E75B6">detect</text></g>
+      <g><rect class="bx" x="284" y="302" width="120" height="40" rx="7" stroke="#2E75B6"/><text class="bt" x="344" y="326" text-anchor="middle" fill="#2E75B6">collapse</text></g>
+      <g><rect class="bx" x="418" y="302" width="120" height="40" rx="7" stroke="#6A1B9A"/><text class="bt" x="478" y="326" text-anchor="middle" fill="#6A1B9A">interpret</text></g>
+      <g><rect class="bx" x="552" y="302" width="120" height="40" rx="7" stroke="#0F6E4F"/><text class="bt" x="612" y="326" text-anchor="middle" fill="#0F6E4F">models</text></g>
+      <g><rect class="bx" x="686" y="302" width="100" height="40" rx="7" stroke="#6A1B9A"/><text class="bt" x="736" y="326" text-anchor="middle" fill="#6A1B9A">generate</text></g>
+      <g><rect class="bx" x="800" y="302" width="106" height="40" rx="7" stroke="#2E75B6"/><text class="bt" x="853" y="320" text-anchor="middle" fill="#2E75B6">materialize</text><text class="bs" x="853" y="334" text-anchor="middle">+ rank</text></g>
+      <g stroke="#9aa6b6" stroke-width="1.3" marker-end="url(#a2)" fill="none">
+        <path d="M270,322 L282,322"/><path d="M404,322 L416,322"/><path d="M538,322 L550,322"/><path d="M672,322 L684,322"/><path d="M786,322 L798,322"/>
+      </g>
+      <text class="bs" x="150" y="360" fill="#8a95a6">research.py provides the lazy L2 drill-down narrative · primitives.py = shared math</text>
+
+      <!-- rules/models/config -->
+      <g><rect class="bx" x="150" y="398" width="150" height="44" rx="7"/><text class="bt" x="225" y="418" text-anchor="middle">rules · catalog</text><text class="bs" x="225" y="434" text-anchor="middle">rules-as-data</text></g>
+      <g><rect class="bx" x="312" y="398" width="160" height="44" rx="7"/><text class="bt" x="392" y="418" text-anchor="middle">detector_settings</text><text class="bs" x="392" y="434" text-anchor="middle">rollup + write-through</text></g>
+      <g><rect class="bx" x="484" y="398" width="150" height="44" rx="7" stroke="#0F6E4F"/><text class="bt" x="559" y="418" text-anchor="middle" fill="#0F6E4F">models · history</text><text class="bs" x="559" y="434" text-anchor="middle">forecasters + snapshots</text></g>
+      <g><rect class="bx" x="646" y="398" width="120" height="44" rx="7"/><text class="bt" x="706" y="418" text-anchor="middle">config</text><text class="bs" x="706" y="434" text-anchor="middle">.env / modes</text></g>
+
+      <!-- persistence -->
+      <g><rect class="bx" x="150" y="470" width="300" height="36" rx="7"/><text class="bt" x="300" y="492" text-anchor="middle">db.py — 38 tables, tenant-scoped (SQLite / Postgres)</text></g>
+      <g><rect class="bx" x="466" y="470" width="290" height="36" rx="7"/><text class="bt" x="611" y="492" text-anchor="middle">api.py — read/aggregate layer (feed, KPIs, explain)</text></g>
+
+      <!-- externals -->
+      <g><rect class="bx ext" x="772" y="150" width="134" height="44" rx="7"/><text class="bt" x="839" y="170" text-anchor="middle">External APIs</text><text class="bs" x="839" y="186" text-anchor="middle">Keepa · News · Anthropic</text></g>
+    </svg>
+    <div class="cap"><b>Fig 4.</b> Component lanes. A single FastAPI process (<code>run.py</code>) fronts an orchestration layer, pluggable ingestion adapters, the L1→Model→L2 pipeline, and a tenant-scoped SQLite store. External services (Keepa, news/recall feeds, Anthropic) are optional and isolated behind adapters.</div>
+  </div>
+
+  <!-- ============================================================ 05 -->
+  <h2 id="pipeline"><span class="eyebrow" style="display:block;color:var(--blue);margin-bottom:6px">05</span>Intelligence pipeline flow</h2>
+  <p>One function, <code>run_pipeline(tenant_id)</code>, orchestrates the plane crossing. Each stage adds to a signal; numbers are set once, in detect, and only ever read thereafter.</p>
+  <div class="fig">
+    <svg viewBox="0 0 920 360" xmlns="http://www.w3.org/2000/svg" font-family="Inter,system-ui,sans-serif">
+      <defs><marker id="a3" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#5b6675"/></marker></defs>
+      <style>.s{rx:10} .st{font:600 13px Inter,sans-serif} .sd{font:11px Inter,sans-serif; fill:#5b6675}</style>
+      <!-- vertical flow -->
+      <g>
+        <rect x="40" y="20" width="250" height="46" rx="10" fill="#f0f6fc" stroke="#2E75B6"/>
+        <text class="st" x="56" y="40" fill="#2E75B6">① detect_all()</text><text class="sd" x="56" y="56">L1 fires rules → signals w/ field, value, op, threshold, exposure, severity</text>
+
+        <rect x="40" y="86" width="250" height="44" rx="10" fill="#f0f6fc" stroke="#2E75B6"/>
+        <text class="st" x="56" y="106" fill="#2E75B6">② _collapse_redundant()</text><text class="sd" x="56" y="121">one card per (field, entity, direction)</text>
+
+        <rect x="40" y="150" width="250" height="50" rx="10" fill="#f7f1fb" stroke="#6A1B9A"/>
+        <text class="st" x="56" y="170" fill="#6A1B9A">③ interpret.annotate()</text><text class="sd" x="56" y="185">canonical detector · gated interpretation</text><text class="sd" x="56" y="198">· non-duplicate phrasing template</text>
+
+        <rect x="40" y="220" width="250" height="44" rx="10" fill="#eef7f2" stroke="#0F6E4F"/>
+        <text class="st" x="56" y="240" fill="#0F6E4F">④ snapshot + models</text><text class="sd" x="56" y="255">history write · trend · forecast · rank_score</text>
+
+        <rect x="40" y="284" width="250" height="50" rx="10" fill="#f7f1fb" stroke="#6A1B9A"/>
+        <text class="st" x="56" y="304" fill="#6A1B9A">⑤ generate()</text><text class="sd" x="56" y="319">L2 LLM phrases (or deterministic fallback);</text><text class="sd" x="56" y="332">numbers locked by L1</text>
+      </g>
+      <g stroke="#5b6675" stroke-width="1.4" fill="none" marker-end="url(#a3)">
+        <path d="M165,66 L165,84"/><path d="M165,130 L165,148"/><path d="M165,200 L165,218"/><path d="M165,264 L165,282"/>
+      </g>
+      <!-- materialize on the right -->
+      <rect x="360" y="150" width="250" height="120" rx="12" fill="#fff" stroke="#2E75B6"/>
+      <text class="st" x="376" y="174" fill="#1F3864">⑥ materialize → cards</text>
+      <text class="sd" x="376" y="196">upsert on dedup_key (idempotent)</text>
+      <text class="sd" x="376" y="214">compute is_new vs prior run</text>
+      <text class="sd" x="376" y="232">prune resolved · keep dismissed/done</text>
+      <text class="sd" x="376" y="250">store rank_score, minis (+trend/forecast)</text>
+      <path d="M290,309 C330,309 340,250 358,236" stroke="#5b6675" stroke-width="1.4" fill="none" marker-end="url(#a3)"/>
+      <!-- outputs -->
+      <rect x="660" y="120" width="220" height="40" rx="9" fill="#f6f8fb" stroke="#cfd8e6"/><text class="st" x="770" y="145" text-anchor="middle">feed (ranked)</text>
+      <rect x="660" y="178" width="220" height="40" rx="9" fill="#f6f8fb" stroke="#cfd8e6"/><text class="st" x="770" y="203" text-anchor="middle">metric_history (+1 / run)</text>
+      <rect x="660" y="236" width="220" height="40" rx="9" fill="#f6f8fb" stroke="#cfd8e6"/><text class="st" x="770" y="261" text-anchor="middle">runs (audit)</text>
+      <g stroke="#5b6675" stroke-width="1.3" fill="none" marker-end="url(#a3)"><path d="M610,200 L658,150"/><path d="M610,210 L658,198"/><path d="M610,220 L658,250"/></g>
+    </svg>
+    <div class="cap"><b>Fig 5.</b> <code>run_pipeline()</code> — five plane-crossing stages feed an idempotent materialize step. The blue stages are deterministic, green is the model layer, purple is interpretation/LLM.</div>
+  </div>
+
+  <!-- ============================================================ 06 -->
+  <h2 id="sequence"><span class="eyebrow" style="display:block;color:var(--blue);margin-bottom:6px">06</span>Sequence: onboard → feed → drill-down</h2>
+  <div class="fig">
+    <svg viewBox="0 0 920 470" xmlns="http://www.w3.org/2000/svg" font-family="Inter,system-ui,sans-serif">
+      <defs><marker id="a4" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2E75B6"/></marker>
+            <marker id="a4r" markerWidth="9" markerHeight="9" refX="1" refY="3" orient="auto"><path d="M7,0 L0,3 L7,6 Z" fill="#9aa6b6"/></marker></defs>
+      <style>.act{font:600 12px Inter,sans-serif; fill:#1F3864} .ll{stroke:#dbe2ec; stroke-dasharray:3 4} .msg{font:11px Inter,sans-serif; fill:#33405a} .ret{font:11px Inter,sans-serif; fill:#8a95a6}</style>
+      <!-- actors -->
+      <g class="act" text-anchor="middle">
+        <text x="70" y="22">Seller</text><text x="250" y="22">run.py API</text><text x="430" y="22">scheduler</text><text x="620" y="22">pipeline</text><text x="820" y="22">SQLite</text>
+      </g>
+      <g class="ll" stroke-width="1.2">
+        <line x1="70" y1="30" x2="70" y2="450"/><line x1="250" y1="30" x2="250" y2="450"/><line x1="430" y1="30" x2="430" y2="450"/><line x1="620" y1="30" x2="620" y2="450"/><line x1="820" y1="30" x2="820" y2="450"/>
+      </g>
+      <!-- messages -->
+      <g stroke="#2E75B6" stroke-width="1.4" marker-end="url(#a4)" fill="none">
+        <line x1="70" y1="52" x2="248" y2="52"/>
+        <line x1="250" y1="84" x2="428" y2="84"/>
+        <line x1="430" y1="138" x2="818" y2="138"/>
+        <line x1="430" y1="186" x2="618" y2="186"/>
+        <line x1="620" y1="214" x2="818" y2="214"/>
+        <line x1="70" y1="300" x2="248" y2="300"/>
+        <line x1="250" y1="330" x2="818" y2="330"/>
+        <line x1="70" y1="392" x2="248" y2="392"/>
+        <line x1="250" y1="420" x2="818" y2="420"/>
+      </g>
+      <g stroke="#9aa6b6" stroke-width="1.2" marker-end="url(#a4r)" fill="none" stroke-dasharray="4 3">
+        <line x1="430" y1="104" x2="252" y2="104"/>
+        <line x1="818" y1="248" x2="252" y2="248"/>
+        <line x1="818" y1="352" x2="72" y2="352"/>
+        <line x1="818" y1="440" x2="72" y2="440"/>
+      </g>
+      <g class="msg">
+        <text x="78" y="48">POST /api/onboard {source, country}</text>
+        <text x="258" y="80">start provision (background job)</text>
+        <text x="438" y="134">own-data: seed/upload · channel build · backfill history</text>
+        <text x="438" y="182">run_pipeline()</text>
+        <text x="628" y="210">detect→collapse→interpret→models→generate→materialize</text>
+        <text x="78" y="296">poll /api/onboard/status → done</text>
+        <text x="258" y="326">GET /api/feed → ranked cards</text>
+        <text x="78" y="388">open card → GET /api/card/:id/research</text>
+        <text x="258" y="416">GET /api/card/:id/explain → L1 · Model · L2 trace</text>
+      </g>
+      <g class="ret">
+        <text x="258" y="100">job id</text>
+        <text x="500" y="244">writes cards, history, runs</text>
+        <text x="430" y="348">cards JSON</text>
+        <text x="360" y="436">provenance trace</text>
+      </g>
+      <!-- background note -->
+      <rect x="438" y="262" width="368" height="26" rx="6" fill="#fbf7ee" stroke="#d8c79a"/>
+      <text x="452" y="279" font-size="11" fill="#9a6a00">async: enrich_market() pulls Keepa/Tier-C → re-runs pipeline; UI never blocks</text>
+    </svg>
+    <div class="cap"><b>Fig 6.</b> Onboarding kicks off a fast own-data provision; the workspace opens as soon as <code>status=done</code>, while market enrichment continues in the background. Drill-down lazily invokes the L2 narrative and the full provenance trace on demand.</div>
+  </div>
+
+  <!-- ============================================================ 07 -->
+  <h2 id="models"><span class="eyebrow" style="display:block;color:var(--blue);margin-bottom:6px">07</span>Models &amp; model architecture</h2>
+  <p>
+    The model layer sits <em>between</em> L1 and L2. It is contract-first and confidence-gated. Today's two models
+    are <b>fit-at-inference</b>: on each run, per SKU, they read that tenant's <code>metric_history</code>, fit a small
+    linear trend in pure Python, and discard it. There is no stored weight, no training job, and no cross-tenant
+    learning yet — by design (see §12).
+  </p>
+  <h4>The contract</h4>
+  <p><code>predict(con, tenant_id, asin, detector) → { value, confidence: low|medium|high, top_features, label, unit }</code></p>
+  <table>
+    <tr><th>Model</th><th>Covers (detectors)</th><th>Output</th><th>Inputs / features</th></tr>
+    <tr><td class="mono">stockout-<br>forecaster</td><td>days-of-cover, seasonal-cover, stock-level</td><td>days-to-stockout</td><td>velocity history (linear fit + recent-bias blend), current stock</td></tr>
+    <tr><td class="mono">metric-trend-<br>forecaster</td><td>margin-vs-floor, tacos, returns-rate, velocity, buy-box-ownership, revenue-share</td><td>projected metric at +14d</td><td>metric history (linear fit), recent avg, slope, R²</td></tr>
+  </table>
+  <div class="fig">
+    <svg viewBox="0 0 920 300" xmlns="http://www.w3.org/2000/svg" font-family="Inter,system-ui,sans-serif">
+      <defs><marker id="a5" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0F6E4F"/></marker></defs>
+      <style>.mb{fill:#eef7f2; stroke:#0F6E4F} .mt{font:600 12px Inter,sans-serif; fill:#0F6E4F} .md{font:11px Inter,sans-serif; fill:#3c5a4c}</style>
+      <rect x="30" y="40" width="150" height="60" rx="9" fill="#fff" stroke="#cfd8e6"/>
+      <text x="105" y="64" text-anchor="middle" font-weight="700" fill="#1F3864" font-size="12">metric_history</text>
+      <text x="105" y="82" text-anchor="middle" fill="#5b6675" font-size="10.5">per tenant · asin · metric</text>
+      <text x="105" y="95" text-anchor="middle" fill="#5b6675" font-size="10.5">· captured_at</text>
+
+      <rect class="mb" x="220" y="36" width="160" height="68" rx="9"/>
+      <text class="mt" x="300" y="58" text-anchor="middle">feature extraction</text>
+      <text class="md" x="300" y="76" text-anchor="middle">series → xs, ys</text>
+      <text class="md" x="300" y="90" text-anchor="middle">recent avg · window</text>
+
+      <rect class="mb" x="420" y="36" width="160" height="68" rx="9"/>
+      <text class="mt" x="500" y="58" text-anchor="middle">linear fit</text>
+      <text class="md" x="500" y="76" text-anchor="middle">slope · intercept · R²</text>
+      <text class="md" x="500" y="90" text-anchor="middle">project / blend</text>
+
+      <rect class="mb" x="620" y="28" width="170" height="84" rx="9"/>
+      <text class="mt" x="705" y="50" text-anchor="middle">contract output</text>
+      <text class="md" x="705" y="68" text-anchor="middle">value</text>
+      <text class="md" x="705" y="82" text-anchor="middle">confidence (gate)</text>
+      <text class="md" x="705" y="96" text-anchor="middle">top_features</text>
+
+      <g stroke="#0F6E4F" stroke-width="1.4" fill="none" marker-end="url(#a5)">
+        <path d="M180,70 L218,70"/><path d="M380,70 L418,70"/><path d="M580,70 L618,70"/>
+      </g>
+      <!-- gate branch -->
+      <rect x="620" y="150" width="270" height="44" rx="9" fill="#f0f6fc" stroke="#2E75B6"/>
+      <text x="755" y="170" text-anchor="middle" font-size="12" font-weight="700" fill="#2E75B6">confidence = low → contribute nothing</text>
+      <text x="755" y="186" text-anchor="middle" font-size="11" fill="#5b6675">deterministic detector stays authoritative</text>
+      <rect x="300" y="150" width="290" height="44" rx="9" fill="#eef7f2" stroke="#0F6E4F"/>
+      <text x="445" y="170" text-anchor="middle" font-size="12" font-weight="700" fill="#0F6E4F">medium/high → inform card</text>
+      <text x="445" y="186" text-anchor="middle" font-size="11" fill="#3c5a4c">forecast mini · explain trace · rank urgency</text>
+      <path d="M705,112 L705,148" stroke="#0F6E4F" stroke-width="1.4" fill="none" marker-end="url(#a5)"/>
+      <path d="M650,134 C560,134 500,140 470,148" stroke="#9aa6b6" stroke-width="1.2" fill="none" marker-end="url(#a5)"/>
+      <text x="715" y="132" font-size="10.5" fill="#8a95a6">gate</text>
+
+      <rect x="30" y="150" width="250" height="100" rx="9" fill="#fbfdff" stroke="#e6ecf4"/>
+      <text x="44" y="170" font-size="11.5" font-weight="700" fill="#1F3864">Properties</text>
+      <text x="44" y="190" font-size="11" fill="#3c5a4c">• per-tenant · fit-at-inference</text>
+      <text x="44" y="207" font-size="11" fill="#3c5a4c">• pure Python · no deps · no network</text>
+      <text x="44" y="224" font-size="11" fill="#3c5a4c">• informs only — never changes L1</text>
+      <text x="44" y="241" font-size="11" fill="#3c5a4c">• enable/disable per tenant</text>
+    </svg>
+    <div class="cap"><b>Fig 7.</b> Model architecture. The confidence gate is the safety mechanism: an immature model that can't fit its history simply abstains, leaving the deterministic result untouched.</div>
+  </div>
+  <div class="callout green"><b>Why this shape.</b> The serving interface is identical whether the prediction comes from today's 5-point local fit or a future cohort model retrained nightly. Maturing the models is a swap <em>behind</em> the contract, not a rewrite — see the lifecycle in §12.</div>
+
+  <!-- ============================================================ 08 -->
+  <h2 id="explain"><span class="eyebrow" style="display:block;color:var(--blue);margin-bottom:6px">08</span>Explainability — L1 · Model · L2</h2>
+  <p><code>explain_card()</code> assembles a three-layer provenance trace, surfaced verbatim in Explanation Mode. It is the auditable expression of the three-plane thesis.</p>
+  <div class="grid3">
+    <div class="card l1"><span class="tag l1">L1</span><h4>Deterministic</h4><p style="font-size:13px;margin-bottom:0">Inputs grouped by source (own / Keepa / news), the rule + formula, the anomaly (<code>field op threshold</code>), the calculation (minis) and the output finding.</p></div>
+    <div class="card mdl"><span class="tag mdl">Model</span><h4>Forecast</h4><p style="font-size:13px;margin-bottom:0">If a model covers the detector: the features it read, the prediction + confidence, and the explicit note that it <em>informs only</em>. Otherwise: "fully deterministic (L1)".</p></div>
+    <div class="card l2"><span class="tag l2">L2</span><h4>Language</h4><p style="font-size:13px;margin-bottom:0">The exact prompt sent to the LLM and the response returned — or a note that L2 was not invoked and deterministic copy was used.</p></div>
+  </div>
+
+  <!-- ============================================================ 09 -->
+  <h2 id="ingest"><span class="eyebrow" style="display:block;color:var(--blue);margin-bottom:6px">09</span>Ingestion &amp; multi-channel</h2>
+  <p>All origins converge on the same canonical tables; detection neither knows nor cares where data came from.</p>
+  <table>
+    <tr><th>Source</th><th>Adapter</th><th>Mode</th><th>Lands in</th></tr>
+    <tr><td>Demo catalog (Autofy, IN)</td><td class="mono">ingest/synthetic · seed</td><td>synthetic</td><td>seller_skus, seller_orders (+ synth_conditions injects signals)</td></tr>
+    <tr><td>Seller store exports</td><td class="mono">ingest/upload_parse</td><td>upload</td><td>seller_skus (tolerant CSV/XLSX, fuzzy column map, COGS optional)</td></tr>
+    <tr><td>Per-channel seller reports</td><td class="mono">ingest/report_ingest → report_writer</td><td>upload</td><td>report-aware engine (recognize → reconcile → persist): seller_skus + ad_performance + sku_revenue_period, with per-field sku_field_provenance and channel interpretation (account_interpretation / pending_confirmations). Seller-owned fields (cogs, margin_floor, lifecycle_flag, title_override) are sticky against re-upload.</td></tr>
+    <tr><td>Market (price, BSR, offers)</td><td class="mono">collectors/keepa</td><td>fixture · live</td><td>keepa_snapshots, competitor_offers</td></tr>
+    <tr><td>Recalls · news · trends · social</td><td class="mono">collectors/tierc</td><td>fixture · live</td><td>tierc_signals</td></tr>
+  </table>
+  <p>The <b>multi-channel build</b> (<code>channels.py</code> + <code>multichannel.py</code>) fans a product across channels into <code>products</code>, <code>channel_listings</code> and <code>channel_economics</code>, with per-channel fee/fulfilment/currency, enabling cross-channel detectors and the Cross-Channel grid.</p>
+
+  <!-- ============================================================ 10 -->
+  <h2 id="schema"><span class="eyebrow" style="display:block;color:var(--blue);margin-bottom:6px">10</span>Database schema</h2>
+  <p>38 tables at migration head <code>0007</code> — SQLite locally and in tests, PostgreSQL in production (same schema, one engine seam) — all tenant-scoped. Two join keys dominate: <code>tenant_id</code> (universal) and the entity keys <code>asin</code> (Amazon/own + market + cards + history) and <code>internal_sku</code> (the cross-channel product spine). The report-aware ingestion path adds five tables beyond the groups drawn below: <code>ad_performance</code> and <code>sku_revenue_period</code> (per-SKU per-period ad spend/sales and settled revenue — the ACoS/TACoS inputs), <code>sku_field_provenance</code> (per-field basis/source), and <code>account_interpretation</code> + <code>pending_confirmations</code> (channel treatment + held-for-confirmation).</p>
+  <div class="fig">
+    <svg viewBox="0 0 920 470" xmlns="http://www.w3.org/2000/svg" font-family="Inter,system-ui,sans-serif">
+      <style>
+        .grp{fill:#f6f8fb; stroke:#e1e8f1} .gt{font:600 10.5px "SF Mono",monospace; letter-spacing:.1em; text-transform:uppercase; fill:#8a95a6}
+        .tb{fill:#fff; stroke:#cfd8e6} .tn{font:600 11.5px "SF Mono",monospace; fill:#1F3864} .tk{font:10px Inter,sans-serif; fill:#5b6675}
+      </style>
+      <!-- identity -->
+      <rect class="grp" x="10" y="14" width="180" height="120" rx="8"/><text class="gt" x="22" y="32">Identity</text>
+      <rect class="tb" x="22" y="42" width="156" height="36" rx="6"/><text class="tn" x="30" y="58">tenants</text><text class="tk" x="30" y="72">id · data_mode · provisioned</text>
+      <rect class="tb" x="22" y="86" width="156" height="40" rx="6"/><text class="tn" x="30" y="102">users</text><text class="tk" x="30" y="116">tenant_id · email · role</text>
+
+      <!-- own data -->
+      <rect class="grp" x="206" y="14" width="290" height="180" rx="8"/><text class="gt" x="218" y="32">Own data</text>
+      <rect class="tb" x="218" y="42" width="266" height="52" rx="6"/><text class="tn" x="226" y="58">seller_skus</text><text class="tk" x="226" y="72">tenant_id · asin · price · cogs · net_margin_pct</text><text class="tk" x="226" y="86">buybox · tacos · lifecycle_flag · margin_floor · title_override …</text>
+      <rect class="tb" x="218" y="102" width="266" height="38" rx="6"/><text class="tn" x="226" y="118">seller_orders</text><text class="tk" x="226" y="132">asin · units · gross · deposits · status</text>
+      <rect class="tb" x="218" y="148" width="266" height="38" rx="6"/><text class="tn" x="226" y="164">metric_history</text><text class="tk" x="226" y="178">asin · metric · value · captured_at  (model substrate)</text>
+
+      <!-- market -->
+      <rect class="grp" x="512" y="14" width="180" height="180" rx="8"/><text class="gt" x="524" y="32">Market (Tier-A/C)</text>
+      <rect class="tb" x="524" y="42" width="156" height="36" rx="6"/><text class="tn" x="532" y="58">keepa_snapshots</text><text class="tk" x="532" y="72">asin · price · bsr · offers</text>
+      <rect class="tb" x="524" y="86" width="156" height="36" rx="6"/><text class="tn" x="532" y="102">competitor_offers</text><text class="tk" x="532" y="116">asin · seller · price · bb</text>
+      <rect class="tb" x="524" y="130" width="156" height="36" rx="6"/><text class="tn" x="532" y="146">tierc_signals</text><text class="tk" x="532" y="160">recall · news · trend · social</text>
+
+      <!-- multichannel -->
+      <rect class="grp" x="708" y="14" width="200" height="232" rx="8"/><text class="gt" x="720" y="32">Cross-channel spine</text>
+      <rect class="tb" x="720" y="42" width="176" height="34" rx="6"/><text class="tn" x="728" y="62">products</text>
+      <rect class="tb" x="720" y="84" width="176" height="34" rx="6"/><text class="tn" x="728" y="104">channel_listings</text>
+      <rect class="tb" x="720" y="126" width="176" height="34" rx="6"/><text class="tn" x="728" y="146">channel_economics</text>
+      <rect class="tb" x="720" y="168" width="176" height="34" rx="6"/><text class="tn" x="728" y="188">traffic · settlements</text>
+      <rect class="tb" x="720" y="210" width="176" height="30" rx="6"/><text class="tn" x="728" y="230">inventory · returns · storage_fees · channels</text>
+
+      <!-- rules/config -->
+      <rect class="grp" x="10" y="150" width="180" height="120" rx="8"/><text class="gt" x="22" y="168">Rules &amp; config</text>
+      <rect class="tb" x="22" y="178" width="156" height="34" rx="6"/><text class="tn" x="30" y="198">rules</text><text class="tk" x="30" y="210" font-size="9">catalog (params, bounds)</text>
+      <rect class="tb" x="22" y="220" width="156" height="20" rx="6"/><text class="tn" x="30" y="234" font-size="10">tenant_rule_settings</text>
+      <rect class="tb" x="22" y="244" width="156" height="20" rx="6"/><text class="tn" x="30" y="258" font-size="10">tenant_settings (incl. models)</text>
+
+      <!-- intelligence outputs -->
+      <rect class="grp" x="206" y="210" width="490" height="120" rx="8"/><text class="gt" x="218" y="228">Intelligence outputs</text>
+      <rect class="tb" x="218" y="238" width="220" height="50" rx="6"/><text class="tn" x="226" y="256">cards</text><text class="tk" x="226" y="270">dedup_key · type_name · finding · why · severity</text><text class="tk" x="226" y="282">confidence · minis · rank_score · status · is_new</text>
+      <rect class="tb" x="448" y="238" width="110" height="50" rx="6"/><text class="tn" x="456" y="256">card_research</text><text class="tk" x="456" y="272">L2 payload</text>
+      <rect class="tb" x="568" y="238" width="118" height="50" rx="6"/><text class="tn" x="576" y="256">runs · pull_log</text><text class="tk" x="576" y="272">audit / freshness</text>
+      <rect class="tb" x="218" y="296" width="468" height="26" rx="6"/><text class="tk" x="226" y="313">actions_log · watchlist · sourcing_list · saved_briefs · category_products · card_why</text>
+
+      <!-- key legend -->
+      <rect x="10" y="286" width="180" height="56" rx="8" fill="#fbfdff" stroke="#e6ecf4"/>
+      <text x="22" y="304" font-size="10.5" font-weight="700" fill="#1F3864">Join keys</text>
+      <text x="22" y="320" font-size="10.5" fill="#3c5a4c"><tspan font-family="SF Mono,monospace">tenant_id</tspan> — every table</text>
+      <text x="22" y="334" font-size="10.5" fill="#3c5a4c"><tspan font-family="SF Mono,monospace">asin</tspan> own·market·cards·history</text>
+
+      <text x="10" y="365" font-size="11" fill="#5b6675"><tspan font-family="SF Mono,monospace" fill="#1F3864">internal_sku</tspan> threads products → channel_listings → channel_economics → traffic / settlements / inventory / returns (the cross-channel product identity).</text>
+      <text x="10" y="388" font-size="11" fill="#5b6675">Cards reference their originating <tspan font-family="SF Mono,monospace">rule_id</tspan> via <tspan font-family="SF Mono,monospace">card_type</tspan>; the detector id is derived at read time (no denormalized column).</text>
+    </svg>
+    <div class="cap"><b>Fig 10.</b> Logical schema grouped by domain. <code>metric_history</code> is the newest table and the substrate for the model layer; <code>cards</code> is the materialized output every surface reads from.</div>
+  </div>
+
+  <!-- ============================================================ 11 -->
+  <h2 id="tenancy"><span class="eyebrow" style="display:block;color:var(--blue);margin-bottom:6px">11</span>Tenancy, security &amp; compliance</h2>
+  <ul>
+    <li><b>Isolation model.</b> One tenant per deployment today; multi-tenant-ready via universal <code>tenant_id</code> scoping. <code>require_tenant()</code> gates every endpoint; there is no query path that crosses tenants.</li>
+    <li><b>Secrets.</b> Keys (Anthropic, Keepa, news) load from a project-root <code>.env</code> via <code>config.py</code>; shell exports override. Nothing secret ships in the package (the repo carries only <code>.env.example</code> with blank values).</li>
+    <li><b>Confidential IP.</b> Interpretation gates, priorities and phrasing pools live only in server code; the customer API emits booleans/counts, never the logic. Interpretation edits are admin-gated (<code>REALIFY_ADMIN_KEY</code>).</li>
+    <li><b>Compliance.</b> No Amazon scraping under any path; market signal is Keepa + official APIs + public feeds (CPSC/BIS, news, trends). The collectors are the only egress and are fixture-mode by default.</li>
+    <li><b>Failure posture.</b> Live pulls run with fail-fast timeouts + a circuit breaker; a dead source degrades to "waiting", never a hung UI. The LLM and models are independently optional.</li>
+  </ul>
+
+  <!-- ============================================================ 12 -->
+  <h2 id="roadmap"><span class="eyebrow" style="display:block;color:var(--blue);margin-bottom:6px">12</span>Constraints &amp; the model lifecycle</h2>
+  <div class="callout warn"><b>Prototype honesty.</b> Data is synthetic or uploaded; the deployment is single-machine SQLite + uvicorn; market/LLM calls aren't reachable from the build sandbox (verified only on the host). Models are <em>fit-at-inference per tenant</em> — there is no training job and no cross-tenant learning yet. None of this is hidden behind the demo.</div>
+  <p>The path from here to the compounding-intelligence moat is additive — the model contract does not change:</p>
+  <table>
+    <tr><th style="width:90px">Phase</th><th>What it adds</th><th>New requirement</th></tr>
+    <tr><td><b>A — now</b></td><td>History accrues every run (<code>snapshot_metrics</code>); fit-at-inference forecasts; trends.</td><td>none — already shipping</td></tr>
+    <tr><td><b>B</b></td><td>Persisted <em>per-tenant</em> models (scheduled fit, stored state, served from cache).</td><td>a job runner; model-state storage</td></tr>
+    <tr><td><b>C</b></td><td><b>Cohort / pooled</b> models across similar sellers — new sellers benefit on day one (the real network effect).</td><td>strict tenant data isolation in training; consent/governance</td></tr>
+    <tr><td><b>D</b></td><td>Continuous retraining on a rolling window with drift detection, holdout eval, rollback.</td><td>monitoring; feature store; build-vs-buy decision</td></tr>
+  </table>
+  <p>Each phase plugs in behind the existing <code>predict()</code> contract and the confidence gate, so serving, explainability and ranking are untouched as the intelligence matures.</p>
+
+  <div class="foot">
+    Realify — Multi-Channel Commerce Intelligence · As-built reference architecture · Prepared for the CTO.
+    Three-plane principle: <span style="color:var(--l1)">L1 decides</span> · <span style="color:var(--mdl)">models inform</span> · <span style="color:var(--l2)">L2 phrases</span>. Confidential.
+  </div>
+
+</div>
+<section style="max-width:980px;margin:40px auto;padding:0 24px;font-family:'Inter',system-ui,sans-serif;color:#1F3864">
+  <h2 style="font-family:'Space Grotesk',sans-serif;border-top:2px solid #1F3864;padding-top:18px">Addendum — Tenancy, Accounts &amp; Operations (updated 2026-07-07)</h2>
+  <p style="font-size:14px;line-height:1.6;color:#33415c">This addendum records architectural changes since the original document. It is updated as part of any build that changes architecture (standing rule).</p>
+
+  <h3 style="font-family:'Space Grotesk'">Account types (tester vs customer)</h3>
+  <p style="font-size:14px;line-height:1.6;color:#33415c"><code>tenants.account_type</code> ∈ {tester, customer, NULL}. Chosen at a post-signup gate, <b>changeable until the tenant is provisioned, then locked</b> (the lock is tied to <code>tenants.provisioned</code>, not to first-set). <b>Tester</b> = demo/ASIN + full synthesis. <b>Customer</b> = no synthesis: real reports only, with margin <i>derived</i> from price − COGS − referral. The deterministic L1 comparison (<code>_cmp</code>) returns False on NULL, so unprovided fields produce no card — graceful degradation is the mechanism that makes the no-synthesis path safe.</p>
+
+  <h3 style="font-family:'Space Grotesk'">Customer ingestion &amp; COGS</h3>
+  <p style="font-size:14px;line-height:1.6;color:#33415c">Customer onboarding establishes a SKU spine from a catalog/listings export (<code>catalog_only_seed</code>, all behavioural metrics NULL), validates a COGS template (reject rules: blank SKU, non-numeric/≤0, duplicate, SKU-not-in-catalog) with partial provisioning and rejects logged to <code>pull_log</code>, then layers other reports by kind. Floor = catalog + ≥1 valid COGS. Wipe/resynthesize are disabled for customers (server-enforced); re-upload of reports/COGS persists incrementally.</p>
+
+  <h3 style="font-family:'Space Grotesk'">Organizations &amp; invites</h3>
+  <p style="font-size:14px;line-height:1.6;color:#33415c">A tenant <i>is</i> an organization. Signup = create-org (first member, role owner). The <code>invites</code> table (tenant_id, email, role, hashed single-use token, status, expiry) backs a no-email invite flow: the owner generates a copy-ready body with a <code>/join?token=…</code> link. Tokens are stored as SHA-256 hashes; the raw token lives only in the link. <code>users.email</code> is globally unique → one person = one org (current limitation). Access is identical for all members for now (role recorded for a future read-only tier).</p>
+
+  <h3 style="font-family:'Space Grotesk'">Self-service deletion</h3>
+  <p style="font-size:14px;line-height:1.6;color:#33415c">Role-aware, password-reauthenticated: single-member org or owner of a multi-member org → full <code>delete_tenant</code> (all tenant-scoped tables + invites + usage_events + users + the tenant row; frees the email); non-owner of a multi-member org → <code>delete_user</code> (leave org, org survives). Full deletes require type-to-confirm.</p>
+
+  <h3 style="font-family:'Space Grotesk'">Operator console (/ops)</h3>
+  <p style="font-size:14px;line-height:1.6;color:#33415c">Key-only admin gate (<code>x-realify-admin</code> == <code>REALIFY_ADMIN_KEY</code>, no session). Fixed path <code>/ops</code>, excluded via <code>robots.txt</code> + <code>X-Robots-Tag: noindex</code> (obscurity, not a security control — the key is the control). Surfaces: system health (counts, DB size, MODE, key presence, per-source pull status), usage statistics, the tenants/orgs table, and key-gated links to this architecture doc and the engineering logbook.</p>
+
+  <h3 style="font-family:'Space Grotesk'">API layer — routers, versioning &amp; the identity seam (updated 2026-06-29)</h3>
+  <p style="font-size:14px;line-height:1.6;color:#33415c">The former monolithic <code>run.py</code> (~1050 lines, ~80 route closures inside <code>make_app</code>) is split into thin FastAPI routers under <code>realify/routers/</code> (pages, auth, onboarding, insights, cards, settings, admin), grouped by concern, with no SQL in handlers — they call the <code>realify.api</code> service layer and the repositories. Two shared seams: <code>routers/deps.py</code> holds <code>current()</code> / <code>require_tenant()</code> / <code>require_admin()</code> — <code>current()</code> is the <b>single identity-resolution point</b> (session today; the Kratos + Google OIDC cutover swaps only this body, and it is transport-agnostic so a future WebSocket handshake reuses it); <code>routers/helpers.py</code> holds the page loader, tracking, and import logging. The partner-facing read + action surface (the insights + cards routers) is <b>dual-mounted at both <code>/api</code> (existing UI, unchanged) and <code>/api/v1</code></b> — a frozen contract for partner teams, guarded by a card-JSON contract test. A 400-line file cap (test-enforced) keeps any module from drifting back toward a monolith. Behaviour-preserving: every existing <code>/api</code> path is byte-identical, and <code>tenant_id</code> is still resolved server-side, never from the client.</p>
+  <h3 style="font-family:'Space Grotesk'">Execution &amp; serving seams — typed config, TaskRunner, ChannelConnector, model boundary (1e, 2026-06-29)</h3>
+  <p style="font-size:14px;line-height:1.6;color:#33415c">Workstream 1e formalizes the seams several partner teams depend on, all behaviour-preserving. <b>Typed config:</b> the scattered <code>os.environ</code> reads are wrapped in a frozen <code>Settings</code> dataclass (<code>config.settings</code>), with every legacy module-level name re-exported so existing call sites are untouched. <b>TaskRunner</b> (<code>realify/runner.py</code>): a small work-execution seam — <code>submit(kind, fn, tenant_id) → job_id</code> / <code>get(job_id)</code> — backed by a new tenant-scoped <code>jobs</code> table. An <code>InlineTaskRunner</code> (synchronous) and a <code>ThreadTaskRunner</code> (daemon thread) ship today; <code>run_pipeline_async()</code> is the real entry point real-time inbound events (§3H) and agent trigger-and-await (§3K) build on. The heavy implementation (external queue + workers) drops in behind this seam without touching callers. <b>ChannelConnector</b> (<code>collectors/base.py</code>): the collector contract gains a typed <code>ConnectorConfig</code> (mode, timeout, circuit-breaker, interval) and a reserved, unregistered <code>AdvertisedProductCollector</code> slot for the period-aware ads ingestion of #004 (certain-vs-estimated dollars kept separate at persistence). <b>Model-serving boundary</b> (<code>models.py</code>): every prediction is crash-isolated and stamped with a model <code>version</code> that flows into card provenance; a slow or failed model degrades to <code>low</code> confidence (silent, never wrong), so the deterministic L1 number always stands. In-process pure-Python models run in-thread; the <code>timeout</code> is the contract that activates when a model is served out-of-process (Team 4's build-and-deploy path). New table: <code>jobs(id, tenant_id, kind, state, result, error, created_at, updated_at)</code> — applied additively by <code>run.py init</code>.</p>
+
+  <h3 style="font-family:'Space Grotesk'">Data layer — engine seam, Postgres, migrations &amp; operational hardening (1c/1g, 2026-06-30)</h3>
+  <p style="font-size:14px;line-height:1.6;color:#33415c">The persistence engine moved from a single SQLite file to <b>PostgreSQL on AWS RDS</b> for production, behind one change-point so the application code is dialect-agnostic. <b>Engine seam</b> (<code>realify/dbengine.py</code>): <code>url()</code> returns the <code>DATABASE_URL</code> when it names a Postgres database, otherwise a <code>sqlite:///</code> URL derived live from <code>config.DB_PATH</code> (so a test's monkeypatch is honoured); SQLAlchemy engines are cached per-URL, and SQLAlchemy/psycopg are imported lazily so a SQLite boot never loads them. <b>Connection wrapper:</b> a thin shim gives a psycopg connection the exact <code>sqlite3</code>-style API the repositories already use — <code>?</code>→<code>%s</code> placeholder translation, and rows that support <code>row["col"]</code>, <code>row[0]</code>, and <code>dict(row)</code> — so the ~500 placeholders across 18 repositories are <b>untouched</b>; <code>db.connect()</code> branches on dialect with the SQLite path byte-identical. <b>Upserts:</b> the 13 <code>INSERT OR REPLACE/IGNORE</code> sites are rewritten to Postgres <code>ON CONFLICT</code> centrally in the wrapper via a <code>_CONFLICT_KEYS</code> map (one entry per table's real unique key; a guard test fails if a new upsert table is unmapped) — repositories are not edited. <b>Schema:</b> <code>schema_to_postgres()</code> translates the single SQLite-ism, <code>INTEGER PRIMARY KEY AUTOINCREMENT</code> → <code>BIGSERIAL</code>; everything else in the schema is already valid Postgres. <b>Migrations:</b> <code>db.init_db()</code> runs <code>alembic upgrade head</code>; the baseline migration is idempotent and adopts an existing SQLite database cleanly, and the two former ad-hoc PRAGMA <code>ALTER</code>s are now a dialect-agnostic inspector migration. <b>Data migration (1g):</b> <code>realify/migrate_sqlite_to_pg.py</code> (<code>run.py migrate-pg [--dry-run]</code>) copies all 33 tables by truncate-then-copy (idempotent regardless of constraints), resets serial sequences from the catalog (not a hardcoded <code>id</code>), and verifies row counts; it never writes to SQLite.</p>
+  <p style="font-size:14px;line-height:1.6;color:#33415c"><b>Production engine vs. local/test engine.</b> SQLite is retained deliberately as the <b>local and test engine</b> — fast, hermetic, no network or credentials — and Postgres is production, selected purely by the presence of <code>DATABASE_URL</code> in the environment. The same container image runs both; the engine seam decides. RDS is a private PostgreSQL 18 instance (security group admits 5432 only from the application's security group, encrypted at rest, 7-day automated backups); the initial cutover migrated ~320k rows with every table verified <code>source == destination</code>. The one place dialects can still diverge (upserts, sequences, type quirks) is covered by running a throwaway local Postgres for a pre-deploy smoke when database code changes.</p>
+  <p style="font-size:14px;line-height:1.6;color:#33415c"><b>Operational hardening.</b> The cutover surfaced sharp edges that are now closed: (1) <code>dbengine.validate_url()</code>, called by <code>init_db()</code>, fails with one clear line when a Postgres <code>DATABASE_URL</code> is malformed or has an empty password — instead of a deep driver traceback at first connect; (2) <code>run.py doctor</code> is a preflight that reports the dialect, validates the URL shape, opens a live connection (<code>SELECT 1</code>), and reports admin-key status with an exit code — the intended gate to run <i>before</i> a deploy and via <code>docker exec</code> after one; (3) the admin gate fails closed — <code>deps.effective_admin_key()</code> treats both an unset key and any known-weak/exposed value as unconfigured, so admin endpoints are denied until a fresh strong <code>REALIFY_ADMIN_KEY</code> is set, with a loud boot warning. <b>Open items:</b> the RDS master password is currently self-managed (folding it into Secrets Manager with boot-time injection is the remaining Phase-0 secrets task), and <b>1d — Postgres row-level security</b> (DB-enforced tenant isolation, complementing the server-side <code>tenant_id</code> resolution) is the next data-layer feature, now unlocked by being on Postgres.</p>
+
+  <h3 style="font-family:'Space Grotesk'">Monetization — per-seat plans, quotas &amp; billing data model (#006, design locked)</h3>
+  <p style="font-size:14px;line-height:1.6;color:#33415c">The pricing model is <b>per-seat</b>: a 30-day Free trial (single user, low daily limits, hard SKU cap) → <b>Starter</b> at $50/seat → <b>Growth</b> at $199 for three users; with per-day rate limits and hard seat and SKU caps as the enforcement levers. The data model is four tables — <code>plans</code>, <code>subscriptions</code>, <code>usage_counters</code>, <code>billing_events</code> — with Stripe mirrored into <code>billing_events</code>. The enforcement seam, <code>require_quota</code>, is documented to sit beside <code>require_tenant()</code> in <code>routers/deps.py</code>, so quota checks attach at the same point identity is resolved. <b>Status (honest):</b> the model and the §3J partner-guide contract are <i>locked</i>, but the four tables and the <code>require_quota</code> seam are <b>not yet built</b> — payments is its own workstream (Team 8), and converges with the sub-second rate-limiting backplane (Redis) flagged for real-time.</p>
+
+  <h3 style="font-family:'Space Grotesk'">Report-aware ingestion, CMAA &amp; explainable recommendations (updated 2026-07-01)</h3>
+  <p>Customer own-data is now built by a <b>report-aware ingestion engine</b> — <code>realify/ingest/report_ingest.py</code> → <code>report_writer.py</code> — that recognizes Amazon report kinds (Monthly Unified Transaction, COGS template, fee-preview, Sponsored Products advertised-product, Business Report, returns/storage), reconciles them (paid-only ASP, actual fees), and persists into <code>seller_skus</code> plus <code>ad_performance</code> (per-SKU per-period spend &amp; attributed sales) and <code>sku_revenue_period</code> (settled revenue — the TACoS denominator), with a per-field <code>sku_field_provenance</code> trail (<code>actual</code>/<code>reported</code>/<code>estimated</code>/<code>seller</code>). Nothing is synthesized for a customer: an absent field stays NULL and the deterministic <code>_cmp</code> yields no card. <b>Seller-owned fields are sticky</b> — <code>cogs</code>, <code>margin_floor</code>, <code>lifecycle_flag</code>, and <code>title_override</code> are edited via <code>POST /api/skus/edit</code> and are not overwritten by a later re-upload (the report value is kept as a provenance alternate); <code>title_override</code> supplies/corrects a title when the report's is missing, resolving as <code>title_override or title</code>. <b>Channel interpretation</b> classifies each marketplace leg; unknown channels become <code>pending_confirmations</code> and their units are held <em>provisional</em> (out of judged numbers) until the seller confirms into <code>account_interpretation</code>. The <b>Intelligence KPI cards</b> re-source from these report tables when present (<code>/api/kpis</code> carries <code>basis=reports</code> for such tenants, <code>orders</code> for the synthetic path).</p>
+  <p>On top of this sits <b>CMAA — Contribution Margin After Ads</b> (<code>realify/domain/cmaa.py</code>, served at <code>GET /api/cmaa</code>): pure deterministic L1 using the locked identity <b>break-even ACoS = gross contribution margin %</b> (#004). Per advertised SKU it computes margin, break-even/actual ACoS, ₹ above break-even (the <em>certain</em> waste), and a quadrant — <code>SCALE</code> / <code>FIX ADS</code> / <code>FIX MARGIN</code> / <code>CUT/DIVEST</code>. On the three problem quadrants each row carries a <code>recommendation</code> object — <code>{headline, steps[], evidence[], recoverable, guarded}</code> — built by <code>cmaa.recommend()</code>: a deterministic, explainable recommended action with <b>no LLM in the loop</b>, where every evidence line traces to a computed figure (e.g. <em>"Actual ACoS = ad spend ÷ ad sales = 31.3%"</em>, <em>"Spend above break-even = spend − (ad sales × margin %) = ₹80,212"</em>). A <b>lifecycle-flagged SKU leads with the guard and is never told to cut</b> — stated seller intent is respected, not overridden. This is the L1-decides / L2-phrases principle made literal: the recommendation is a number-derived artifact of the decision plane, not model output.</p>
+  <p>SQL discipline hardened with the move to Postgres-in-production: repositories must write <b>dialect-portable SQL</b> (no <code>SUM(bool)</code>, no <code>date('now', ?)</code>, no selecting non-grouped columns) since these pass the SQLite suite yet fail on Postgres; the real-Postgres smoke gates any DB-shaped change. Migrations are at head <code>0007</code> (the additive, inspector-guarded <code>title_override</code> column); the SKU table also freezes its header on scroll and constrains the lifecycle picker to valid values (presentation only — the field whitelist and stickiness are server-enforced).</p>
+  <h3 style="font-family:'Space Grotesk'">SIMULATE — deterministic scenario projection (added 2026-07-07)</h3>
+  <p>Every recommendation Realify surfaces can be <b>projected forward</b> — "if you take this action, here is the 30/60/90-day effect on the affected numbers, what could go wrong, and the monitoring plan" — as a deterministic <b>scenario projection, never a prediction</b>, badged <code>L1&nbsp;·&nbsp;projection&nbsp;·&nbsp;directional</code>. The trust rule is absolute: <b>every projected number = a current L1 value × a stated, editable assumption</b>, emitted as a <code>realify.domain.explain</code> part (formula + inputs + the assumption used + result) and rendered by the client <em>verbatim</em> — the client never re-computes a formatted value (the "Fix-1" rule that closed an earlier NaN class, alongside the "[object&nbsp;Object]" render class). Assumptions carry <b>sourced defaults</b>, are user-editable, and re-simulate server-side; a headline confidence <b>band</b> (conservative/expected/optimistic) is re-derived around the current point on every run so <code>expected == the point</code> and the point always lies inside the band. A missing required input degrades to an honest "can't simulate" (no fabricated number); a projection resting on a weak or undefined base is marked <code>sim_quality:"degraded"</code> with an L1-owned reason the modal pins as a caution banner (and dims a null-base headline to "—"). The <b>monitoring plan</b> — 7/15/30/60-day checkpoints, each with an expected value and an explicit tripwire, where every checkpoint's ⓘ result equals the value on screen — is the trust hero.</p>
+  <p>The engine is a small module family under <code>realify/domain/</code>: <code>sim_common.py</code> (the shared spine — formatting, the linear ramp curve, the explain-cell/row builders, assumption validate+clamp, the band contract, the degrade classifier, the final-dict assembler); <code>simulate.py</code> (the Profit&nbsp;&amp;&nbsp;Ads engine — one model per <code>SCALE</code>/<code>FIX ADS</code>/<code>FIX MARGIN</code>/<code>CUT·DIVEST</code> quadrant); and <code>sim_intel.py</code>, which <b>dispatches by canonical detector id</b> (<code>interpret.detector_for</code>) to one own-data intervention model per detector — grouped into <code>sim_inventory.py</code> (REORDER, DEMAND-CAPTURE), <code>sim_flow.py</code> (TACOS-ARREST, RETURNS-REDUCTION, CVR-LIFT, CONCENTRATION stress-test) and <code>sim_market.py</code> (FIX-ECONOMICS, BUY-BOX-REGAIN, PRICE-RESPONSE, REVIEW-RECOVERY, GAP-CAPTURE, plus a disclaimer-only view for a new-entrant signal that has no own-data lever). News/recall/social cards get <b>no Simulate button</b> — a projection there would be fabricated. Wherever a model needs a target it defaults to the <b>tenant's own detector threshold</b> from <code>/api/settings/detectors</code> (their margin floor, TACoS ceiling, days-of-cover line, CVR line, returns ceiling, Buy Box line), labelled "your line" and flagged when customized.</p>
+  <p>One endpoint serves both surfaces: <code>POST /cmaa/simulate</code> (dual-mounted <code>/api</code> + <code>/api/v1</code>, tenant-scoped, fail-closed) takes <code>{sku}</code> (Profit&nbsp;&amp;&nbsp;Ads) or <code>{card_id}</code> (an Intelligence card) plus the edited assumptions, <b>rebuilds the row server-side</b> from L1 tenant data (<code>build_row_card</code> / the card's own-product SKU + latest traffic) — never a client-supplied value — and returns the Simulation. This is also the <b>model-readiness seam</b>: today the band comes from a deterministic formula; the same <code>range</code> + <code>explain.part</code> derivation (a formula string <em>or</em> a model-basis string) is exactly where a model's confidence interval will later populate, with no change to the client or the contract. Each model group is its own file to honour the 400-line-per-module cap.</p>
+  <h3 style="font-family:'Space Grotesk'">Cross-channel onboarding — Shopify + guided wizard (added 2026-07-07)</h3>
+  <p>Sellers can now connect a <b>Shopify</b> store alongside Amazon, unified at the <b>SKU level</b>, via two paths that converge on one pipeline. The <b>raw path</b> (default) is the existing drag-drop controller, extended: a header-fingerprint recognizer classifies each file, and Shopify types are just new rows. The <b>guided wizard</b> (optional) runs a thin interview that emits a personalized file checklist + a persisted topology, then hands back to the same controller. The spine is <b>rules-as-DATA</b>: <code>realify/topology.py</code> holds a <b>source-aware manifest</b> (each row is a data need with <code>csv</code> + <code>inline</code> slots live and an <code>api</code> slot declared-dormant for a future connected-source lane, plus shared <code>natural_keys</code> so a CSV upload and a later API pull idempotently converge); <code>realify/nodegraph.py</code> holds the wizard node graph + the answer→emit map. Adding Walmart/TikTok or an ad partner is new rows, not a new branch.</p>
+  <p>The recognizer was extracted to <code>realify/ingest/recognizer.py</code> (100%-signature substring match, greedy-best, with ANY-OF tokens for cases like Shopify inventory's "Available" OR "On hand"); Shopify fingerprints are sourced from the manifest so recognizer + checklist stay in lockstep. Dedup is <b>record-level</b> (upsert on <code>natural_keys</code> — overlapping re-exports never double-count; file-hash stays advisory). The onboarding data model (<code>realify/topology_model.py</code>) centres on <b>Resolved&lt;T&gt;</b>, the provenance primitive carrying stated/detected/effective — <b>detection wins the number immediately</b> on a conflict, and the user's confirmation only flips provenance STATED→RECONCILED — plus a <b>reliability-flag lifecycle</b> (ARMED→SATISFIED→WAIVED) whose blocks/satisfied-by mapping is data. Persistence (migration <code>0010</code>, additive): <code>tenant_topology</code> (the resolved topology as a JSON blob) + <code>sku_crosswalk</code> ((channel, store_id, external_sku, external_variant_id) → <code>canonical_sku_id</code> = <code>internal_sku</code>), both registered in <code>dbengine._CONFLICT_KEYS</code> + <code>TENANT_DATA_TABLES</code>.</p>
+  <p>SKU identity resolves via <code>ingest/crosswalk.py</code> (auto-map when a Shopify Variant SKU equals an Amazon SKU; blank/bundle SKUs park into an unmapped bucket; a stated-IDENTICAL mismatch arms a reconcile). Financial normalization (<code>ingest/normalize_finance.py</code>) handles the two trust-critical cases: <b>MCF shared inventory</b> — an "Amazon Fulfillment" location in a Shopify inventory export is the one physical FBA pool, so it is NOT summed with Shopify stock (Shopify contributes demand; the MCF fee lives on the Amazon side, so Shopify margin stays <em>partial</em> until <code>AMZ_MCF_FEES</code>) — and <b>booked vs settled</b> (<code>SHOP_ORDERS</code> booked/reported vs <code>SHOP_PAYOUTS</code> settled/actual, coexisting; unmatched orders are <em>not-yet-paid-out</em>, a state not an error). The resolution engine + <code>pipeline/checklist.py</code> derive a goal-ordered checklist; <code>pipeline/reconcile.py</code> surfaces RC-1..RC-8 (stated-vs-detected prompts); <code>pipeline/completeness.py</code> yields per-goal AVAILABLE/PARTIAL/UNAVAILABLE.</p>
+  <p>Wiring: <code>routers/wizard.py</code> serves <code>/api/wizard/graph</code> + <code>/api/wizard/resolve</code> (answers → topology + checklist + completeness, persisted); the raw path's <code>/api/ingest/identify</code> now returns detection signals + reconcile prompts via <code>ingest/rawpath.py</code>; and <code>/api/onboard/reports</code> commits recognized Shopify reports through <code>ingest/shopify_commit.py</code> — Shopify-only SKUs become <code>seller_skus</code> rows (COGS/price/units/stock + provenance) while a SKU that maps to an existing Amazon SKU is linked in the crosswalk without overwriting Amazon economics (the cross-channel number merge belongs in <code>channel_economics</code>, a later step). The wizard UI is server-rendered in <code>login.html</code>, reusing the existing components + tokens (no client framework). All modules stay ≤400 lines; the Amazon flow is behavior-preserving.</p>
+  <h3 style="font-family:'Space Grotesk'">Libraries &amp; frameworks — what we use and why</h3>
+  <p style="font-size:14px;line-height:1.6;color:#33415c">The deterministic core (the L1 detectors and economic math) depends on <b>nothing but the Python standard library</b>; third-party packages are confined to the API server, live data sources, and the database engine. This keeps the part of the system that <i>decides numbers</i> auditable and dependency-free. The table below is the full inventory and the rationale for each choice.</p>
+  <style>.libtbl{border-collapse:collapse;width:100%;font-size:13px;margin:14px 0;font-family:'Inter',sans-serif}.libtbl th,.libtbl td{border:1px solid #dbe2ec;padding:7px 10px;text-align:left;vertical-align:top}.libtbl th{background:#eef3f9;color:#1F3864;font-weight:600;font-size:11px;letter-spacing:.04em;text-transform:uppercase}.libtbl td code{font-size:12px}</style>
+  <table class="libtbl"><thead><tr><th>Library / framework</th><th>Role</th><th>Why it was chosen &amp; value added</th></tr></thead><tbody>
+    <tr><td><b>Python standard library</b><br>(<code>sqlite3</code>, <code>threading</code>, <code>json</code>, <code>dataclasses</code>, <code>http</code>)</td><td>The deterministic core, local persistence, background threads, typed config.</td><td>The L1 detectors, ranking, and all economic formulas run on the stdlib alone — no external dependency can change a number. <code>sqlite3</code> is the zero-setup local/test engine; <code>dataclasses</code> backs the frozen typed <code>Settings</code>; <code>threading</code> backs the <code>ThreadTaskRunner</code> and scheduler.</td></tr>
+    <tr><td><b>FastAPI</b></td><td>HTTP API and routing layer (<code>realify/routers/</code>).</td><td>Typed, async-capable request handling with automatic validation and OpenAPI generation. Lets the routers stay thin (no SQL, no business logic) while giving partner teams a documented contract surface at <code>/api/v1</code>.</td></tr>
+    <tr><td><b>Uvicorn</b></td><td>ASGI server that runs the app (<code>run.py start</code>).</td><td>Production-grade ASGI host for FastAPI; fast, lightweight, and the standard pairing.</td></tr>
+    <tr><td><b>itsdangerous</b></td><td>Signs the session cookie (Starlette <code>SessionMiddleware</code>).</td><td>Tamper-proof signed sessions are how identity is carried; the signed cookie is what <code>current()</code> reads to resolve <code>(uid, tid)</code> server-side, never trusting a client-supplied tenant.</td></tr>
+    <tr><td><b>SQLAlchemy</b> (Core, not ORM)</td><td>Engine, dialect detection, and connection pooling — the database seam.</td><td>Provides one abstraction over SQLite and Postgres so a single codebase serves both. Used only for the engine/dialect/pool; repositories keep writing explicit SQL (through the wrapper), so query behaviour stays transparent and reviewable rather than hidden behind an ORM.</td></tr>
+    <tr><td><b>Alembic</b></td><td>Versioned, dialect-aware schema migrations.</td><td>Replaces ad-hoc <code>CREATE</code>/<code>ALTER</code> scripting with a migration history that runs identically on SQLite and Postgres, so schema changes are reproducible and the production cutover was a known, tested sequence.</td></tr>
+    <tr><td><b>psycopg</b> v3 <code>[binary]</code></td><td>PostgreSQL driver.</td><td>The actual wire driver for RDS Postgres; loaded lazily only when <code>DATABASE_URL</code> is a Postgres URL, so local/SQLite runs never pull it in. The <code>[binary]</code> build avoids a local libpq/compiler requirement.</td></tr>
+    <tr><td><b>keepa</b></td><td>Live Amazon market data (prices, ranks, history).</td><td>The compliant data path — Realify <b>never</b> scrapes Amazon; Keepa's official API is the source for competitive and historical signal.</td></tr>
+    <tr><td><b>requests</b></td><td>HTTP client for recalls and news fetches.</td><td>Simple, dependable HTTP for the non-Keepa live collectors (product recalls, news signal).</td></tr>
+    <tr><td><b>pytrends</b></td><td>Google Trends signal (best-effort).</td><td>Adds a demand/interest signal to the Tier-C inputs; treated as best-effort, degrading silently when unavailable so it never blocks a pipeline.</td></tr>
+    <tr><td><b>anthropic</b></td><td>Claude API for L2 card narratives.</td><td>The L2 layer only <i>phrases</i> what the deterministic L1 already decided — it never chooses or overrides a number. Model output is crash-isolated and version-stamped into card provenance.</td></tr>
+    <tr><td><b>openpyxl</b></td><td>Parses uploaded <code>.xlsx</code> store/COGS exports.</td><td>Customer onboarding ingests real spreadsheet exports; openpyxl reads them without an Excel dependency.</td></tr>
+    <tr><td><b>python-multipart</b></td><td>Multipart form/file upload parsing for FastAPI.</td><td>Required for the file-upload endpoints (catalog, COGS, report uploads) that drive customer onboarding.</td></tr>
+    <tr><td><b>pytest</b> <span style="color:#5b6675">(dev only)</span></td><td>Test runner for the suite under <code>tests/</code>.</td><td>Not a runtime dependency. Backs the contract tests (card-JSON shape, upsert-key guard, 400-line file cap) and the engine/migration/hardening tests that gate every deploy.</td></tr>
+  </tbody></table>
+</section>
+
+<section style="max-width:960px;margin:40px auto 0;padding:0 24px 60px;font-family:'Inter',sans-serif;color:#33415c">
+  <h2 style="font-family:'Space Grotesk',sans-serif;border-top:2px solid #1F3864;padding-top:18px;color:#1F3864">Addendum 2 — Realify for Agencies (agency console, updated 2026-07-15)</h2>
+
+  <p><b>What it is.</b> A multi-tenant overlay on the same app: an <em>agency</em> operates <em>N brand-accounts</em> under a revocable <b>envelope</b> the brand grants; each user holds a <b>grant</b> within an engagement; the effective capability is <code>intersection(envelope, grant)</code>. The whole surface is <b>Postgres-only</b> and feature-flagged behind <code>AGENCY_CONSOLE</code> (an env flag; <code>off</code> ⇒ every agency route returns 404). It is built, deployed, and <b>live</b> in production (flipped 2026‑07‑14); the seller product above is unchanged for direct customers. Code lives in <code>realify/agency/*</code> (domain), <code>realify/routers/agency_*.py</code> (routes), <code>realify/pdp/*</code> (policy), and <code>realify/agency_jobs.py</code> (periodic jobs). Migrations <code>0015</code>–<code>0030</code>.</p>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;color:#1F3864">Tenancy, isolation &amp; cryptography (the security spine)</h3>
+  <ul style="font-size:14px;line-height:1.7">
+    <li><b>Row-level security, enforced not advisory.</b> 14 brand-scoped tables (engagements, envelopes, grants, brand_keys, ledger, connections, agency_ingest_rows, decisions, rollup_cache, approvals, executions, brand_pause, metering_events, invoice_lines) have <code>ENABLE</code> + <code>FORCE ROW LEVEL SECURITY</code> with policy <code>tenant_id = ANY(current_brand_ids())</code>. <code>current_brand_ids()</code> reads the transaction-local GUC <code>app.brand_ids</code>, set per request via <code>set_config(..., /*local*/ true)</code> — PgBouncer-transaction-safe.</li>
+    <li><b>No runtime role can bypass RLS.</b> Production runs as <code>realify_app</code> (NOSUPERUSER, NOBYPASSRLS); even the table owner <code>realify_admin</code> is NOBYPASSRLS. So the actor bootstrap can't use <code>row_security = off</code> — instead a user reads <em>their own</em> grants/engagements/deep-link approval through narrow, GUC-keyed <b>self-read policies</b> (migrations <code>0027</code>/<code>0029</code>, keyed to <code>app.actor_user_id</code>, permissive+OR'd, fail-closed). This is the deliberate, minimal exception to isolation.</li>
+    <li><b>PDP.</b> One pure function <code>realify.pdp.decide(envelope, grant, action)</code> — imported everywhere, no per-route policy logic. Capability = the intersection of what the brand permitted (envelope) and what the user was assigned (grant), on the read&lt;propose&lt;execute ladder with per-lens autonomy ceilings.</li>
+    <li><b>Per-brand ledger + envelope crypto.</b> Every state change appends to a per-brand <b>hash-chained ledger</b>; payloads are AES-256-GCM encrypted with a per-brand DEK wrapped by a master KEK (<code>MASTER_KEK</code>). <b>Crypto-shred</b> nulls the wrapped DEK → payloads become permanently unreadable while the chain still verifies. A <b>KEK fingerprint guard</b> (migration <code>0028</code>) catches a key wrapped under the wrong KEK with a clear error instead of a cryptic AEAD failure.</li>
+    <li><b>Tenant taxonomy.</b> <code>tenants.tenant_kind ∈ {seller, agency_workspace, internal, sandbox}</code> (migration <code>0024</code>, replacing the overloaded <code>is_internal</code>). Aggregates, billable counts, and the governance <b>drift check</b> key off it: every active tenant must be exactly one of seller-with-Stripe · seller-under-active-engagement · agency_workspace · internal · sandbox (drift = a seller with neither Stripe nor an active engagement).</li>
+  </ul>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;color:#1F3864">The workflow, end to end</h3>
+  <p><b>Onboarding funnel</b> (<code>agency.py</code>, <code>agency/funnel.py</code>, <code>provision.py</code>): public apply → intake (row + ops notification email) → confirmation page + applicant email → review queue → one-click approve/provision (idempotent, step-tracked, retryable) → single-use 7-day admin invite email → acceptance sets a password, session, and lands in the workspace. <b>Consent</b> (<code>agency_consent.py</code>, <code>consent.py</code>): the brand receives an OTP-gated, single-use, 7-day link and picks an envelope template (Full Operate / Operate ex-Pricing / Ads Only / Advise / Read-only), sets per-lens autonomy ceilings, counters, or declines; credentials are brand-owned (stub-OAuth connect). <b>Data</b> (<code>ingest.py</code>): CSV exports are auto-detected, column-mapped, and tagged <code>source_class</code>; an expired connection <b>pauses, not guesses</b>.</p>
+
+  <p><b>The action loop</b> (the core, closed in R2–R4). The <b>work queue</b> (<code>agency_console.py</code>, <code>queue.py</code>) is one $-ranked stream across the actor's grant-scoped brands, each item carrying confidence, driving signal, and the brand's selling currency + the locked FX date. Acting on an item runs the maker-checker path: <code>propose</code> → co-sign is <b>derived</b> from the engagement (pricing lens or amount ≥ <code>brand_cosign_threshold</code>) not hardcoded; below the maker-checker threshold the proposer's Approve advances straight to <em>approved</em>, at/above a distinct checker is required, and a co-sign-required item emails the brand a signed deep link and waits (<b>silence never executes</b>, 5-day expiry). On <em>approved</em>, execution fires against the <b>in-process mock marketplace</b> (there is <em>no</em> real marketplace client) with the full P5 guardrails: TOCTOU re-check against the current envelope, durable idempotency key, per-account token buckets, pre-state snapshot, canary rollout with halt + rollback, and per-item <b>Undo</b> that restores the snapshot. Every write/rollback/halt is ledgered.</p>
+
+  <p><b>Money &amp; evidence</b> (R4): agency-triggered <b>white-label reports</b> pass a <b>factuality gate</b> that BLOCKS delivery of any numeric claim not emitted by the engine (a blocked report is never sent); on pass it emails the brand + ledgers. <b>Plan &amp; billing</b> shows a Decisions-pool burn meter ("warn at 85%, never surprise-bill"), per-client cost allocation with a Value-delivered column, invoices + CSV export; a monthly invoice job builds from metering (Stripe stays TEST-mode). <b>ROI v1</b> is the sum of executed decisions' <em>projected</em> impact — explicitly labeled projected, never a measured-vs-do-nothing counterfactual. The <b>admin fleet</b> and <b>quality console</b> replace raw dumps with per-agency tables (leverage vs the 1.5× gate, decisions used/pool, acceptance, MRR, needs-attention worklist, gate PASS/FAIL) and precision-by-action with below-gate coloring, dismissal reasons, acceptance drift, and ledgered mitigations.</p>
+
+  <p><b>Brand surfaces &amp; operators.</b> Brands get a <b>portal</b> (transparency log, approvals inbox, pause/narrow/revoke — "Revoking is immediate. Your data, history, and connections stay with you."), a <b>day-0 baseline</b>, a <b>data-sources</b> page, and <b>offboarding</b> (export + a crypto-shred deletion certificate behind a typed-confirmation + staff co-sign; the "Continue directly" option appears only when the brand ended the engagement). Locale follows the brand (₹ / en-IN for INR). The <b>superlogin</b> back door is hardened (admin key + <code>@realify.ai</code> + emailed OTP → a separate 8-hour ledgered session cookie, 3-fail lockout) and lands staff on a <b>tester/sandbox hub</b>; a deterministic sandbox generator + injectors seed demo worlds, and sandbox tenants are excluded from all aggregates.</p>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;color:#1F3864">Feeders, jobs &amp; deploy</h3>
+  <p>The background scheduler (<code>agency_jobs.py</code>, run from <code>scheduler._loop</code>) drives the real-brand feeders — for each active-engaged brand with ingested SKU data it (re)generates decisions, refreshes the USD-normalized rollup, and locks the daily FX rate — plus maintenance (connection-health sweep, day-90 pilot lapse, co-sign + gate expiry) and the idempotent monthly invoice build. Production is RDS Postgres behind PgBouncer (transaction pooling), the app image is baked via <code>COPY</code>, and requests flow <b>Cloudflare → Caddy → uvicorn</b>. Inbound SES bounces/complaints arrive <b>SES → SNS → a signature-verified, flag-independent webhook</b> → suppression list. <b>Migrations must be applied as <code>realify_admin</code> before recreating the container</b> (the runtime <code>realify_app</code> cannot run DDL).</p>
+
+  <div class="callout warn" style="background:#fff7ed;border-left:4px solid #c2853b;padding:12px 16px;margin:16px 0;font-size:13.5px"><b>Honesty markers.</b> Execution targets an <b>in-process mock marketplace only</b> — no real marketplace API exists. ROI is <b>projected</b>, not realized. Stripe billing runs in <b>test mode</b>. Reports/billing/ROI ship functional with the required semantics; a few engine capabilities remain intentionally declared-not-triggered (see <code>docs/WIRING_CENSUS.md</code>): <code>ledger.read_payload</code> and <code>ops.break_glass</code> have no route yet, and realized-ROI reconciliation is future work.</div>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;color:#1F3864">Agency schema (migrations 0015–0030)</h3>
+  <table class="libtbl"><thead><tr><th>Migration(s)</th><th>What it added</th></tr></thead><tbody>
+    <tr><td><code>0015</code></td><td>Agency core: agencies, engagements, envelopes, grants, brand_keys, ledger + RLS ENABLE/FORCE + <code>current_brand_ids()</code> + realify_app grants.</td></tr>
+    <tr><td><code>0016–0018</code></td><td>Agency OTP + break-glass grant cols; <code>tenants.is_internal</code> (both engines); the funnel tables (agency_requests/invites/provision_steps/audit).</td></tr>
+    <tr><td><code>0019–0021</code></td><td>Brand consent + connections + CSV ingest + deletion ledger; console FX + decisions; approvals + executions + brand_pause (+ maker-checker threshold).</td></tr>
+    <tr><td><code>0022</code></td><td>Reporting/billing: metering_events[RLS], invoice_lines[RLS], invoices, agency_subscriptions, suppression_list, agency_pilots; approval deep-link cols.</td></tr>
+    <tr><td><code>0023</code></td><td>Internal admin + superlogin (superlogin_sessions/otp/lockout, both engines) + gates (PG-only).</td></tr>
+    <tr><td><code>0024 / 0025</code></td><td><code>tenants.tenant_kind</code> (both engines, backfilled); <code>approvals.viewed_at</code>.</td></tr>
+    <tr><td><code>0026 / 0027</code></td><td><code>engagements.brand_cosign_threshold</code>; actor self-read RLS policies on grants + engagements.</td></tr>
+    <tr><td><code>0028 / 0029 / 0030</code></td><td><code>brand_keys.kek_fingerprint</code>; approvals deep-link self-read policy; <code>agency_subscriptions.decisions_pool</code>.</td></tr>
+  </tbody></table>
+</section>
+
+<section style="max-width:960px;margin:40px auto 0;padding:0 24px 60px;font-family:'Inter',sans-serif;color:#33415c">
+  <h2 style="font-family:'Space Grotesk',sans-serif;border-top:2px solid #1F3864;padding-top:18px;color:#1F3864">Addendum 3 — V4 experience: parallel skin, Feature/Version Registry, Ask &amp; Agents (updated 2026-07-23)</h2>
+
+  <h3>Parallel skin — zero-risk delivery</h3>
+  <p>The V4 seller SPA is a <b>separate file</b> (<code>frontend_v4.html</code>); legacy <code>frontend.html</code>
+  is never edited, so it cannot regress. <code>pages.home()</code> serves V4 only when the resolved skin is
+  <code>v4</code> and the file exists. All backend is additive (new routers/tables/nullable columns); the
+  frozen <code>/api/v1</code> contract is unchanged. A deploy is inert until a flag is flipped.</p>
+
+  <h3>Feature/Version Registry (<code>realify/flags.py</code>)</h3>
+  <p>The standing convention for shipping new work: everything ships <b>dark</b> behind the registry and is
+  turned on / rolled back from the Ops page — no redeploy. Two flag kinds: <b>version</b> features
+  (coexisting builds with a baseline; e.g. <code>app_ui</code> = legacy(baseline)/v4; pick build + scope
+  <code>off|internal|on</code>) and <b>gate</b> features (behavior on/off, default off; <code>ask</code>,
+  <code>agents</code>). State is DB-backed (system pseudo-tenant 0 + per-tenant in <code>tenant_settings</code>,
+  no FK) and read <b>per request</b> → instant flip. <code>?skin=v4</code>/<code>?skin=legacy</code> pin a
+  session. Forward features declare <code>requires: app_ui=v4</code>; <code>feature_enabled = gate AND
+  dependency</code>, so an "on" gate under a legacy build is inert (defined state in every combination), and
+  behavior (e.g. agents acting) is prevented from arming until v4 is rolled. Because both skins share the
+  same additive backend, flipping the build mid-session is non-destructive: presentation switches on next
+  navigation, persisted V4 data (conversations, agent configs, ledger) is retained and simply hidden under
+  legacy, and agent autonomous behavior stops (dependency unmet). Control surface: <code>/ops</code> Rollout
+  card + <code>GET/POST /api/admin/rollout</code>.</p>
+
+  <h3>Ask — conversational surface (<code>realify/ask/</code>)</h3>
+  <p>Agent-shaped: a question routes through a <b>tool layer</b> over the tenant's real data (same domain
+  code as the cards), a <b>narrator</b> composes structured response parts, and the turn streams as SSE and
+  persists. <b><code>narrator.py</code> is the single model swap point</b> — today a data-grounded stub;
+  a self-hosted model implements the same <code>compose()</code> contract, dispatched on the model's
+  <code>provider</code>. Tenant-scoped, monthly usage cap. Tables <code>ask_*</code> (migration 0039).</p>
+
+  <h3>Agents — the workforce (<code>realify/agents/</code>)</h3>
+  <p>A hire→configure→assign→monitor framework: specialist catalog, an autonomy ladder
+  (Observe→Suggest→Assist→Act, start Observe), server-side guardrails, a hash-chained <b>Autonomy Ledger</b>
+  (tamper-evident, reversible), and the pricing scope hierarchy (Category plane → Subcategory CPS → Item
+  state; policy inherits down, outcomes aggregate up). The flagship Pricing agent "runs like a GMM"
+  (four clocks / five signals / ITL-ARB-01) and consumes the RIA models for the math. Behavior is gated
+  (<code>feature_enabled('agents')</code>, default off) and <b>Act is held until the RIA models + real
+  Amazon write-back land</b>; testers get seeded sample decisions. Tables <code>agent</code>,
+  <code>agent_task</code>, <code>agent_decision</code>, <code>pricing_*</code> (migration 0041). See
+  <code>AGENTS-ARCHITECTURE.md</code>.</p>
+
+  <p style="color:#6E7A90;font-size:14px">Migration chain extended: <code>0039</code> ask · <code>0040</code>
+  users.avatar · <code>0041</code> agents (head = 0041). All additive, no RLS on these tables (tenant-scoped
+  seller-data pattern, isolated by <code>WHERE tenant_id=?</code>).</p>
+</section>
+</body>
+</html>

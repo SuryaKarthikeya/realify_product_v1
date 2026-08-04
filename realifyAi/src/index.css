@@ -1,0 +1,319 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, button, input, select, textarea, optgroup, option {
+    font-family: 'Inter', sans-serif;
+  }
+
+  /*
+   * ── Brand palette — ONLY edit here to retheme the entire app ──
+   *
+   *  Tailwind classes generated:
+   *    bg-brand          text-brand          border-brand          ring-brand
+   *    bg-brand-hover    text-brand-hover    border-brand-hover
+   *    bg-brand-subtle   (light tint for ghost-button / tab hover backgrounds)
+   */
+  :root {
+    --color-brand:        56  56  56;   /* #383838 — primary */
+    --color-brand-hover:  85  85  85;   /* #555555 — hover / active  */
+    --color-brand-subtle: 56  56  56;   /* bg-brand-subtle/10 gives a nice tint */
+
+    /* ── Cobalt-blue accent palette — edit here to retheme blue accents ── */
+    --cb-200: 221 214 254; /* violet-200 */
+    --cb-300: 196 181 253; /* violet-300 */
+    --cb-400: 167 139 250; /* violet-400 */
+    --cb-500: 139 92 246;  /* violet-500 */
+    --cb-600: 124 58 237;  /* #7C3AED */
+    --cb-700: 109 40 217;  /* violet-700 */
+    --cb-800: 91 33 182;   /* violet-800 */
+    --cb-850: 76 29 149;   /* custom */
+    --cb-900: 46 16 101;   /* violet-950-ish */
+
+    /* ── Chart tooltip tokens ── */
+    --tooltip-bg:     #ffffff;
+    --tooltip-border: #e2e8f0;
+    --tooltip-text:   #0f172a;
+
+    /*
+     * ── KPI card surfaces ──
+     *
+     * These live here as tokens because the cards paint a two-layer gradient
+     * (padding-box surface + border-box edge) that has to be set through the
+     * `background` shorthand, i.e. an inline style. An inline style cannot carry
+     * a `dark:` variant, so the cards used to stay light in dark mode while
+     * their text switched to white — the values became invisible.
+     * A var inside the inline style re-resolves per theme, which fixes that
+     * without giving up the gradient-border technique.
+     */
+    --kpi-pos-surface: linear-gradient(180deg, #ffffff 0%, #f5fff9 100%);
+    --kpi-pos-edge:    linear-gradient(180deg, #f6fffc 0%, #e2e8f0 100%);
+    --kpi-neg-surface: linear-gradient(180deg, rgba(255,247,247,0.5) 0%, rgba(255,255,255,0.5) 100%);
+    --kpi-neg-edge:    linear-gradient(180deg, rgba(226,232,240,0.15) 0%, rgba(197,34,34,0.15) 100%);
+  }
+  .dark {
+    --color-brand:        156 163 175;  /* gray-400 — legible on dark surfaces */
+    --color-brand-hover:  209 213 219;  /* gray-300 — dark hover               */
+    --color-brand-subtle: 156 163 175;
+
+    /* ── Cobalt-blue accent palette — dark mode: all darks become light violet ── */
+    --cb-200: 221 214 254;
+    --cb-300: 196 181 253;
+    --cb-400: 167 139 250;
+    --cb-500: 167 139 250;
+    --cb-600: 167 139 250;
+    --cb-700: 139 92 246;
+    --cb-800: 196 181 253;
+    --cb-850: 196 181 253;
+    --cb-900: 221 214 254;
+
+    /* ── Chart tooltip tokens ── */
+    --tooltip-bg:     #1e293b;
+    --tooltip-border: #334155;
+    --tooltip-text:   #f1f5f9;
+
+    /* ── KPI card surfaces ──
+       Same shape as light: the card sits on the app's slate-900 card colour and
+       carries a faint tint in the direction of its delta, with the edge gradient
+       running the same way. */
+    --kpi-pos-surface: linear-gradient(180deg, #0f172a 0%, #0b1a16 100%);
+    --kpi-pos-edge:    linear-gradient(180deg, #14312a 0%, #1e293b 100%);
+    --kpi-neg-surface: linear-gradient(180deg, #1c1114 0%, #0f172a 100%);
+    --kpi-neg-edge:    linear-gradient(180deg, #1e293b 0%, #4c1d24 100%);
+  }
+}
+
+@layer base {
+  /*
+   * ── Native <select> popups ──
+   *
+   * The option list is drawn by the OS, not by us, and with no `color-scheme`
+   * declared it follows the *system* appearance — so on a Mac set to Dark every
+   * dropdown in the app opened as a black panel regardless of the app's own
+   * theme. Declaring it pins the popup to the light palette, matching the custom
+   * dropdowns (SKU, date range) that are real DOM and always white.
+   *
+   * Light in both themes on purpose: `option` colours cannot be animated or
+   * gradient-filled, so a dark popup here can only ever approximate the app's
+   * dark surfaces — and a white sheet reads as deliberate where a near-miss
+   * black reads as broken. The closed control keeps its own Tailwind classes;
+   * these rules only reach the popup.
+   */
+  select {
+    color-scheme: light;
+  }
+  select option {
+    background-color: #ffffff;
+    color: #0f172a;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.25);
+    border-radius: 4px;
+  }
+  .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.45);
+  }
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.35);
+  }
+  .dark .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.55);
+  }
+
+  .sticky-below-header {
+    top: 1rem;
+    transition: top 0s;
+  }
+
+  .max-h-below-header {
+    max-height: calc(100vh - 2rem);
+  }
+}
+
+@layer components {
+  /* ── Legal pages (PrivacyPolicy, TermsOfService) ── */
+  .policy-content h1 { @apply text-4xl font-bold mb-6 text-black; }
+  .policy-content h2 { @apply text-2xl font-semibold mt-12 mb-4 border-b border-gray-200 pb-2 text-black; }
+  .policy-content h3 { @apply text-lg font-semibold mt-8 mb-3 text-gray-800; }
+  .policy-content h4 { @apply font-bold mb-2 text-black; }
+  .policy-content p { @apply text-gray-700 mb-4 leading-relaxed; }
+  .policy-content ul { @apply list-disc pl-6 mb-4 text-gray-700 space-y-2; }
+  .policy-content table { @apply w-full border-collapse mb-8 text-sm; }
+  .policy-content th { @apply bg-gray-50 border border-gray-200 p-3 text-left font-semibold text-gray-900; }
+  .policy-content td { @apply border border-gray-200 p-3 text-gray-700 align-top; }
+  .policy-content section { @apply scroll-mt-20; }
+  .info-callout { @apply bg-blue-50 border-l-4 border-blue-500 p-4 my-6 text-gray-800 rounded-r-md shadow-sm; }
+  .warning-callout { @apply bg-amber-50 border-l-4 border-amber-500 p-4 my-6 text-gray-800 rounded-r-md shadow-sm; }
+
+  .dashboard-main-content {
+    contain: style;
+  }
+
+  /* ── Sticky page header — scroll-linked collapse via CSS vars ── */
+
+  .page-header-toolbar {
+    height: var(--header-toolbar-visible, 84px);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    will-change: height;
+    backface-visibility: hidden;
+  }
+  .header-expand-animating .page-header-toolbar {
+    transition: height 340ms cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  /* Title block fades and shifts left as header collapses */
+  .page-header-title {
+    opacity: clamp(0, calc(1 - var(--header-collapse-progress, 0) * 2.5), 1);
+    transform: translateX(calc(var(--header-collapse-progress, 0) * -6px));
+    will-change: opacity, transform;
+  }
+  .header-expand-animating .page-header-title {
+    transition: opacity 340ms ease, transform 340ms ease;
+  }
+
+  /* Subtitle fades faster than title */
+  .page-header-subtitle {
+    opacity: clamp(0, calc(1 - var(--header-collapse-progress, 0) * 5), 1);
+    will-change: opacity;
+  }
+
+  /* Search bar fades out as compact tabs take center */
+  .page-header-search {
+    opacity: clamp(0, calc(1 - var(--header-collapse-progress, 0) * 2), 1);
+    pointer-events: none;
+    will-change: opacity;
+  }
+  .page-header-search.is-active {
+    pointer-events: auto;
+  }
+  .header-expand-animating .page-header-search {
+    transition: opacity 200ms ease;
+  }
+
+  /* Compact tabs in toolbar — invisible until header collapses past midpoint */
+  .page-header-compact-tabs {
+    opacity: clamp(0, calc((var(--header-collapse-progress, 0) - 0.5) * 2), 1);
+    pointer-events: none;
+    will-change: opacity;
+  }
+  .page-header-compact-tabs.is-visible {
+    pointer-events: auto;
+  }
+  .header-expand-animating .page-header-compact-tabs {
+    transition: opacity 200ms ease;
+  }
+
+  /* Secondary section (full tabs + filters) — collapses to 0 on scroll */
+  .page-header-secondary {
+    height: calc(var(--header-secondary-height, 0px) * (1 - var(--header-collapse-progress, 0)));
+    overflow: hidden;
+    will-change: height;
+    backface-visibility: hidden;
+  }
+  .header-expand-animating .page-header-secondary {
+    transition: height 340ms cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  /* Expand button — appears when header is fully compressed */
+  .page-header-expand-btn {
+    opacity: clamp(0, calc((var(--header-collapse-progress, 0) - 0.75) * 4), 1);
+    pointer-events: none;
+    will-change: opacity;
+  }
+  .page-header-expand-btn.is-visible {
+    pointer-events: auto;
+  }
+
+  /* Header Greeting Block — opacity driven directly by CSS class on scroll */
+  .header-greeting-block {
+    opacity: 1;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+  }
+  .header-is-compressed .header-greeting-block {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    display: none !important;
+  }
+
+  @keyframes ws-tab-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .ws-tab-enter {
+    animation: ws-tab-in 150ms cubic-bezier(0.33, 1, 0.68, 1) both;
+  }
+
+  /* ── Connection handshake ──
+   *
+   * Used beside "What happens next?" on the Authorize step. It narrates the
+   * sentence next to it: packets leave the store, reach Realify, and the link is
+   * confirmed. All transform/opacity so it composites on the GPU and costs
+   * nothing to run, and the whole thing is a single 3.2s loop so the three
+   * elements stay in step without any JS timers.
+   */
+  @keyframes conn-packet {
+    0%        { transform: translateX(0) scale(0.6); opacity: 0; }
+    12%       { opacity: 1; transform: translateX(4px) scale(1); }
+    62%       { opacity: 1; }
+    72%, 100% { transform: translateX(var(--conn-distance, 44px)) scale(0.6); opacity: 0; }
+  }
+  .conn-packet { animation: conn-packet 3.2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+  @keyframes conn-pulse {
+    0%, 55%  { transform: scale(0.8); opacity: 0; }
+    70%      { transform: scale(1); opacity: 0.55; }
+    100%     { transform: scale(1.45); opacity: 0; }
+  }
+  .conn-pulse { animation: conn-pulse 3.2s ease-out infinite; }
+
+  @keyframes conn-confirm {
+    0%, 62%   { transform: scale(0); opacity: 0; }
+    74%       { transform: scale(1.18); opacity: 1; }
+    82%, 94%  { transform: scale(1); opacity: 1; }
+    100%      { transform: scale(1); opacity: 0; }
+  }
+  .conn-confirm { animation: conn-confirm 3.2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite; }
+
+  @keyframes conn-wire {
+    0%, 8%   { transform: scaleX(0); }
+    45%,100% { transform: scaleX(1); }
+  }
+  .conn-wire {
+    transform-origin: left center;
+    animation: conn-wire 3.2s cubic-bezier(0.33, 1, 0.68, 1) infinite;
+  }
+
+  /* Motion is decoration here — the copy beside it already says everything. */
+  @media (prefers-reduced-motion: reduce) {
+    .conn-packet, .conn-pulse, .conn-confirm, .conn-wire {
+      animation: none;
+    }
+    .conn-packet { opacity: 0; }
+    .conn-confirm { opacity: 1; transform: scale(1); }
+    .conn-wire { transform: scaleX(1); }
+  }
+}

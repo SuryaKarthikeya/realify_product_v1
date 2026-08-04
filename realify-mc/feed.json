@@ -1,0 +1,2827 @@
+[
+ {
+  "id": 1,
+  "dedup_key": "e56db660b877a0b9",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B09ZVQ29FB",
+  "category": "Car Accessories",
+  "finding": "<b>RoadArmour</b> is selling at <span class='rupee'>₹1089</span>, undercutting your <b>B09ZVQ29FB</b> by <span class='rupee'>₹110</span>.",
+  "why": "Your floor is <span class='rupee'>₹991</span>, so repricing to <span class='rupee'>₹1067</span> stays above breakeven while defending the Buy Box (now 68%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 95,
+  "exposure_val": "₹45.3L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹1089",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1199",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹991",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 2,
+  "dedup_key": "1952941ac08db3a0",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0BHSZQG3P",
+  "category": "Bike Accessories",
+  "finding": "<b>RoadArmour</b> is selling at <span class='rupee'>₹472</span>, undercutting your <b>B0BHSZQG3P</b> by <span class='rupee'>₹57</span>.",
+  "why": "Your floor is <span class='rupee'>₹457</span>, so repricing to <span class='rupee'>₹462</span> stays above breakeven while defending the Buy Box (now 63%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 95,
+  "exposure_val": "₹19.0L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹472",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹529",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹457",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 3,
+  "dedup_key": "8aeba24661816016",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0DCGFHXD1",
+  "category": "Car Accessories",
+  "finding": "<b>GenericCo</b> is selling at <span class='rupee'>₹1302</span>, undercutting your <b>B0DCGFHXD1</b> by <span class='rupee'>₹97</span>.",
+  "why": "Your floor is <span class='rupee'>₹1206</span>, so repricing to <span class='rupee'>₹1276</span> stays above breakeven while defending the Buy Box (now 88%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 95,
+  "exposure_val": "₹11.5L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹1302",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1399",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹1206",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 4,
+  "dedup_key": "5da3fa8bbd393809",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0C4YWJ3Z4",
+  "category": "Car Accessories",
+  "finding": "<b>CarKraft</b> is selling at <span class='rupee'>₹1438</span>, undercutting your <b>B0C4YWJ3Z4</b> by <span class='rupee'>₹100</span>.",
+  "why": "Your floor is <span class='rupee'>₹1297</span>, so repricing to <span class='rupee'>₹1410</span> stays above breakeven while defending the Buy Box (now 81%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 95,
+  "exposure_val": "₹8.0L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹1438",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1538",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹1297",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 5,
+  "dedup_key": "f27fb013f7455993",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0CDC3P57T",
+  "category": "Car Accessories",
+  "finding": "<b>CarKraft</b> is selling at <span class='rupee'>₹1342</span>, undercutting your <b>B0CDC3P57T</b> by <span class='rupee'>₹57</span>.",
+  "why": "Your floor is <span class='rupee'>₹1143</span>, so repricing to <span class='rupee'>₹1316</span> stays above breakeven while defending the Buy Box (now 78%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 95,
+  "exposure_val": "₹4.0L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹1342",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1399",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹1143",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 47,
+  "dedup_key": "d64fa91457c237b8",
+  "run_id": 1,
+  "card_type": "C4",
+  "family": "demand",
+  "type_name": "Seasonality Inflection",
+  "asin": "B0BHSZQG3P",
+  "category": "Bike Accessories",
+  "finding": "<b>B0BHSZQG3P</b> has <b>19 days</b> of cover against a 14-day lead time — monsoon demand turn approaching.",
+  "why": "At current velocity it runs out before resupply during the seasonal surge. Restock now.",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Revenue at risk if understocked",
+  "exposure_pct": 95,
+  "exposure_val": "₹18.8L",
+  "action": "Create restock task",
+  "sources": [
+   "OWN",
+   "TIER-C"
+  ],
+  "minis": [
+   [
+    "Days of cover",
+    "19",
+    "neg"
+   ],
+   [
+    "Lead time",
+    "14d",
+    ""
+   ],
+   [
+    "Velocity/day",
+    "118.3",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "days of cover",
+    "OWN"
+   ],
+   [
+    "velocity",
+    "OWN"
+   ],
+   [
+    "seasonality",
+    "TIER-C"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 48,
+  "dedup_key": "2c1549832937f90e",
+  "run_id": 1,
+  "card_type": "C4",
+  "family": "demand",
+  "type_name": "Seasonality Inflection",
+  "asin": "B0D8TGRG3T",
+  "category": "Car Accessories",
+  "finding": "<b>B0D8TGRG3T</b> has <b>19 days</b> of cover against a 14-day lead time — monsoon demand turn approaching.",
+  "why": "At current velocity it runs out before resupply during the seasonal surge. Restock now.",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Revenue at risk if understocked",
+  "exposure_pct": 95,
+  "exposure_val": "₹6.0L",
+  "action": "Create restock task",
+  "sources": [
+   "OWN",
+   "TIER-C"
+  ],
+  "minis": [
+   [
+    "Days of cover",
+    "19",
+    "neg"
+   ],
+   [
+    "Lead time",
+    "14d",
+    ""
+   ],
+   [
+    "Velocity/day",
+    "18.1",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "days of cover",
+    "OWN"
+   ],
+   [
+    "velocity",
+    "OWN"
+   ],
+   [
+    "seasonality",
+    "TIER-C"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 6,
+  "dedup_key": "543106a665f760cf",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0D8THGGT2",
+  "category": "Car Accessories",
+  "finding": "<b>GenericCo</b> is selling at <span class='rupee'>₹1760</span>, undercutting your <b>B0D8THGGT2</b> by <span class='rupee'>₹79</span>.",
+  "why": "Your floor is <span class='rupee'>₹1545</span>, so repricing to <span class='rupee'>₹1724</span> stays above breakeven while defending the Buy Box (now 93%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 80,
+  "exposure_val": "₹3.4L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹1760",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1839",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹1545",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 7,
+  "dedup_key": "69c1e2fa47971d4a",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0D8TGKJQG",
+  "category": "Car Accessories",
+  "finding": "<b>GenericCo</b> is selling at <span class='rupee'>₹956</span>, undercutting your <b>B0D8TGKJQG</b> by <span class='rupee'>₹143</span>.",
+  "why": "Your floor is <span class='rupee'>₹901</span>, so repricing to <span class='rupee'>₹937</span> stays above breakeven while defending the Buy Box (now 78%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 61,
+  "exposure_val": "₹2.5L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹956",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1099",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹901",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 8,
+  "dedup_key": "7acf6effce81b6bb",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0C9HPNFW7",
+  "category": "Car Accessories",
+  "finding": "<b>CarKraft</b> is selling at <span class='rupee'>₹1650</span>, undercutting your <b>B0C9HPNFW7</b> by <span class='rupee'>₹249</span>.",
+  "why": "Your floor is <span class='rupee'>₹1559</span>, so repricing to <span class='rupee'>₹1617</span> stays above breakeven while defending the Buy Box (now 53%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 48,
+  "exposure_val": "₹2.0L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹1650",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1899",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹1559",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 9,
+  "dedup_key": "95f835af12e02bad",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0D8TGRHDM",
+  "category": "Car Accessories",
+  "finding": "<b>MotoShield</b> is selling at <span class='rupee'>₹1560</span>, undercutting your <b>B0D8TGRHDM</b> by <span class='rupee'>₹59</span>.",
+  "why": "Your floor is <span class='rupee'>₹1318</span>, so repricing to <span class='rupee'>₹1529</span> stays above breakeven while defending the Buy Box (now 79%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 44,
+  "exposure_val": "₹1.8L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹1560",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1619",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹1318",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 10,
+  "dedup_key": "5aef768867f900e5",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0CDC1HYPC",
+  "category": "Car Accessories",
+  "finding": "<b>GenericCo</b> is selling at <span class='rupee'>₹1863</span>, undercutting your <b>B0CDC1HYPC</b> by <span class='rupee'>₹136</span>.",
+  "why": "Your floor is <span class='rupee'>₹1722</span>, so repricing to <span class='rupee'>₹1826</span> stays above breakeven while defending the Buy Box (now 94%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 36,
+  "exposure_val": "₹1.5L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹1863",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1999",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹1722",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 11,
+  "dedup_key": "adaa17d4e87af7d7",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0DK916Q7C",
+  "category": "Car Accessories",
+  "finding": "<b>CarKraft</b> is selling at <span class='rupee'>₹2154</span>, undercutting your <b>B0DK916Q7C</b> by <span class='rupee'>₹238</span>.",
+  "why": "Your floor is <span class='rupee'>₹2055</span>, so repricing to <span class='rupee'>₹2111</span> stays above breakeven while defending the Buy Box (now 84%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 31,
+  "exposure_val": "₹1.3L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹2154",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹2392",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹2055",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 12,
+  "dedup_key": "780fe668db4d340c",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B091YZ4RBM",
+  "category": "Car Accessories",
+  "finding": "<b>GenericCo</b> is selling at <span class='rupee'>₹449</span>, undercutting your <b>B091YZ4RBM</b> by <span class='rupee'>₹50</span>.",
+  "why": "Your floor is <span class='rupee'>₹419</span>, so repricing to <span class='rupee'>₹440</span> stays above breakeven while defending the Buy Box (now 91%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 27,
+  "exposure_val": "₹1.1L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹449",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹499",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹419",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 13,
+  "dedup_key": "e26e5c1f8b7af844",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B09ZVRSND8",
+  "category": "Car Accessories",
+  "finding": "<b>MotoShield</b> is selling at <span class='rupee'>₹1329</span>, undercutting your <b>B09ZVRSND8</b> by <span class='rupee'>₹70</span>.",
+  "why": "Your floor is <span class='rupee'>₹1133</span>, so repricing to <span class='rupee'>₹1303</span> stays above breakeven while defending the Buy Box (now 67%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 25,
+  "exposure_val": "₹1.1L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹1329",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1399",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹1133",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 14,
+  "dedup_key": "6e19b82273f25cee",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0BCX4GR8K",
+  "category": "Car Accessories",
+  "finding": "<b>ShieldPro</b> is selling at <span class='rupee'>₹1270</span>, undercutting your <b>B0BCX4GR8K</b> by <span class='rupee'>₹159</span>.",
+  "why": "Your floor is <span class='rupee'>₹1156</span>, so repricing to <span class='rupee'>₹1245</span> stays above breakeven while defending the Buy Box (now 83%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 24,
+  "exposure_val": "₹1.0L",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹1270",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1429",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹1156",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 15,
+  "dedup_key": "8f3b961b623e37e9",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B091ZJ1KH6",
+  "category": "Car Electronics",
+  "finding": "<b>GenericCo</b> is selling at <span class='rupee'>₹688</span>, undercutting your <b>B091ZJ1KH6</b> by <span class='rupee'>₹61</span>.",
+  "why": "Your floor is <span class='rupee'>₹608</span>, so repricing to <span class='rupee'>₹674</span> stays above breakeven while defending the Buy Box (now 68%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹74K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹688",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹749",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹608",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 16,
+  "dedup_key": "ea7e2a569bd3db1c",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0DJGQLT6T",
+  "category": "Car Accessories",
+  "finding": "<b>CarKraft</b> is selling at <span class='rupee'>₹3920</span>, undercutting your <b>B0DJGQLT6T</b> by <span class='rupee'>₹479</span>.",
+  "why": "Your floor is <span class='rupee'>₹3616</span>, so repricing to <span class='rupee'>₹3842</span> stays above breakeven while defending the Buy Box (now 81%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹67K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹3920",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹4399",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹3616",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 17,
+  "dedup_key": "b2ec157c63ccd466",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0D8TCMD9P",
+  "category": "Car Accessories",
+  "finding": "<b>MotoShield</b> is selling at <span class='rupee'>₹2188</span>, undercutting your <b>B0D8TCMD9P</b> by <span class='rupee'>₹111</span>.",
+  "why": "Your floor is <span class='rupee'>₹1991</span>, so repricing to <span class='rupee'>₹2144</span> stays above breakeven while defending the Buy Box (now 97%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹65K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹2188",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹2299",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹1991",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 18,
+  "dedup_key": "5bf407f66d27d8c2",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0DM28PRG7",
+  "category": "Car Electronics",
+  "finding": "<b>RoadArmour</b> is selling at <span class='rupee'>₹3438</span>, undercutting your <b>B0DM28PRG7</b> by <span class='rupee'>₹331</span>.",
+  "why": "Your floor is <span class='rupee'>₹3206</span>, so repricing to <span class='rupee'>₹3370</span> stays above breakeven while defending the Buy Box (now 94%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹62K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹3438",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹3769",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹3206",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 19,
+  "dedup_key": "08d0da268fbdf266",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0C7MMPNH3",
+  "category": "Car Accessories",
+  "finding": "<b>ShieldPro</b> is selling at <span class='rupee'>₹1621</span>, undercutting your <b>B0C7MMPNH3</b> by <span class='rupee'>₹208</span>.",
+  "why": "Your floor is <span class='rupee'>₹1576</span>, so repricing to <span class='rupee'>₹1588</span> stays above breakeven while defending the Buy Box (now 70%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹59K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹1621",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1829",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹1576",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 20,
+  "dedup_key": "0d4c4b6c90c556e9",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0CDC2XKDH",
+  "category": "Car Accessories",
+  "finding": "<b>CarKraft</b> is selling at <span class='rupee'>₹1879</span>, undercutting your <b>B0CDC2XKDH</b> by <span class='rupee'>₹65</span>.",
+  "why": "Your floor is <span class='rupee'>₹1603</span>, so repricing to <span class='rupee'>₹1841</span> stays above breakeven while defending the Buy Box (now 89%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹57K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹1879",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1944",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹1603",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 21,
+  "dedup_key": "2fba17604cfcf868",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0DK8Y9RX1",
+  "category": "Car Accessories",
+  "finding": "<b>MotoShield</b> is selling at <span class='rupee'>₹5808</span>, undercutting your <b>B0DK8Y9RX1</b> by <span class='rupee'>₹311</span>.",
+  "why": "Your floor is <span class='rupee'>₹5282</span>, so repricing to <span class='rupee'>₹5692</span> stays above breakeven while defending the Buy Box (now 93%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹53K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹5808",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹6119",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹5282",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 22,
+  "dedup_key": "076dfd557e2efc56",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0CWPD2GYG",
+  "category": "Car Electronics",
+  "finding": "<b>CarKraft</b> is selling at <span class='rupee'>₹1374</span>, undercutting your <b>B0CWPD2GYG</b> by <span class='rupee'>₹125</span>.",
+  "why": "Your floor is <span class='rupee'>₹1257</span>, so repricing to <span class='rupee'>₹1347</span> stays above breakeven while defending the Buy Box (now 79%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹50K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹1374",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹1499",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹1257",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 23,
+  "dedup_key": "5141fca88ba1650b",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0DJGMY9SJ",
+  "category": "Car Accessories",
+  "finding": "<b>GenericCo</b> is selling at <span class='rupee'>₹3616</span>, undercutting your <b>B0DJGMY9SJ</b> by <span class='rupee'>₹443</span>.",
+  "why": "Your floor is <span class='rupee'>₹3262</span>, so repricing to <span class='rupee'>₹3544</span> stays above breakeven while defending the Buy Box (now 96%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹48K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹3616",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹4059",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹3262",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 24,
+  "dedup_key": "f2412269002a49f6",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0FL8148V2",
+  "category": "Car Electronics",
+  "finding": "<b>RoadArmour</b> is selling at <span class='rupee'>₹3387</span>, undercutting your <b>B0FL8148V2</b> by <span class='rupee'>₹212</span>.",
+  "why": "Your floor is <span class='rupee'>₹3069</span>, so repricing to <span class='rupee'>₹3319</span> stays above breakeven while defending the Buy Box (now 98%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹46K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹3387",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹3599",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹3069",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 25,
+  "dedup_key": "414f3ae06e96a842",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0DGD5QTJ4",
+  "category": "Car Electronics",
+  "finding": "<b>MotoShield</b> is selling at <span class='rupee'>₹2235</span>, undercutting your <b>B0DGD5QTJ4</b> by <span class='rupee'>₹310</span>.",
+  "why": "Your floor is <span class='rupee'>₹2123</span>, so repricing to <span class='rupee'>₹2191</span> stays above breakeven while defending the Buy Box (now 99%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹44K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹2235",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹2545",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹2123",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 26,
+  "dedup_key": "c5ca7ca591f39d5c",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0FGJQ52BR",
+  "category": "Other Accessories",
+  "finding": "<b>ShieldPro</b> is selling at <span class='rupee'>₹3652</span>, undercutting your <b>B0FGJQ52BR</b> by <span class='rupee'>₹347</span>.",
+  "why": "Your floor is <span class='rupee'>₹3349</span>, so repricing to <span class='rupee'>₹3579</span> stays above breakeven while defending the Buy Box (now 99%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹41K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹3652",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹3999",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹3349",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 27,
+  "dedup_key": "4567d5cf4c4591df",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0GVHS8BNZ",
+  "category": "Car Electronics",
+  "finding": "<b>RoadArmour</b> is selling at <span class='rupee'>₹17925</span>, undercutting your <b>B0GVHS8BNZ</b> by <span class='rupee'>₹1074</span>.",
+  "why": "Your floor is <span class='rupee'>₹15099</span>, so repricing to <span class='rupee'>₹17566</span> stays above breakeven while defending the Buy Box (now 53%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹40K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹17925",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹18999",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹15099",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 28,
+  "dedup_key": "914b50de33f188e9",
+  "run_id": 1,
+  "card_type": "C1",
+  "family": "competitive",
+  "type_name": "Competitor Move",
+  "asin": "B0GPQMXCND",
+  "category": "Car Electronics",
+  "finding": "<b>MotoShield</b> is selling at <span class='rupee'>₹7689</span>, undercutting your <b>B0GPQMXCND</b> by <span class='rupee'>₹310</span>.",
+  "why": "Your floor is <span class='rupee'>₹6801</span>, so repricing to <span class='rupee'>₹7535</span> stays above breakeven while defending the Buy Box (now 99%).",
+  "severity": "act",
+  "sev_label": "Act today",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "Your monthly revenue on this SKU",
+  "exposure_pct": 20,
+  "exposure_val": "₹39K",
+  "action": "Reprice",
+  "sources": [
+   "KEEPA/SP-API",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Their price",
+    "₹7689",
+    "neg"
+   ],
+   [
+    "Your price",
+    "₹7999",
+    ""
+   ],
+   [
+    "Your floor",
+    "₹6801",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor price",
+    "KEEPA/SP-API"
+   ],
+   [
+    "your price",
+    "OWN"
+   ],
+   [
+    "floor",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 49,
+  "dedup_key": "cbea8e65a8797581",
+  "run_id": 1,
+  "card_type": "C5",
+  "family": "opportunity",
+  "type_name": "Opportunity Surfaced",
+  "asin": null,
+  "category": "Bike Accessories",
+  "finding": "A niche cleared your opportunity threshold in <b>Bike Accessories</b> — score 88.",
+  "why": "Adjacent to your catalog with strong margin and low competition. Modeled — validate demand first.",
+  "severity": "opp",
+  "sev_label": "Opportunity",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Fit with your catalog & sourcing",
+  "exposure_pct": 45,
+  "exposure_val": "₹1.9L",
+  "action": "Research deeper",
+  "sources": [
+   "MODEL",
+   "TIER-C"
+  ],
+  "minis": [
+   [
+    "Score",
+    "88",
+    "pos"
+   ],
+   [
+    "Est. revenue",
+    "₹1.9L/mo",
+    "pos"
+   ],
+   [
+    "Competition",
+    "low",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "trend",
+    "TIER-C"
+   ],
+   [
+    "score",
+    "MODEL"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 52,
+  "dedup_key": "c9e51b0d5e2074d7",
+  "run_id": 1,
+  "card_type": "C8",
+  "family": "news",
+  "type_name": "Recall / Regulatory",
+  "asin": null,
+  "category": "Car Accessories",
+  "finding": "BIS quality order flags phthalate limits on PVC car covers",
+  "why": "Two competitor PVC cover lines fall under a revised phthalate limit and are likely to be delisted. Govt source — confidence maximal.",
+  "severity": "opp",
+  "sev_label": "Opportunity",
+  "confidence": 4,
+  "conf_label": "Very high",
+  "exposure_label": "Capture potential in your category",
+  "exposure_pct": 43,
+  "exposure_val": "₹1.8L",
+  "action": "Plan capture",
+  "sources": [
+   "TIER-C"
+  ],
+  "minis": [
+   [
+    "Source",
+    "BIS govt",
+    "pos"
+   ]
+  ],
+  "provenance": [
+   [
+    "BIS govt feed",
+    "TIER-C"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 29,
+  "dedup_key": "f7a6eff5dffbd37d",
+  "run_id": 1,
+  "card_type": "C2",
+  "family": "competitive",
+  "type_name": "New Entrant",
+  "asin": "B09ZVQ29FB",
+  "category": "Car Accessories",
+  "finding": "Offer count on <b>B09ZVQ29FB</b> jumped from 9 to 17 — a likely new entrant.",
+  "why": "Watch weekly; if a new seller takes Buy Box on this SKU it becomes a pricing decision.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Contested revenue",
+  "exposure_pct": 95,
+  "exposure_val": "₹13.6L",
+  "action": "Add to watchlist",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Offers now",
+    "17",
+    "neg"
+   ],
+   [
+    "Prior",
+    "9",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "offer count",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 42,
+  "dedup_key": "2121f844b4c82e32",
+  "run_id": 1,
+  "card_type": "C3",
+  "family": "demand",
+  "type_name": "Demand Shift",
+  "asin": "B0D8TGZFVB",
+  "category": "Car Accessories",
+  "finding": "<b>B0D8TGZFVB</b> is climbing — current BSR 20,634 vs 30-day avg 30,353.",
+  "why": "Rank improvement isn't price-driven, so it's real demand. Protect stock and lean ad spend in.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "You carry this — scale headroom",
+  "exposure_pct": 95,
+  "exposure_val": "₹4.8L",
+  "action": "Scale & restock",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Current BSR",
+    "20,634",
+    "pos"
+   ],
+   [
+    "30d avg",
+    "30,353",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "BSR",
+    "KEEPA"
+   ],
+   [
+    "trend",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 30,
+  "dedup_key": "7dbd9815cb59f44f",
+  "run_id": 1,
+  "card_type": "C2",
+  "family": "competitive",
+  "type_name": "New Entrant",
+  "asin": "B0DCGFHXD1",
+  "category": "Car Accessories",
+  "finding": "Offer count on <b>B0DCGFHXD1</b> jumped from 11 to 25 — a likely new entrant.",
+  "why": "Watch weekly; if a new seller takes Buy Box on this SKU it becomes a pricing decision.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Contested revenue",
+  "exposure_pct": 82,
+  "exposure_val": "₹3.4L",
+  "action": "Add to watchlist",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Offers now",
+    "25",
+    "neg"
+   ],
+   [
+    "Prior",
+    "11",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "offer count",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 50,
+  "dedup_key": "6c522a5df035eaa8",
+  "run_id": 1,
+  "card_type": "C6",
+  "family": "opportunity",
+  "type_name": "Assortment Gap Widened",
+  "asin": null,
+  "category": "Car Accessories",
+  "finding": "Competitors carry ~68 SKUs in <b>Car Accessories</b>; you carry 31. The gap is worth ~<span class='rupee'>₹2.3L</span>/mo.",
+  "why": "A sourcing decision, not a quick win — flagged for evaluation.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Unserved demand in your category",
+  "exposure_pct": 55,
+  "exposure_val": "₹2.3L",
+  "action": "Send to sourcing",
+  "sources": [
+   "KEEPA",
+   "OWN"
+  ],
+  "minis": [
+   [
+    "Competitor SKUs",
+    "68",
+    "neg"
+   ],
+   [
+    "Your SKUs",
+    "31",
+    "neg"
+   ]
+  ],
+  "provenance": [
+   [
+    "competitor assortment",
+    "KEEPA"
+   ],
+   [
+    "your coverage",
+    "OWN"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 43,
+  "dedup_key": "df8948e3247d424c",
+  "run_id": 1,
+  "card_type": "C3",
+  "family": "demand",
+  "type_name": "Demand Shift",
+  "asin": "B0D8TGRHDM",
+  "category": "Car Accessories",
+  "finding": "<b>B0D8TGRHDM</b> is climbing — current BSR 64,201 vs 30-day avg 113,726.",
+  "why": "Rank improvement isn't price-driven, so it's real demand. Protect stock and lean ad spend in.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "You carry this — scale headroom",
+  "exposure_pct": 44,
+  "exposure_val": "₹1.8L",
+  "action": "Scale & restock",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Current BSR",
+    "64,201",
+    "pos"
+   ],
+   [
+    "30d avg",
+    "113,726",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "BSR",
+    "KEEPA"
+   ],
+   [
+    "trend",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 51,
+  "dedup_key": "7106cef0b82f7e13",
+  "run_id": 1,
+  "card_type": "C7",
+  "family": "news",
+  "type_name": "Category News",
+  "asin": null,
+  "category": "Car Accessories",
+  "finding": "GST rate revision reported on auto-accessory inputs",
+  "why": "A reported GST change may raise PVC cover landed cost ~3-4% next quarter, lifting breakeven floors across the PVC line.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "SKUs with exposure",
+  "exposure_pct": 43,
+  "exposure_val": "₹1.8L",
+  "action": "Watch story",
+  "sources": [
+   "TIER-C"
+  ],
+  "minis": [
+   [
+    "Status",
+    "reported",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "news API",
+    "TIER-C"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 31,
+  "dedup_key": "5765bf81777d7d49",
+  "run_id": 1,
+  "card_type": "C2",
+  "family": "competitive",
+  "type_name": "New Entrant",
+  "asin": "B0D8TGZFVB",
+  "category": "Car Accessories",
+  "finding": "Offer count on <b>B0D8TGZFVB</b> jumped from 12 to 31 — a likely new entrant.",
+  "why": "Watch weekly; if a new seller takes Buy Box on this SKU it becomes a pricing decision.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Contested revenue",
+  "exposure_pct": 34,
+  "exposure_val": "₹1.4L",
+  "action": "Add to watchlist",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Offers now",
+    "31",
+    "neg"
+   ],
+   [
+    "Prior",
+    "12",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "offer count",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 44,
+  "dedup_key": "917b86bc5d8533ce",
+  "run_id": 1,
+  "card_type": "C3",
+  "family": "demand",
+  "type_name": "Demand Shift",
+  "asin": "B0DCG9KHM3",
+  "category": "Car Accessories",
+  "finding": "<b>B0DCG9KHM3</b> is climbing — current BSR 32,417 vs 30-day avg 48,840.",
+  "why": "Rank improvement isn't price-driven, so it's real demand. Protect stock and lean ad spend in.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "You carry this — scale headroom",
+  "exposure_pct": 29,
+  "exposure_val": "₹1.2L",
+  "action": "Scale & restock",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Current BSR",
+    "32,417",
+    "pos"
+   ],
+   [
+    "30d avg",
+    "48,840",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "BSR",
+    "KEEPA"
+   ],
+   [
+    "trend",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 45,
+  "dedup_key": "ca5af43609edab7a",
+  "run_id": 1,
+  "card_type": "C3",
+  "family": "demand",
+  "type_name": "Demand Shift",
+  "asin": "B0C7MLPRLB",
+  "category": "Car Accessories",
+  "finding": "<b>B0C7MLPRLB</b> is climbing — current BSR 21,661 vs 30-day avg 37,964.",
+  "why": "Rank improvement isn't price-driven, so it's real demand. Protect stock and lean ad spend in.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "You carry this — scale headroom",
+  "exposure_pct": 21,
+  "exposure_val": "₹90K",
+  "action": "Scale & restock",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Current BSR",
+    "21,661",
+    "pos"
+   ],
+   [
+    "30d avg",
+    "37,964",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "BSR",
+    "KEEPA"
+   ],
+   [
+    "trend",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 53,
+  "dedup_key": "e597fb30b30967dd",
+  "run_id": 1,
+  "card_type": "C9",
+  "family": "news",
+  "type_name": "Social / Virality",
+  "asin": null,
+  "category": "Car Electronics",
+  "finding": "'Car interior makeover' reel format gaining traction",
+  "why": "Social velocity rising around ambient interior lighting; demand not yet confirmed by BSR/search. Ranked low and flagged — promotes to a Demand card if data corroborates.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 1,
+  "conf_label": "Low",
+  "exposure_label": "Adjacent to your catalog",
+  "exposure_pct": 21,
+  "exposure_val": "₹90K",
+  "action": "Research deeper",
+  "sources": [
+   "TIER-C"
+  ],
+  "minis": [
+   [
+    "Confirmed?",
+    "not yet",
+    "neg"
+   ]
+  ],
+  "provenance": [
+   [
+    "social listening",
+    "TIER-C"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 32,
+  "dedup_key": "4a8ca9d294dae3f3",
+  "run_id": 1,
+  "card_type": "C2",
+  "family": "competitive",
+  "type_name": "New Entrant",
+  "asin": "B0D8TF7DXB",
+  "category": "Car Accessories",
+  "finding": "Offer count on <b>B0D8TF7DXB</b> jumped from 7 to 20 — a likely new entrant.",
+  "why": "Watch weekly; if a new seller takes Buy Box on this SKU it becomes a pricing decision.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Contested revenue",
+  "exposure_pct": 20,
+  "exposure_val": "₹68K",
+  "action": "Add to watchlist",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Offers now",
+    "20",
+    "neg"
+   ],
+   [
+    "Prior",
+    "7",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "offer count",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 33,
+  "dedup_key": "63af23beb2e4a13a",
+  "run_id": 1,
+  "card_type": "C2",
+  "family": "competitive",
+  "type_name": "New Entrant",
+  "asin": "B0C9HNMZ97",
+  "category": "Car Accessories",
+  "finding": "Offer count on <b>B0C9HNMZ97</b> jumped from 20 to 36 — a likely new entrant.",
+  "why": "Watch weekly; if a new seller takes Buy Box on this SKU it becomes a pricing decision.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Contested revenue",
+  "exposure_pct": 20,
+  "exposure_val": "₹50K",
+  "action": "Add to watchlist",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Offers now",
+    "36",
+    "neg"
+   ],
+   [
+    "Prior",
+    "20",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "offer count",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 34,
+  "dedup_key": "a49f4c0b0a66cb6b",
+  "run_id": 1,
+  "card_type": "C2",
+  "family": "competitive",
+  "type_name": "New Entrant",
+  "asin": "B0DK916Q7C",
+  "category": "Car Accessories",
+  "finding": "Offer count on <b>B0DK916Q7C</b> jumped from 7 to 21 — a likely new entrant.",
+  "why": "Watch weekly; if a new seller takes Buy Box on this SKU it becomes a pricing decision.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Contested revenue",
+  "exposure_pct": 20,
+  "exposure_val": "₹39K",
+  "action": "Add to watchlist",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Offers now",
+    "21",
+    "neg"
+   ],
+   [
+    "Prior",
+    "7",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "offer count",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 35,
+  "dedup_key": "527f864d06fd5d5a",
+  "run_id": 1,
+  "card_type": "C2",
+  "family": "competitive",
+  "type_name": "New Entrant",
+  "asin": "B0DCG9KHM3",
+  "category": "Car Accessories",
+  "finding": "Offer count on <b>B0DCG9KHM3</b> jumped from 12 to 40 — a likely new entrant.",
+  "why": "Watch weekly; if a new seller takes Buy Box on this SKU it becomes a pricing decision.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Contested revenue",
+  "exposure_pct": 20,
+  "exposure_val": "₹37K",
+  "action": "Add to watchlist",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Offers now",
+    "40",
+    "neg"
+   ],
+   [
+    "Prior",
+    "12",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "offer count",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 36,
+  "dedup_key": "792b5796e3685c98",
+  "run_id": 1,
+  "card_type": "C2",
+  "family": "competitive",
+  "type_name": "New Entrant",
+  "asin": "B0BCX4GR8K",
+  "category": "Car Accessories",
+  "finding": "Offer count on <b>B0BCX4GR8K</b> jumped from 7 to 27 — a likely new entrant.",
+  "why": "Watch weekly; if a new seller takes Buy Box on this SKU it becomes a pricing decision.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Contested revenue",
+  "exposure_pct": 20,
+  "exposure_val": "₹30K",
+  "action": "Add to watchlist",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Offers now",
+    "27",
+    "neg"
+   ],
+   [
+    "Prior",
+    "7",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "offer count",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 37,
+  "dedup_key": "4ea92b07d55bfff0",
+  "run_id": 1,
+  "card_type": "C2",
+  "family": "competitive",
+  "type_name": "New Entrant",
+  "asin": "B0DQH4VSBD",
+  "category": "Other Accessories",
+  "finding": "Offer count on <b>B0DQH4VSBD</b> jumped from 12 to 36 — a likely new entrant.",
+  "why": "Watch weekly; if a new seller takes Buy Box on this SKU it becomes a pricing decision.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Contested revenue",
+  "exposure_pct": 20,
+  "exposure_val": "₹24K",
+  "action": "Add to watchlist",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Offers now",
+    "36",
+    "neg"
+   ],
+   [
+    "Prior",
+    "12",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "offer count",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 38,
+  "dedup_key": "dbc180b8e9d20b17",
+  "run_id": 1,
+  "card_type": "C2",
+  "family": "competitive",
+  "type_name": "New Entrant",
+  "asin": "B0DJGQLT6T",
+  "category": "Car Accessories",
+  "finding": "Offer count on <b>B0DJGQLT6T</b> jumped from 17 to 26 — a likely new entrant.",
+  "why": "Watch weekly; if a new seller takes Buy Box on this SKU it becomes a pricing decision.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Contested revenue",
+  "exposure_pct": 20,
+  "exposure_val": "₹20K",
+  "action": "Add to watchlist",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Offers now",
+    "26",
+    "neg"
+   ],
+   [
+    "Prior",
+    "17",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "offer count",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 39,
+  "dedup_key": "6c0e68e3f0b00ce3",
+  "run_id": 1,
+  "card_type": "C2",
+  "family": "competitive",
+  "type_name": "New Entrant",
+  "asin": "B0DK8Y9RX1",
+  "category": "Car Accessories",
+  "finding": "Offer count on <b>B0DK8Y9RX1</b> jumped from 3 to 24 — a likely new entrant.",
+  "why": "Watch weekly; if a new seller takes Buy Box on this SKU it becomes a pricing decision.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Contested revenue",
+  "exposure_pct": 20,
+  "exposure_val": "₹16K",
+  "action": "Add to watchlist",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Offers now",
+    "24",
+    "neg"
+   ],
+   [
+    "Prior",
+    "3",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "offer count",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 40,
+  "dedup_key": "097e9fb2745edbd1",
+  "run_id": 1,
+  "card_type": "C2",
+  "family": "competitive",
+  "type_name": "New Entrant",
+  "asin": "B0DHH3H8SN",
+  "category": "Other Accessories",
+  "finding": "Offer count on <b>B0DHH3H8SN</b> jumped from 8 to 12 — a likely new entrant.",
+  "why": "Watch weekly; if a new seller takes Buy Box on this SKU it becomes a pricing decision.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Contested revenue",
+  "exposure_pct": 20,
+  "exposure_val": "₹15K",
+  "action": "Add to watchlist",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Offers now",
+    "12",
+    "neg"
+   ],
+   [
+    "Prior",
+    "8",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "offer count",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 41,
+  "dedup_key": "851b17524ac1d197",
+  "run_id": 1,
+  "card_type": "C2",
+  "family": "competitive",
+  "type_name": "New Entrant",
+  "asin": "B0CLJK6V76",
+  "category": "Other Accessories",
+  "finding": "Offer count on <b>B0CLJK6V76</b> jumped from 22 to 36 — a likely new entrant.",
+  "why": "Watch weekly; if a new seller takes Buy Box on this SKU it becomes a pricing decision.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 2,
+  "conf_label": "Medium",
+  "exposure_label": "Contested revenue",
+  "exposure_pct": 20,
+  "exposure_val": "₹13K",
+  "action": "Add to watchlist",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Offers now",
+    "36",
+    "neg"
+   ],
+   [
+    "Prior",
+    "22",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "offer count",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ },
+ {
+  "id": 46,
+  "dedup_key": "fbfc5d4e4d5225fe",
+  "run_id": 1,
+  "card_type": "C3",
+  "family": "demand",
+  "type_name": "Demand Shift",
+  "asin": "B0C7MMPNH3",
+  "category": "Car Accessories",
+  "finding": "<b>B0C7MMPNH3</b> is climbing — current BSR 57,944 vs 30-day avg 91,415.",
+  "why": "Rank improvement isn't price-driven, so it's real demand. Protect stock and lean ad spend in.",
+  "severity": "watch",
+  "sev_label": "Watch",
+  "confidence": 3,
+  "conf_label": "High",
+  "exposure_label": "You carry this — scale headroom",
+  "exposure_pct": 20,
+  "exposure_val": "₹59K",
+  "action": "Scale & restock",
+  "sources": [
+   "KEEPA"
+  ],
+  "minis": [
+   [
+    "Current BSR",
+    "57,944",
+    "pos"
+   ],
+   [
+    "30d avg",
+    "91,415",
+    ""
+   ]
+  ],
+  "provenance": [
+   [
+    "BSR",
+    "KEEPA"
+   ],
+   [
+    "trend",
+    "KEEPA"
+   ]
+  ],
+  "status": "new",
+  "is_new": 1,
+  "created_at": "2026-06-24T18:09:04+00:00",
+  "updated_at": "2026-06-24T18:09:04+00:00"
+ }
+]

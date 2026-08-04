@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Realify · Usage Analytics</title>
+<style>
+  :root{
+    --navy:#1F3864; --blue:#2E75B6; --green:#0F6E4F; --purple:#6A1B9A; --amber:#9a6a00;
+    --ink:#16202e; --grey:#5b6675; --line:#dbe2ec; --bg:#f4f7fb; --panel:#ffffff; --panel2:#eef3f9;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px}
+  .mono{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 22px 80px}
+  header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+  h1{font-size:22px;color:var(--navy);margin:0;letter-spacing:-.01em}
+  .sub{color:var(--grey);font-size:13px;margin:2px 0 0}
+  .controls{display:flex;gap:8px;align-items:center}
+  select,button,input{font:inherit}
+  select{padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}
+  /* gate */
+  .gate{max-width:420px;margin:80px auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px}
+  .gate h2{margin:0 0 4px;color:var(--navy);font-size:18px}
+  .gate p{color:var(--grey);font-size:13px;margin:0 0 16px}
+  .gate input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;margin-bottom:10px}
+  .gate button{width:100%;padding:10px;border:0;border-radius:9px;background:var(--navy);color:#fff;font-weight:600;cursor:pointer}
+  .gate .err{color:#9e2b25;font-size:12.5px;min-height:16px;margin-top:6px}
+  /* kpi cards */
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:18px 0}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;border-top:3px solid var(--blue)}
+  .kpi .lbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--grey)}
+  .kpi .val{font-size:28px;font-weight:700;color:var(--navy);margin-top:4px;line-height:1}
+  .kpi.u{border-top-color:var(--navy)} .kpi.v{border-top-color:var(--grey)}
+  .kpi.i{border-top-color:var(--blue)} .kpi.r{border-top-color:var(--purple)} .kpi.a{border-top-color:var(--green)}
+  /* panels */
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0}
+  .panel h3{margin:0 0 2px;color:var(--navy);font-size:15px}
+  .panel .ph{color:var(--grey);font-size:12.5px;margin:0 0 12px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--grey);margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left}
+  th{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--grey);font-weight:600}
+  td.num,th.num{text-align:right;font-family:"SF Mono",monospace}
+  tr:hover td{background:var(--panel2)}
+  .rank{color:var(--grey);width:30px}
+  .empty{color:var(--grey);font-size:13px;padding:20px 0;text-align:center}
+  .foot{color:var(--grey);font-size:11.5px;margin-top:24px}
+  @media (max-width:760px){ .kpis{grid-template-columns:repeat(2,1fr)} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- admin gate -->
+  <div id="gate" class="gate">
+    <h2>Usage analytics</h2>
+    <p>Internal dashboard. Enter the admin key to continue.</p>
+    <input id="key" type="password" placeholder="Admin key" autocomplete="off">
+    <button id="enter">View dashboard</button>
+    <div id="gateErr" class="err"></div>
+  </div>
+
+  <!-- dashboard -->
+  <div id="dash" style="display:none">
+    <header>
+      <div>
+        <h1>Usage analytics</h1>
+        <p class="sub">Active users and the insight → research → action funnel.</p>
+      </div>
+      <div class="controls">
+        <select id="range">
+          <option value="7">Last 7 days</option>
+          <option value="14" selected>Last 14 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+        </select>
+        <button id="refresh" style="padding:7px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;cursor:pointer">Refresh</button>
+      </div>
+    </header>
+
+    <div class="kpis">
+      <div class="kpi u"><div class="lbl">Active users</div><div class="val" id="k_users">–</div></div>
+      <div class="kpi v"><div class="lbl">Page views</div><div class="val" id="k_views">–</div></div>
+      <div class="kpi i"><div class="lbl">Insights clicked</div><div class="val" id="k_ins">–</div></div>
+      <div class="kpi r"><div class="lbl">Researched more</div><div class="val" id="k_res">–</div></div>
+      <div class="kpi a"><div class="lbl">Action click-outs</div><div class="val" id="k_act">–</div></div>
+    </div>
+
+    <div class="panel">
+      <h3>Daily activity</h3>
+      <p class="ph" id="chartSub">Distinct active users and funnel events per day.</p>
+      <div id="chart"></div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--navy)"></i>Active users</span>
+        <span><i class="dot" style="background:var(--blue)"></i>Insights clicked</span>
+        <span><i class="dot" style="background:var(--purple)"></i>Researched</span>
+        <span><i class="dot" style="background:var(--green)"></i>Action click-outs</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Top 10 users</h3>
+      <p class="ph">By total events in the selected range.</p>
+      <table>
+        <thead><tr>
+          <th class="rank">#</th><th>User</th>
+          <th class="num">Insights</th><th class="num">Research</th>
+          <th class="num">Actions</th><th class="num">Total</th><th>Last seen</th>
+        </tr></thead>
+        <tbody id="topBody"></tbody>
+      </table>
+      <div id="topEmpty" class="empty" style="display:none">No usage recorded yet in this range.</div>
+    </div>
+
+    <div class="foot">Events are attributed server-side from the session. This view is internal and admin-gated.</div>
+  </div>
+</div>
+
+<script>
+let ADMIN_KEY = "";
+const $ = id => document.getElementById(id);
+const H = () => ({ "x-realify-admin": ADMIN_KEY });
+const fmt = n => (n==null?0:n).toLocaleString();
+
+async function api(path){
+  const r = await fetch(path, { headers: H() });
+  if(r.status===403 || r.status===401){ const e=new Error("forbidden"); e.code=403; throw e; }
+  return r.json();
+}
+
+async function load(){
+  const days = $("range").value;
+  $("chartSub").textContent = `Distinct active users and funnel events per day, last ${days} days.`;
+  const [summary, top] = await Promise.all([
+    api(`/api/admin/analytics/summary?days=${days}`),
+    api(`/api/admin/analytics/top_users?days=${days}&limit=10`)
+  ]);
+  const t = summary.totals || {};
+  $("k_users").textContent = fmt(t.active_users);
+  $("k_views").textContent = fmt(t.page_views);
+  $("k_ins").textContent   = fmt(t.insight_clicks);
+  $("k_res").textContent   = fmt(t.researched);
+  $("k_act").textContent   = fmt(t.action_clickouts);
+  drawChart(summary.daily || []);
+  drawTop(top.users || []);
+}
+
+function drawChart(daily){
+  const W=1000, H=240, P={t:14,r:14,b:34,l:34};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b;
+  if(!daily.length){ $("chart").innerHTML='<div class="empty">No events recorded yet in this range.</div>'; return; }
+  const series=[
+    {k:"active_users",  c:"#1F3864"},
+    {k:"insight_clicks",c:"#2E75B6"},
+    {k:"researched",    c:"#6A1B9A"},
+    {k:"action_clickouts",c:"#0F6E4F"}
+  ];
+  const maxV = Math.max(1, ...daily.flatMap(d=>series.map(s=>d[s.k]||0)));
+  const n = daily.length;
+  const x = i => P.l + (n===1 ? iw/2 : (i*(iw/(n-1))));
+  const y = v => P.t + ih - (v/maxV)*ih;
+  const grid=[0,.25,.5,.75,1].map(f=>{
+    const gv=Math.round(maxV*f), gy=y(gv);
+    return `<line x1="${P.l}" y1="${gy}" x2="${W-P.r}" y2="${gy}" stroke="#eef3f9"/>`
+         + `<text x="${P.l-6}" y="${gy+3}" text-anchor="end" font-size="9.5" fill="#9aa6b6" font-family="SF Mono,monospace">${gv}</text>`;
+  }).join("");
+  // x labels: show ~6 evenly spaced
+  const step = Math.ceil(n/6);
+  const xlab = daily.map((d,i)=> (i%step===0||i===n-1)
+    ? `<text x="${x(i)}" y="${H-12}" text-anchor="middle" font-size="9.5" fill="#9aa6b6" font-family="SF Mono,monospace">${(d.day||'').slice(5)}</text>` : "").join("");
+  const lines = series.map(s=>{
+    const pts = daily.map((d,i)=>`${x(i)},${y(d[s.k]||0)}`).join(" ");
+    const dots = daily.map((d,i)=>`<circle cx="${x(i)}" cy="${y(d[s.k]||0)}" r="2.4" fill="${s.c}"/>`).join("");
+    return `<polyline points="${pts}" fill="none" stroke="${s.c}" stroke-width="2" stroke-linejoin="round"/>${dots}`;
+  }).join("");
+  $("chart").innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${grid}${xlab}${lines}</svg>`;
+}
+
+function drawTop(users){
+  const body=$("topBody");
+  if(!users.length){ body.innerHTML=""; $("topEmpty").style.display="block"; return; }
+  $("topEmpty").style.display="none";
+  body.innerHTML = users.map((u,i)=>`
+    <tr>
+      <td class="rank">${i+1}</td>
+      <td>${(u.email||"(unknown)").replace(/</g,"&lt;")}</td>
+      <td class="num">${fmt(u.insight_clicks)}</td>
+      <td class="num">${fmt(u.researched)}</td>
+      <td class="num">${fmt(u.action_clickouts)}</td>
+      <td class="num"><b>${fmt(u.events)}</b></td>
+      <td class="mono" style="font-size:12px;color:var(--grey)">${(u.last_seen||"").replace("T"," ").slice(0,16)}</td>
+    </tr>`).join("");
+}
+
+async function enter(){
+  ADMIN_KEY = $("key").value.trim();
+  if(!ADMIN_KEY){ $("gateErr").textContent="Enter the admin key."; return; }
+  $("gateErr").textContent="Checking…";
+  try{
+    await load();
+    $("gate").style.display="none";
+    $("dash").style.display="block";
+  }catch(e){
+    $("gateErr").textContent = e.code===403 ? "Invalid admin key, or admin key not set on the server." : "Could not load (is the server running?).";
+  }
+}
+
+$("enter").addEventListener("click", enter);
+$("key").addEventListener("keydown", e=>{ if(e.key==="Enter") enter(); });
+$("refresh").addEventListener("click", ()=>load().catch(()=>{}));
+$("range").addEventListener("change", ()=>load().catch(()=>{}));
+</script>
+</body>
+</html>
