@@ -194,11 +194,12 @@ export const FEED_TAG_TONES = {
 
 /* ── Right rail ── */
 
+/* No disconnect action, by product decision: a connection is removed by revoking
+   Realify's access at the provider, not from inside this rail. */
 export const RAIL_QUICK_ACTIONS = [
   { key: 'activity', label: 'View activity', icon: 'fa-eye' },
   { key: 'reconnect', label: 'Reconnect', icon: 'fa-rotate' },
   { key: 'pause', label: 'Pause sync', icon: 'fa-circle-pause' },
-  { key: 'disconnect', label: 'Disconnect', icon: 'fa-trash-can', danger: true },
 ];
 
 /** Recent-activity feed for the rail. Derived from the connector's own feeds. */
@@ -254,7 +255,9 @@ export const AUTHORIZE_PILLARS = [
     key: 'revocable',
     icon: 'fa-rotate-left',
     title: 'Revocable anytime',
-    body: 'Disconnect anytime from the provider or Realify',
+    /* Provider-side only — Realify itself no longer offers a disconnect action,
+       so promising one here would be a promise the UI does not keep. */
+    body: "Revoke Realify's access from your provider account anytime",
   },
 ];
 

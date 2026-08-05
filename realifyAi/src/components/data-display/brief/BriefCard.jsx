@@ -67,7 +67,7 @@ const BriefCard = ({ data, isLoading = false }) => {
               <span className="text-[10px] font-mono font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider block leading-tight">
                 {tile.label}
               </span>
-              <strong className={`text-xl sm:text-[22px] font-bold ${tile.color} block leading-tight mt-0.5`}>
+              <strong className={`text-xl sm:text-[22px] font-bold block leading-tight mt-0.5`}>
                 {tile.value ?? '—'}
               </strong>
             </div>

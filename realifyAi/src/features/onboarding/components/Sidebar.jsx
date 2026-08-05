@@ -20,7 +20,7 @@ const steps = [
   },
   {
     num: 4,
-    title: "Welcome to your Dashboard",
+    title: "Welcome to Workspace",
     desc: "Your command center is ready with powerful tools and AI-driven insights.",
   },
 ];
@@ -85,7 +85,7 @@ function Sidebar() {
 
           {/* Progress text */}
           <p className="text-sm text-gray-500 mb-5">
-            {completedCount} Out of 5 Steps Completed.
+            {completedCount} Out of 4 Steps Completed.
           </p>
 
           {/* Steps */}

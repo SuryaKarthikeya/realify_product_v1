@@ -8,7 +8,7 @@ import BriefHeaderControls from '@/components/data-display/brief/BriefHeaderCont
 import ProductDetailModal from '@/features/products/components/ProductDetailModal';
 import BriefCard from '@/components/data-display/brief/BriefCard';
 import { REALIFY_BRIEF } from '@/data/briefData';
-import { CHANNEL_TABS, ALL_PRODUCTS, PAGE_SIZE, CATEGORIES, DEFAULT_COLS, STATUS_OPTIONS, STATUS_STYLES } from '@/features/products/data/productsData';
+import { CHANNEL_TABS, ALL_PRODUCTS, PAGE_SIZE, CATEGORIES, DEFAULT_COLS, STATUS_OPTIONS, STATUS_STYLES, catalogSummary } from '@/features/products/data/productsData';
 import BinView from '@/features/products/components/BinView';
 import ProductEditView from '@/features/products/components/ProductEditView';
 
@@ -120,6 +120,16 @@ const ProductsListPage = () => {
 
   const totalPages = Math.ceil(sortedFiltered.length / PAGE_SIZE);
   const pageProducts = sortedFiltered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  /* Header counts describe the whole catalogue, so they read from productsData
+     rather than the filtered view — but they are still derived from it, never
+     written down. */
+  const summary = useMemo(() => catalogSummary(productsData), [productsData]);
+  const subtitle = [
+    `${summary.skus.toLocaleString()} SKU${summary.skus === 1 ? '' : 's'}`,
+    `avg ${summary.avgFilled}/${summary.fieldsPerSku} fields filled`,
+    `${summary.missingCogs} missing COGS`,
+  ].join(' · ');
 
   const toggleSelect = (id) => setSelectedIds(prev => {
     const next = new Set(prev);
@@ -318,7 +328,7 @@ const ProductsListPage = () => {
   return (
     <DashboardLayout
       title="Product Catalog"
-      subtitle="1447 SKUs &middot; avg 5.3/7 fields filled &middot; 59 missing COGS"
+      subtitle={subtitle}
       showTabs={false}
       showAIPrompt={false}
     >

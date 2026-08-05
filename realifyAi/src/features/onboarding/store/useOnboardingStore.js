@@ -9,7 +9,9 @@ export const useOnboardingStore = create((set) => ({
     email: "",
     phone: "",
     storeName: "",
-    gmvRange: "$500K - $1M",
+    gmvRange: "", // range bucket label, set by typing an amount or picking a range
+    annualGmv: "", // exact amount typed by the user, digits only
+
     primaryMarketplaces: [],
     goals: [
       { id: "1", title: "Increase Profitability", description: "Optimize pricing and reduce costs to maximize margins" },
