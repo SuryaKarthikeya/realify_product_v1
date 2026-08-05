@@ -86,8 +86,8 @@ const ALL_TIME_WINDOW_DAYS = 3650;
  * Keyed by this app's internal domain key, then by the API's `cards[].key`.
  */
 const CARD_VALUE_FORMAT = {
-  sales: { net_revenue: 'money', orders: 'count', units_sold: 'count', aov: 'money', buybox_pct: 'percent' },
-  margin: { cm1: 'money', gross_margin_pct: 'percent', cm2: 'money', cm3: 'money', unprofitable_skus: 'count' },
+  sales: { net_revenue: 'money', orders: 'count', conversion_rate: 'percent', aov: 'money', buybox_pct: 'percent' },
+  margin: { cm1: 'money', gross_margin: 'money', cm2: 'money', cm3: 'money', unprofitable_skus: 'count' },
   inventory: { days_of_cover: 'days', oos_risks: 'money', oos_skus: 'count', sell_through_pct: 'percent', dead_inventory: 'money' },
   ads: { total_ad_spend: 'money', roas: 'ratio', margin_adj_roas: 'ratio', ctr: 'percent', cpc: 'money' },
   cash: { cash_balance: 'money', cash_inflow: 'money', cash_outflow: 'money', net_cash_flow: 'money', payouts_pending: 'money' },

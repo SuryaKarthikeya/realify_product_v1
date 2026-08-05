@@ -151,18 +151,18 @@ def kpis(tenant_id, window=30):
     econ = {r["asin"]: dict(cogs=r["cogs"] or 0, ad=r["ad_cost_unit"] or 0)
             for r in SellerRepository(con).select_columns(tenant_id, ["asin", "cogs", "ad_cost_unit"])}
 
-    rev = units = referral = fba = cogs_tot = ad_tot = 0.0
+    rev = units = referral = fba = cogs_tot = 0.0
     for o in OrderRepository(con).window_rows(tenant_id, since):
         u = o["units"] or 0
         rev += o["gross"] or 0; units += u
         referral += o["referral_fee"] or 0; fba += o["fba_fee"] or 0
         e = econ.get(o["asin"], {"cogs":0,"ad":0})
-        cogs_tot += e["cogs"] * u; ad_tot += e["ad"] * u
-    # If per-unit ad cost isn't stamped on seller_skus, fall back to the ad report's own spend,
-    # normalized from its reported periods to a monthly figure and scaled to this window — the
-    # SAME fallback the reports-basis branch below already uses. A real orders-basis tenant can
-    # have ad_performance data without ad_cost_unit ever being set on the catalog.
-    if ad_tot <= 0 and rev > 0:
+        cogs_tot += e["cogs"] * u
+    # Ads spend = sum of all ad spend recorded in the ad performance report, normalized from
+    # its reported periods to a monthly figure and scaled to this window — not a per-unit-cost
+    # estimate.
+    ad_tot = 0.0
+    if rev > 0:
         try:
             ap = AdPerformanceRepository(con)
             total_spend = sum((v.get("spend") or 0) for v in ap.totals(tenant_id).values())
@@ -183,7 +183,7 @@ def kpis(tenant_id, window=30):
         # the window. Nothing is fabricated: every input is a value the reports supplied.
         basis = "reports"
         factor = window / 30.0
-        rev = units = margin = ad_tot = 0.0
+        rev = units = margin = 0.0
         for k in SellerRepository(con).all(tenant_id):
             um = k.get("units_month") or 0
             rev += um * (k.get("price") or 0)
@@ -191,17 +191,17 @@ def kpis(tenant_id, window=30):
             npu = k.get("net_profit_unit")
             if npu is not None:
                 margin += npu * um
-            ad_tot += (k.get("ad_cost_unit") or 0) * um
-        # If per-unit ad cost isn't stamped on the SKUs, fall back to the ad report's own spend,
-        # normalized from its reported periods to a monthly figure (what Profit & Ads reads).
-        if ad_tot <= 0:
-            try:
-                ap = AdPerformanceRepository(con)
-                total_spend = sum((v.get("spend") or 0) for v in ap.totals(tenant_id).values())
-                nper = len(ap.periods(tenant_id)) or 1
-                ad_tot = (total_spend / nper)
-            except Exception:
-                ad_tot = 0.0
+        # Ads spend = sum of all ad spend recorded in the ad performance report, normalized
+        # from its reported periods to a monthly figure (what Profit & Ads reads) — not a
+        # per-unit-cost estimate.
+        ad_tot = 0.0
+        try:
+            ap = AdPerformanceRepository(con)
+            total_spend = sum((v.get("spend") or 0) for v in ap.totals(tenant_id).values())
+            nper = len(ap.periods(tenant_id)) or 1
+            ad_tot = (total_spend / nper)
+        except Exception:
+            ad_tot = 0.0
         rev *= factor; units *= factor; margin *= factor; ad_tot *= factor
         # Cash received = settled per-period revenue where the transaction report gave us periods.
         try:
@@ -257,10 +257,15 @@ def kpis(tenant_id, window=30):
     buybox_vals = [r["buybox_pct"] for r in SellerRepository(con).select_columns(tenant_id, ["buybox_pct"])
                    if r["buybox_pct"] is not None]
     buybox_avg = round(sum(buybox_vals) / len(buybox_vals), 1) if buybox_vals else None
+    # Conversion Rate is a value sellers report directly (Sales & Traffic upload), never derived
+    # from clicks/orders — same convention as Buy Box % above.
+    conv_vals = TrafficRepository(con).conversion_values(tenant_id)
+    conversion_avg = round(sum(conv_vals) / len(conv_vals), 2) if conv_vals else None
     revenue_substats = [
         dict(key="net_revenue", label="Net Revenue", value=round(net_revenue), trend=None, note=reports_note),
         dict(key="orders", label="Orders", value=orders_ct, trend=None, note=reports_note),
-        dict(key="units_sold", label="Units Sold", value=int(order_agg["units"]), trend=None, note=reports_note),
+        dict(key="conversion_rate", label="Conversion Rate", value=conversion_avg, trend=None,
+             note=None if conversion_avg is not None else "no Sales & Traffic data"),
         dict(key="aov", label="AOV", value=(round(aov, 2) if aov is not None else None), trend=None,
              note=reports_note or (None if aov is not None else "no orders in window")),
         dict(key="buybox_pct", label="Buy Box %", value=buybox_avg, trend=None,
@@ -271,7 +276,7 @@ def kpis(tenant_id, window=30):
                          SellerRepository(con).select_columns(tenant_id, ["internal_sku", "net_margin_pct"])}
     unprofitable_skus = sum(1 for v in margin_pct_by_sku.values() if v is not None and v < 0)
     cm1 = net_revenue - cogs_tot
-    gross_margin_pct = round(cm1 / rev * 100, 1) if rev else None
+    gross_margin = round(cm1)
     storage_win = StorageFeeRepository(con).window_summary(tenant_id, since_month)
     settle_win = SettlementRepository(con).window_summary(tenant_id, since)
     gross_by_channel = SettlementRepository(con).window_gross_by_channel(tenant_id, since)
@@ -287,8 +292,8 @@ def kpis(tenant_id, window=30):
     cm2_pct = round(cm2 / rev * 100, 1) if rev else None
     cm3_pct = round(cm3 / rev * 100, 1) if rev else None
     margin_substats = [
+        dict(key="gross_margin", label="Gross Margin", value=gross_margin, trend=None, note=reports_note),
         dict(key="cm1", label="CM1", value=round(cm1), pct=cm1_pct, trend=None, note=reports_note),
-        dict(key="gross_margin_pct", label="Gross Margin %", value=gross_margin_pct, trend=None, note=reports_note),
         dict(key="cm2", label="CM2", value=round(cm2), pct=cm2_pct, trend=None, note=reports_note),
         dict(key="cm3", label="CM3", value=round(cm3), pct=cm3_pct, trend=None, note=reports_note),
         dict(key="unprofitable_skus", label="Unprofitable SKUs", value=unprofitable_skus, trend=None),
@@ -297,9 +302,12 @@ def kpis(tenant_id, window=30):
     sf = StockoutForecaster()
     oos_risk_ct = sum(1 for a in SellerRepository(con).asins(tenant_id)
                       if (sf.predict(con, tenant_id, a).get("value") or 999) < 7)
+    # Days of Cover = sum, across SKUs, of (that SKU's inventory count / that SKU's sell velocity
+    # per day) — each SKU's own days_of_cover (already stock_on_hand/velocity_day, computed at
+    # ingest in report_writer.py) summed rather than averaged.
     days_cover_vals = [r["days_of_cover"] for r in SellerRepository(con).select_columns(tenant_id, ["days_of_cover"])
                        if r["days_of_cover"] is not None]
-    days_cover_avg = round(sum(days_cover_vals) / len(days_cover_vals), 1) if days_cover_vals else None
+    days_cover_avg = round(sum(days_cover_vals), 1) if days_cover_vals else None
     on_hand_by_sku = {}
     for r in inv:
         on_hand_by_sku[r["sku"]] = on_hand_by_sku.get(r["sku"], 0) + (r["on_hand"] or 0)
@@ -345,11 +353,11 @@ def kpis(tenant_id, window=30):
     cpa = round(entity_tot["spend"] / entity_tot["orders"], 2) if entity_tot["orders"] else None
     cvr = round(entity_tot["orders"] / entity_tot["clicks"] * 100, 2) if entity_tot["clicks"] else None
     ads_substats = [
-        dict(key="cvr", label="CVR", value=cvr, trend=None, note=entity_note),
         dict(key="roas", label="ROAS", value=roas, trend=None),
-        dict(key="cpa", label="CPA", value=cpa, trend=None, note=entity_note),
-        dict(key="ctr", label="CTR", value=None, trend=None, note="no impressions data tracked"),
         dict(key="cpc", label="CPC", value=cpc, trend=None, note=entity_note),
+        dict(key="ctr", label="CTR", value=None, trend=None, note="no impressions data tracked"),
+        dict(key="cpa", label="CPA", value=cpa, trend=None, note=entity_note),
+        dict(key="cvr", label="CVR", value=cvr, trend=None, note=entity_note),
     ]
 
     settle_all = SettlementRepository(con).all_time_summary(tenant_id)

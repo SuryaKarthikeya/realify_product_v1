@@ -15,6 +15,13 @@ class TrafficRepository(BaseRepository):
             "SELECT COUNT(*) c FROM traffic WHERE tenant_id=? AND conversion_pct IS NOT NULL",
             (tenant_id,)).fetchone()["c"]
 
+    def conversion_values(self, tenant_id):
+        """Non-null conversion_pct values as reported by the seller (Sales & Traffic upload) —
+        never computed from clicks/orders."""
+        return [r["conversion_pct"] for r in self.con.execute(
+            "SELECT conversion_pct FROM traffic WHERE tenant_id=? AND conversion_pct IS NOT NULL",
+            (tenant_id,)).fetchall()]
+
     def conversion_by_asin(self, tenant_id):
         """asin -> conversion_pct, joining traffic to channel_listings on internal_sku."""
         return self.con.execute(
