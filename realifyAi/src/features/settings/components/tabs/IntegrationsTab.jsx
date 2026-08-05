@@ -132,7 +132,7 @@ const ConnectForm = ({ platform, onClose, onConnected }) => {
 };
 
 const IntegrationsTab = () => {
-  const { connectedStores, addStore, removeStore } = useMarketplaceStore();
+  const { connectedStores, addStore } = useMarketplaceStore();
   const [connectingPlatform, setConnectingPlatform] = useState(null);
   const [justConnected, setJustConnected] = useState(null);
 
@@ -149,10 +149,6 @@ const IntegrationsTab = () => {
     setConnectingPlatform(null);
     setJustConnected(platform.id);
     setTimeout(() => setJustConnected(null), 3000);
-  };
-
-  const handleDisconnect = (id) => {
-    removeStore(id);
   };
 
   return (
@@ -195,12 +191,6 @@ const IntegrationsTab = () => {
                     </span>
                     <button className="px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-bold text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all">
                       Re-auth
-                    </button>
-                    <button
-                      onClick={() => handleDisconnect(app.id)}
-                      className="px-4 py-2 bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 rounded-xl text-sm font-bold hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
-                    >
-                      Disconnect
                     </button>
                   </>
                 ) : (

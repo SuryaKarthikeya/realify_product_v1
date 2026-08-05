@@ -1,8 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useExplainStore } from '@/store/useExplainStore';
 import { useIntegrationsStore } from '@/store/useIntegrationsStore';
+import { getDataCompleteness } from '@/services/dataService';
+
+/** "1 SKU" / "1,447 SKUs" — the count is read back as a live figure, so it has to read right. */
+const skuLabel = (n) => `${n.toLocaleString()} SKU${n === 1 ? '' : 's'}`;
 
 const ProfileDrawer = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -11,9 +15,29 @@ const ProfileDrawer = ({ isOpen, onClose }) => {
   const resetCompletedSetups = useIntegrationsStore((s) => s.resetCompletedSetups);
   const [deleteMode, setDeleteMode] = useState(false);
   const [wipeMode, setWipeMode] = useState(false);
-  
+
   const [password, setPassword] = useState('');
   const [confirmText, setConfirmText] = useState('');
+
+  /* Data completeness is fetched per open rather than once on mount: the drawer's
+     own "upload COGS" / "add reports" actions change these counts, so a cached
+     copy would show the user pre-upload coverage right after they uploaded.
+     State moves only inside the request callbacks — the previous read stays on
+     screen while a refetch is in flight instead of flashing a loading line. */
+  const [coverage, setCoverage] = useState({ status: 'loading', data: null });
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    let cancelled = false;
+    getDataCompleteness()
+      .then((data) => {
+        if (!cancelled) setCoverage({ status: 'ready', data });
+      })
+      .catch(() => {
+        if (!cancelled) setCoverage({ status: 'error', data: null });
+      });
+    return () => { cancelled = true; };
+  }, [isOpen]);
 
   const userName = user?.name || localStorage.getItem('user_name') || 'Rohit';
 
@@ -126,82 +150,49 @@ const ProfileDrawer = ({ isOpen, onClose }) => {
             <p className="text-[13px] text-gray-600 dark:text-slate-300 leading-relaxed mb-4">
               Detectors light up as you upload the reports that feed them. Anything missing stays dark — nothing is ever synthesized for your account.
             </p>
-            <p className="text-[12px] font-sans text-gray-500 mb-4 tracking-tight">
-              6/10 detector groups active · 1447 SKUs
-            </p>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-between py-1 border-b border-gray-50 dark:border-slate-700/50">
-                <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-check text-green-600 text-xs w-3" />
-                  <span className="text-[13px] text-gray-800 dark:text-slate-200">Price</span>
+            {coverage.data ? (
+              <>
+                <p className="text-[12px] font-sans text-gray-500 mb-4 tracking-tight">
+                  {coverage.data.active}/{coverage.data.total} detector groups active ·{' '}
+                  {skuLabel(coverage.data.skus ?? 0)}
+                </p>
+
+                <div className="space-y-3">
+                  {(coverage.data.fields ?? []).map((field, index) => (
+                    <div
+                      key={field.field}
+                      className={`flex items-center justify-between py-1 ${
+                        index < (coverage.data.fields.length - 1)
+                          ? 'border-b border-gray-50 dark:border-slate-700/50'
+                          : ''
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <i
+                          className={
+                            field.provided
+                              ? 'fa-solid fa-check text-green-600 text-xs w-3'
+                              : 'fa-regular fa-circle text-gray-300 dark:text-gray-600 text-xs w-3'
+                          }
+                        />
+                        <span className="text-[13px] text-gray-800 dark:text-slate-200">{field.label}</span>
+                      </div>
+                      <span className="text-[11px] font-sans text-gray-400">
+                        {field.provided ? skuLabel(field.skus ?? 0) : `add: ${field.report}`}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                <span className="text-[11px] font-sans text-gray-400">1424 SKUs</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-gray-50 dark:border-slate-700/50">
-                <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-check text-green-600 text-xs w-3" />
-                  <span className="text-[13px] text-gray-800 dark:text-slate-200">COGS</span>
-                </div>
-                <span className="text-[11px] font-sans text-gray-400">1388 SKUs</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-gray-50 dark:border-slate-700/50">
-                <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-check text-green-600 text-xs w-3" />
-                  <span className="text-[13px] text-gray-800 dark:text-slate-200">Margin</span>
-                </div>
-                <span className="text-[11px] font-sans text-gray-400">1 SKUs</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-gray-50 dark:border-slate-700/50">
-                <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-check text-green-600 text-xs w-3" />
-                  <span className="text-[13px] text-gray-800 dark:text-slate-200">Buy Box %</span>
-                </div>
-                <span className="text-[11px] font-sans text-gray-400">1273 SKUs</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-gray-50 dark:border-slate-700/50">
-                <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-check text-green-600 text-xs w-3" />
-                  <span className="text-[13px] text-gray-800 dark:text-slate-200">Sales velocity</span>
-                </div>
-                <span className="text-[11px] font-sans text-gray-400">395 SKUs</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-gray-50 dark:border-slate-700/50">
-                <div className="flex items-center gap-2">
-                  <i className="fa-regular fa-circle text-gray-300 dark:text-gray-600 text-xs w-3" />
-                  <span className="text-[13px] text-gray-800 dark:text-slate-200">Inventory & cover</span>
-                </div>
-                <span className="text-[11px] font-sans text-gray-400">add: Inventory report</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-gray-50 dark:border-slate-700/50">
-                <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-check text-green-600 text-xs w-3" />
-                  <span className="text-[13px] text-gray-800 dark:text-slate-200">Return rate</span>
-                </div>
-                <span className="text-[11px] font-sans text-gray-400">395 SKUs</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-gray-50 dark:border-slate-700/50">
-                <div className="flex items-center gap-2">
-                  <i className="fa-regular fa-circle text-gray-300 dark:text-gray-600 text-xs w-3" />
-                  <span className="text-[13px] text-gray-800 dark:text-slate-200">Ad efficiency (TACoS)</span>
-                </div>
-                <span className="text-[11px] font-sans text-gray-400">add: Ads / Sales report</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-gray-50 dark:border-slate-700/50">
-                <div className="flex items-center gap-2">
-                  <i className="fa-regular fa-circle text-gray-300 dark:text-gray-600 text-xs w-3" />
-                  <span className="text-[13px] text-gray-800 dark:text-slate-200">Rating & reviews</span>
-                </div>
-                <span className="text-[11px] font-sans text-gray-400">add: Listings export</span>
-              </div>
-              <div className="flex items-center justify-between py-1">
-                <div className="flex items-center gap-2">
-                  <i className="fa-regular fa-circle text-gray-300 dark:text-gray-600 text-xs w-3" />
-                  <span className="text-[13px] text-gray-800 dark:text-slate-200">Conversion</span>
-                </div>
-                <span className="text-[11px] font-sans text-gray-400">add: Sales & Traffic</span>
-              </div>
-            </div>
+              </>
+            ) : (
+              /* No placeholder counts here on purpose — a stand-in number in this
+                 card is indistinguishable from a real one. */
+              <p className="text-[12px] font-sans text-gray-400 tracking-tight">
+                {coverage.status === 'error'
+                  ? "Coverage couldn't be loaded. Reopen this panel to try again."
+                  : 'Checking what your reports have populated…'}
+              </p>
+            )}
           </div>
 
           {/* New: Your reports & COGS */}

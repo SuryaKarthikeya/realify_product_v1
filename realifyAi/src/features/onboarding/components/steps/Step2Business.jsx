@@ -1,7 +1,18 @@
 import { useState } from "react";
 import { useOnboardingStore } from "@/features/onboarding/store/useOnboardingStore";
 
-const gmvMarkers = ['$0', '$100K', '$500K', '$1M', '$5M', '$10M+'];
+// `min` is the lower bound of each bucket, so a typed figure can find its range.
+const gmvRanges = [
+  { label: 'Less than $100K', min: 0 },
+  { label: '$100K – $500K', min: 100000 },
+  { label: '$500K – $1M', min: 500000 },
+  { label: '$1M – $5M', min: 1000000 },
+  { label: '$5M – $10M', min: 5000000 },
+  { label: '$10M+', min: 10000000 },
+];
+
+const rangeForAmount = (amount) =>
+  gmvRanges.reduce((match, range) => (amount >= range.min ? range : match), gmvRanges[0]);
 
 const initialFocusItems = [
   { id: 'margin', label: 'Margin Optimization', desc: 'Focusing on profitability and unit economics' },
@@ -11,13 +22,29 @@ const initialFocusItems = [
 
 function Step2Business() {
   const { setStep, formValues, updateFormValues } = useOnboardingStore();
-  const [gmvSlider, setGmvSlider] = useState(2);
+  const [showGmvRanges, setShowGmvRanges] = useState(false);
   const [focusItems, setFocusItems] = useState(initialFocusItems);
   const [draggedId, setDraggedId] = useState(null);
 
-  const gmvDisplay = gmvSlider < gmvMarkers.length - 1
-    ? `${gmvMarkers[gmvSlider]} - ${gmvMarkers[gmvSlider + 1]}`
-    : gmvMarkers[gmvMarkers.length - 1];
+  const gmvInputDisplay = formValues.annualGmv
+    ? Number(formValues.annualGmv).toLocaleString('en-US')
+    : '';
+
+  // Typing an exact figure selects the range it falls in.
+  const handleGmvInput = (e) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 15);
+    if (!digits) {
+      updateFormValues({ annualGmv: '', gmvRange: '' });
+      return;
+    }
+    updateFormValues({ annualGmv: digits, gmvRange: rangeForAmount(Number(digits)).label });
+  };
+
+  // Picking a range snaps the exact figure to that range's lower bound so the
+  // two controls never disagree.
+  const handleGmvRange = (range) => {
+    updateFormValues({ annualGmv: String(range.min), gmvRange: range.label });
+  };
 
   const handleDragStart = (e, id) => {
     setDraggedId(id);
@@ -141,67 +168,93 @@ function Step2Business() {
           </div>
         </div> */}
 
-        {/* Annual GMV Range — Slider */}
+        {/* Annual GMV — exact figure, with an opt-in range picker */}
         <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
-              <i className="fa-solid fa-chart-simple text-gray-500 text-[10px]"></i>
+          <div className="flex items-start gap-2 mb-3">
+            <div className="w-7 h-7 rounded-2xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <i className="fa-solid fa-chart-simple text-gray-500 text-xs"></i>
             </div>
-            <h3 className="font-semibold text-gray-800 text-sm">Annual GMV Range</h3>
-          </div>
-          <div className="bg-gray-50 border border-gray-200 rounded-xl px-5 py-4">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-gray-500">Selected Range:</span>
-              <span className="text-sm font-bold text-gray-900">{gmvDisplay}</span>
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={5}
-              step={1}
-              value={gmvSlider}
-              onChange={(e) => setGmvSlider(parseInt(e.target.value))}
-              className="w-full accent-indigo-600 cursor-pointer"
-            />
-            <div className="flex justify-between mt-2">
-              {gmvMarkers.map((m) => (
-                <span key={m} className="text-xs text-gray-400">{m}</span>
-              ))}
+            <div>
+              <h3 className="font-semibold text-gray-900 text-sm flex items-center gap-1.5">
+                Annual GMV
+                <i
+                  className="fa-regular fa-circle-question text-gray-400 text-[11px]"
+                  title="Gross merchandise value — total sales across all your channels over the last 12 months."
+                ></i>
+              </h3>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Enter your approximate annual gross merchandise value.
+              </p>
             </div>
           </div>
-        </div>
 
-        {/* Primary Marketplaces — Pills */}
-        {/* <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
-              <i className="fa-solid fa-bag-shopping text-gray-500 text-[10px]"></i>
+          <div className="relative">
+            <input
+              type="text"
+              inputMode="numeric"
+              value={gmvInputDisplay}
+              onChange={handleGmvInput}
+              placeholder="e.g. 5,000,000"
+              className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-xl focus:border-gray-600 focus:outline-none focus:ring-1 focus:ring-gray-800 transition text-sm font-medium text-gray-900"
+            />
+          </div>
+
+            <button
+              type="button"
+              onClick={() => setShowGmvRanges((prev) => !prev)}
+              className="flex items-center gap-2.5 text-xs font-medium text-gray-400 hover:text-blue-700 transition mt-2"
+            >
+              <i className="fa-regular fa-circle-question text-sm"></i>
+              {showGmvRanges
+                ? 'Hide ranges'
+                : "Don't know your Annual GMV? Choose a range instead"}
+            </button>
+
+          {showGmvRanges && (
+            <div className="anim-fade-in">
+              <div className="flex items-center gap-3 my-4">
+                <div className="flex-1 border-t border-gray-200" />
+                <span className="text-xs font-medium text-gray-400">OR</span>
+                <div className="flex-1 border-t border-gray-200" />
+              </div>
+              <div className="flex items-start gap-2.5 mb-3">
+                <i className="fa-regular fa-circle-question text-indigo-600 text-sm mt-0.5"></i>
+                <div>
+                  <h4 className="font-semibold text-gray-900 text-sm">Choose a range instead</h4>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Select the range that best represents your annual gross merchandise value.
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {gmvRanges.map((range) => {
+                  const isSelected = formValues.gmvRange === range.label;
+                  return (
+                    <button
+                      key={range.label}
+                      type="button"
+                      onClick={() => handleGmvRange(range)}
+                      className={`flex items-center gap-2.5 px-3 py-3 border rounded-xl text-left transition ${
+                        isSelected
+                          ? 'border-indigo-600 ring-1 ring-indigo-600 bg-white'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <span
+                        className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          isSelected ? 'border-indigo-600' : 'border-gray-300'
+                        }`}
+                      >
+                        {isSelected && <span className="w-2 h-2 rounded-full bg-indigo-600" />}
+                      </span>
+                      <span className="text-sm text-gray-800">{range.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <h3 className="font-semibold text-gray-800 text-sm">
-              Primary Marketplaces{' '}
-              <span className="text-gray-400 font-normal">(Select all that apply)</span>
-            </h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {primaryMarketplaces.map((m) => {
-              const isSelected = formValues.primaryMarketplaces.includes(m.id);
-              return (
-                <button
-                  key={m.id}
-                  onClick={() => toggleMarketplace(m.id)}
-                  className={`flex items-center gap-2 px-4 py-2 border rounded-full text-sm font-medium transition select-none ${
-                    isSelected
-                      ? 'border-gray-700 bg-gray-50 text-gray-900'
-                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                  }`}
-                >
-                  <i className={`${m.icon} ${m.iconColor}`}></i>
-                  {m.name}
-                </button>
-              );
-            })}
-          </div>
-        </div> */}
+          )}
+        </div>
 
         {/* Strategic Focus — Draggable */}
         <div>

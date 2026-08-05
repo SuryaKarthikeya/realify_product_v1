@@ -25,6 +25,13 @@ export const API_PATHS = {
     // list pre-upload.
     CATALOG: '/ingest/catalog',
   },
+  // Per-tenant data coverage: which canonical fields real uploaded reports have
+  // populated, how many detector groups that lights up, and the SKU total.
+  // Mounted at /api/data/... and /api/v1/data/... — we use the unversioned one.
+  DATA: {
+    COMPLETENESS: '/data/completeness',
+    SKUS: '/skus',
+  },
   // Unversioned, same as ONBOARDING/AUTH above — mounted at /api/workspace,
   // not /api/v1/workspace.
   WORKSPACE: {

@@ -20,6 +20,37 @@ export const ALL_PRODUCTS = [
   { id: 15, name: 'Cotton Tote Bag', sku: 'APP-TOT-003', status: 'Draft', price: '$14', cogs: '$4', margin: '71.4%', returns: '2.8%', bb: '91%', salesTrend: 'down', category: 'Apparel', inventory: 640, velocity: '28/day', workspaceLabel: 'Stable', workspaceColor: 'text-gray-500 dark:text-slate-400', createdAt: new Date('2023-10-17'), updatedAt: new Date('2026-04-22') },
 ];
 
+/**
+ * The per-SKU fields the catalogue counts as "filled", mirroring the backend's
+ * completeness read (realify-mc `routers/skus.py::_COMPLETENESS`) so "x/7 fields
+ * filled" means the same thing on both sides.
+ */
+export const COMPLETENESS_FIELDS = ['price', 'cogs', 'margin', 'returns', 'bb', 'inventory', 'velocity'];
+
+const isFilled = (value) => value !== null && value !== undefined && value !== '';
+
+/**
+ * The counts in the Product Catalog header, derived from the rows the page is
+ * actually rendering.
+ *
+ * Deliberately computed rather than written down: a fixed SKU count in the
+ * header is read as a live figure, and it silently disagrees with the table the
+ * moment either one changes.
+ */
+export const catalogSummary = (products = []) => {
+  const skus = products.length;
+  const filled = products.reduce(
+    (sum, product) => sum + COMPLETENESS_FIELDS.filter((field) => isFilled(product[field])).length,
+    0
+  );
+  return {
+    skus,
+    fieldsPerSku: COMPLETENESS_FIELDS.length,
+    avgFilled: skus ? Math.round((filled / skus) * 10) / 10 : 0,
+    missingCogs: products.filter((product) => !isFilled(product.cogs)).length,
+  };
+};
+
 export const PAGE_SIZE = 10;
 export const CATEGORIES = ['All', 'Electronics', 'Apparel', 'Pet', 'Fitness', 'Furniture', 'Home', 'Accessories'];
 

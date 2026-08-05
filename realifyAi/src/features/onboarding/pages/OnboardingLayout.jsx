@@ -176,7 +176,7 @@ const ONBOARDING_STEPS = [
   { num: 1, title: "Create your Account", desc: "Sign up with email, phone, or social login to get started on your intelligence journey." },
   { num: 2, title: "Business Profile", desc: "Tell us about your store, revenue scale, and marketplace channels to personalize your experience." },
   { num: 3, title: "Connect your Data", desc: "Upload reports or set up with a guided wizard to start seeing real insights immediately." },
-  { num: 4, title: "Welcome to your Dashboard", desc: "Your command center is ready with powerful tools and AI-driven insights." },
+  { num: 4, title: "Welcome to your Workspace", desc: "Your command center is ready with powerful tools and AI-driven insights." },
 ];
 
 const FAQSection = () => {

@@ -342,13 +342,18 @@ const DETAIL_OVERRIDES = {
   },
 };
 
-/** Quick actions. `Disconnect` reads as destructive because it is. */
+/**
+ * Quick actions on the connector panel.
+ *
+ * No disconnect action, by product decision: a connection is removed by revoking
+ * Realify's access at the provider, not from inside this panel. Nothing here is
+ * destructive, so nothing carries the `danger` tone.
+ */
 const QUICK_ACTIONS = [
   { key: 'manage', label: 'Manage connector', icon: 'fa-gear' },
   { key: 'activity', label: 'View activity', icon: 'fa-eye' },
   { key: 'reconnect', label: 'Reconnect', icon: 'fa-rotate' },
   { key: 'pause', label: 'Pause sync', icon: 'fa-circle-pause' },
-  { key: 'disconnect', label: 'Disconnect', icon: 'fa-trash-can', danger: true },
 ];
 
 /**
