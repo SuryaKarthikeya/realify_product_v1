@@ -187,15 +187,22 @@ def _extract(rtype, df, n_months=1, resolver=None):
             add("asin", asin, "title", str(r.get("title") or "")[:120], "reported")
 
     elif rtype == STORAGE_FEE:
-        # a report may carry several monthly rows per ASIN; keep the latest month, then the merge
-        # sums across the ASINs that share a SKU (total current monthly storage / on-hand snapshot).
+        # A report may carry several monthly rows per ASIN, and several fulfilment-centre rows per
+        # month. Keep the LATEST month per ASIN, then SUM across that month's fulfilment-centre rows
+        # so stock_on_hand / storage fee is the TOTAL inventory on hand for the ASIN across all
+        # warehouses, not just one. The downstream merge then sums ASINs that share a SKU.
+        for c in ["estimated-monthly-storage-fee", "average-quantity-on-hand"]:
+            if c in df.columns:
+                df[c] = _num(df[c])
         if "month-of-charge" in df.columns:
-            df = df.sort_values("month-of-charge").groupby("asin", as_index=False).last()
-        for _, r in df.iterrows():
-            add("asin", r.get("asin"), "storage_fee_month",
-                _num(pd.Series([r.get("estimated-monthly-storage-fee")]))[0], "reported")
-            add("asin", r.get("asin"), "stock_on_hand",
-                _num(pd.Series([r.get("average-quantity-on-hand")]))[0], "reported")
+            latest = df.groupby("asin")["month-of-charge"].transform("max")
+            df = df[df["month-of-charge"] == latest]
+        g = df.groupby("asin", as_index=False).agg(
+            _fee=("estimated-monthly-storage-fee", "sum"),
+            _onhand=("average-quantity-on-hand", "sum"))
+        for _, r in g.iterrows():
+            add("asin", r.get("asin"), "storage_fee_month", float(r["_fee"]), "reported")
+            add("asin", r.get("asin"), "stock_on_hand", float(r["_onhand"]), "reported")
 
     elif rtype == FBA_RETURNS:
         cnt = {}

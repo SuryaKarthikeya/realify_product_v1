@@ -147,6 +147,9 @@ def kpis(tenant_id, window=30):
     con = db.connect()
     today = dt.date.today()
     since = (today - dt.timedelta(days=window)).isoformat()
+    # Fixed 30-day lookback for the monthly sell-velocity (Inventory domain). Independent of the
+    # selected window: velocity is a monthly run-rate from one real recent month, not the window.
+    since_30 = (today - dt.timedelta(days=30)).isoformat()
 
     econ = {r["asin"]: dict(cogs=r["cogs"] or 0, ad=r["ad_cost_unit"] or 0)
             for r in SellerRepository(con).select_columns(tenant_id, ["asin", "cogs", "ad_cost_unit"])}
@@ -276,7 +279,7 @@ def kpis(tenant_id, window=30):
                          SellerRepository(con).select_columns(tenant_id, ["internal_sku", "net_margin_pct"])}
     unprofitable_skus = sum(1 for v in margin_pct_by_sku.values() if v is not None and v < 0)
     cm1 = net_revenue - cogs_tot
-    gross_margin = round(cm1)
+    gross_profit = round(cm1)
     storage_win = StorageFeeRepository(con).window_summary(tenant_id, since_month)
     settle_win = SettlementRepository(con).window_summary(tenant_id, since)
     gross_by_channel = SettlementRepository(con).window_gross_by_channel(tenant_id, since)
@@ -292,7 +295,7 @@ def kpis(tenant_id, window=30):
     cm2_pct = round(cm2 / rev * 100, 1) if rev else None
     cm3_pct = round(cm3 / rev * 100, 1) if rev else None
     margin_substats = [
-        dict(key="gross_margin", label="Gross Margin", value=gross_margin, trend=None, note=reports_note),
+        dict(key="gross_profit", label="Gross Profit", value=gross_profit, trend=None, note=reports_note),
         dict(key="cm1", label="CM1", value=round(cm1), pct=cm1_pct, trend=None, note=reports_note),
         dict(key="cm2", label="CM2", value=round(cm2), pct=cm2_pct, trend=None, note=reports_note),
         dict(key="cm3", label="CM3", value=round(cm3), pct=cm3_pct, trend=None, note=reports_note),
@@ -320,17 +323,16 @@ def kpis(tenant_id, window=30):
     dead_inv_ct = (sum(1 for r in vel_soh if (r["velocity_day"] or 0) < 0.01 and (r["stock_on_hand"] or 0) > 0)
                   if has_stock_data else None)
     stock_note = None if has_stock_data else "add inventory report"
-    # Days of Cover (tenant-wide) = total inventory ÷ total sell velocity — one meaningful
-    # day-count regardless of catalog size, rather than summing (or averaging) each SKU's own
-    # days_of_cover, which scales with SKU count.
+    # Sell Velocity (tenant-wide) = units sold in the most recent 30 days ÷ 30 — a monthly run-rate
+    # from one real recent month, NOT the selected window and NOT a 3-month average. Window-independent
+    # by design (inventory turnover is a monthly-pace concept), so it uses the fixed since_30 lookback.
+    monthly_units = OrderRepository(con).window_aggregate(tenant_id, since_30)["units"]
+    sell_velocity = round(monthly_units / 30.0, 2)
+    # Days of Cover (tenant-wide) = total inventory on hand ÷ sell velocity — how many days of stock
+    # remain at the current monthly selling pace. total_stock sums stock_on_hand across all SKUs
+    # (each already summed across fulfilment centres at ingest), so it's the true total on hand.
     total_stock = sum((r["stock_on_hand"] or 0) for r in vel_soh)
-    total_velocity = sum((r["velocity_day"] or 0) for r in vel_soh)
-    days_cover_avg = round(total_stock / total_velocity, 1) if total_velocity else None
-    # Sell Velocity = units sold in the window ÷ window length — units/day, tenant-wide. Reuses
-    # order_agg (already fetched above for the Revenue substats' Units Sold card), so no new
-    # query. window is always > 0 (validated at the top of this function); 0 units in the window
-    # is a real, legitimate 0.0 (not missing) when a dated order feed exists at all.
-    sell_velocity = round(order_agg["units"] / window, 2)
+    days_cover_avg = round(total_stock / sell_velocity, 1) if sell_velocity else None
     inventory_substats = [
         dict(key="days_of_cover", label="Days of Cover", value=days_cover_avg, trend=None),
         dict(key="oos_risks", label="OOS Risks", value=oos_risk_ct, trend=None,
