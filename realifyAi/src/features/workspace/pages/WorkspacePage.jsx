@@ -265,7 +265,7 @@ const WorkspacePage = () => {
   const [isDismissModalOpen, setIsDismissModalOpen] = useState(false);
   const [isRepriceModalOpen, setIsRepriceModalOpen] = useState(false);
   const [isCaseReportModalOpen, setIsCaseReportModalOpen] = useState(false);
-  
+
   const [openDropdown, setOpenDropdown] = useState(null);
   const filterBarRef = React.useRef(null);
   // Watches only the KPI card grid (not the whole section — the Actions table
@@ -278,7 +278,7 @@ const WorkspacePage = () => {
   });
 
 
-  
+
   /**
    * Closes whichever dropdown is open when the click lands outside *any* filter
    * dropdown.
@@ -353,19 +353,19 @@ const WorkspacePage = () => {
   const domainValueFormat = CARD_VALUE_FORMAT[currentDomainKey] || {};
   const currentSubStats = domainCards.length
     ? domainCards.map((card) => ({
-        title: card.label,
-        // CM1/CM2/CM3 carry their own margin % (`card.pct`) — that's the
-        // number worth leading with, not the underlying money value.
-        value: typeof card.pct === 'number' ? `${card.pct}%` : formatCardValue(card.value, domainValueFormat[card.key]),
-        subtext: card.note || range.label,
-        isPositive: true,
-      }))
+      title: card.label,
+      // CM1/CM2/CM3 carry their own margin % (`card.pct`) — that's the
+      // number worth leading with, not the underlying money value.
+      value: typeof card.pct === 'number' ? `${card.pct}%` : formatCardValue(card.value, domainValueFormat[card.key]),
+      subtext: card.note || range.label,
+      isPositive: true,
+    }))
     : Array.from({ length: 5 }, () => ({
-        title: domainCardsLoading ? '…' : '—',
-        value: domainCardsLoading ? '…' : '—',
-        subtext: range.label,
-        isPositive: true,
-      }));
+      title: domainCardsLoading ? '…' : '—',
+      value: domainCardsLoading ? '…' : '—',
+      subtext: range.label,
+      isPositive: true,
+    }));
 
   // Always the current API response's own action list — never the overall
   // list filtered client-side down to a domain, so there's a single source
@@ -439,11 +439,11 @@ const WorkspacePage = () => {
   // SKU sort applies to whatever labels the rows are showing.
   const sortedSignals = skuFilter.sort
     ? [...filteredSignals].sort((a, b) => {
-        const key = (s) => (s.campaign || s.skuCode || '').toLowerCase();
-        return skuFilter.sort === 'asc'
-          ? key(a).localeCompare(key(b))
-          : key(b).localeCompare(key(a));
-      })
+      const key = (s) => (s.campaign || s.skuCode || '').toLowerCase();
+      return skuFilter.sort === 'asc'
+        ? key(a).localeCompare(key(b))
+        : key(b).localeCompare(key(a));
+    })
     : filteredSignals;
 
   const handleTakeAction = (signal) => {
@@ -517,7 +517,7 @@ const WorkspacePage = () => {
         onToggle={() => toggleDropdown(`channel_${prefix}`)}
         width="w-[140px]"
       />
-      
+
       <DateFilterSelect
         timeRange={timeRange}
         setTimeRange={setTimeRange}
@@ -562,7 +562,7 @@ const WorkspacePage = () => {
         }
       />
 
-      <div className="flex flex-col gap-3.5 max-w-[1600px] mx-auto pb-2 font-sans px-3 sm:px-4 pt-2 relative">
+      <div className="flex flex-col gap-3.5 max-w-[1600px] mx-auto pb-2 font-sans px-2 sm:px-2 pt-2 relative">
         {/* ── SECTION 1: THE BRIEF CARD ── */}
         <BriefCard data={briefData} isLoading={overviewLoading && !briefData} />
 
@@ -570,304 +570,302 @@ const WorkspacePage = () => {
         <div className="bg-[#f1f5f9]/35 dark:bg-slate-800/30 border border-[#e2e8f0] dark:border-slate-800 rounded-2xl p-4 sm:p-5 space-y-5">
           {/* ── Metrics & KPI block ── */}
           <div ref={kpiBlockRef} className="space-y-3">
-          {selectedMainKpi === null ? (
-            /* STATE A: DEFAULT VIEW — 5 MAIN KPI CARDS AT TOP */
-            <div>
-              <div className="flex items-center justify-end gap-3 w-full mb-2.5">
-                {renderTopControls('state_a')}
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                {mainKpiCards.map((kpi) => (
-                  <div
-                    key={kpi.key}
-                    onClick={() => selectDomain(kpi.key)}
-                    style={kpiCardStyle(kpi.isPositive)}
-                    className="rounded-2xl p-4 flex flex-col justify-between transition-all cursor-pointer shadow-2xs group"
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 truncate">
-                        {kpi.title}
-                      </span>
-                    </div>
-
-                    <div className="my-1.5">
-                      <p className="text-[20px] font-bold tracking-tight text-gray-900 dark:text-white leading-none">
-                        {kpi.value}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-1 text-[11px]">
-                      <span className="text-gray-400 dark:text-slate-500 truncate">
-                        {kpi.subtext}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            /* STATE B: CARD CLICKED VIEW — PILL TABS + SUB KPIS */
-            <div className="space-y-3.5 animate-in fade-in duration-200">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-slate-800/80 pb-3">
-                <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide py-0.5">
-                  {MAIN_TABS.map((tab) => {
-                    const isSelected = activeDomain === tab.key;
-                    return (
-                      <button
-                        key={tab.key}
-                        onClick={() => {
-                          if (isSelected && selectedMainKpi) {
-                            setSelectedMainKpi(null);
-                          } else {
-                            selectDomain(tab.key);
-                          }
-                        }}
-                        className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all whitespace-nowrap ${
-                          isSelected
-                            ? 'bg-[#18181B] dark:bg-slate-100 text-white dark:text-gray-900 shadow-xs'
-                            : 'bg-transparent text-gray-500 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-100'
-                        }`}
-                      >
-                        {tab.label}
-                      </button>
-                    );
-                  })}
+            {selectedMainKpi === null ? (
+              /* STATE A: DEFAULT VIEW — 5 MAIN KPI CARDS AT TOP */
+              <div>
+                <div className="flex items-center justify-end gap-3 w-full mb-2.5">
+                  {renderTopControls('state_a')}
                 </div>
 
-                {renderTopControls('state_b')}
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                {currentSubStats.map((stat, i) => {
-                  return (
+                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {mainKpiCards.map((kpi) => (
                     <div
-                      key={i}
-                      style={kpiCardStyle(stat.isPositive)}
-                      className="rounded-2xl p-4 flex flex-col justify-between transition-all"
+                      key={kpi.key}
+                      onClick={() => selectDomain(kpi.key)}
+                      style={kpiCardStyle(kpi.isPositive)}
+                      className="rounded-2xl p-4 flex flex-col justify-between transition-all cursor-pointer shadow-2xs group"
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 truncate">
-                          {stat.title}
+                          {kpi.title}
                         </span>
                       </div>
 
                       <div className="my-1.5">
                         <p className="text-[20px] font-bold tracking-tight text-gray-900 dark:text-white leading-none">
-                          {stat.value}
+                          {kpi.value}
                         </p>
                       </div>
 
                       <div className="flex items-center justify-between gap-1 text-[11px]">
-                        <span className="text-gray-400 dark:text-slate-500 truncate" title={stat.subtext}>
-                          {stat.subtext}
+                        <span className="text-gray-400 dark:text-slate-500 truncate">
+                          {kpi.subtext}
                         </span>
                       </div>
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            ) : (
+              /* STATE B: CARD CLICKED VIEW — PILL TABS + SUB KPIS */
+              <div className="space-y-3.5 animate-in fade-in duration-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-slate-800/80 pb-3">
+                  <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide py-0.5">
+                    {MAIN_TABS.map((tab) => {
+                      const isSelected = activeDomain === tab.key;
+                      return (
+                        <button
+                          key={tab.key}
+                          onClick={() => {
+                            if (isSelected && selectedMainKpi) {
+                              setSelectedMainKpi(null);
+                            } else {
+                              selectDomain(tab.key);
+                            }
+                          }}
+                          className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all whitespace-nowrap ${isSelected
+                              ? 'bg-[#18181B] dark:bg-slate-100 text-white dark:text-gray-900 shadow-xs'
+                              : 'bg-transparent text-gray-500 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-100'
+                            }`}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {renderTopControls('state_b')}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {currentSubStats.map((stat, i) => {
+                    return (
+                      <div
+                        key={i}
+                        style={kpiCardStyle(stat.isPositive)}
+                        className="rounded-2xl p-4 flex flex-col justify-between transition-all"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 truncate">
+                            {stat.title}
+                          </span>
+                        </div>
+
+                        <div className="my-1.5">
+                          <p className="text-[20px] font-bold tracking-tight text-gray-900 dark:text-white leading-none">
+                            {stat.value}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-1 text-[11px]">
+                          <span className="text-gray-400 dark:text-slate-500 truncate" title={stat.subtext}>
+                            {stat.subtext}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ── Actions (white table box, nested inside upper section) ── */}
           <div className="bg-white dark:bg-slate-900 border border-[#e2e8f0] dark:border-slate-800 rounded-2xl p-4 sm:p-5">
-          {/* One grid for the whole card, so the simulation panel starts on the
+            {/* One grid for the whole card, so the simulation panel starts on the
               same row as the "Actions" heading rather than below the filter bar. */}
-          <div
-            className={`grid transition-all duration-300 gap-4 lg:gap-5 items-start ${
-              isExpanded ? 'grid-cols-1 lg:grid-cols-[1.25fr_1fr]' : 'grid-cols-1'
-            }`}
-          >
-          <div className="min-w-0 space-y-3">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-baseline gap-2">
-              <h3 className="text-base font-bold text-gray-900 dark:text-white tracking-tight">
-                Actions
-              </h3>
-              <span className="text-xs text-gray-400 dark:text-slate-500 font-normal">
-                • {sortedSignals.length} signals
-              </span>
-            </div>
+            <div
+              className={`grid transition-all duration-300 gap-4 lg:gap-5 items-start ${isExpanded ? 'grid-cols-1 lg:grid-cols-[1.25fr_1fr]' : 'grid-cols-1'
+                }`}
+            >
+              <div className="min-w-0 space-y-3">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-baseline gap-2">
+                    <h3 className="text-base font-bold text-gray-900 dark:text-white tracking-tight">
+                      Actions
+                    </h3>
+                    <span className="text-xs text-gray-400 dark:text-slate-500 font-normal">
+                      • {sortedSignals.length} signals
+                    </span>
+                  </div>
 
-            <div className="flex items-center justify-between gap-3 flex-wrap py-0.5 relative z-30 w-full" ref={filterBarRef}>
-              
-              <div className="flex items-center gap-2 flex-wrap">
-              <FilterSelect
-                label="Category"
-                value={categoryCut}
-                options={CATEGORY_OPTIONS}
-                onChange={setCategoryCut}
-                multiple
-                isOpen={openDropdown === 'category'}
-                onToggle={() => toggleDropdown('category')}
-                width="w-[160px]"
-              />
+                  <div className="flex items-center justify-between gap-3 flex-wrap py-0.5 relative z-30 w-full" ref={filterBarRef}>
 
-              <FilterSelect
-                label="Channel"
-                value={marketplace}
-                options={CHANNEL_OPTIONS}
-                onChange={setMarketplace}
-                multiple
-                isOpen={openDropdown === 'channel'}
-                onToggle={() => toggleDropdown('channel')}
-                width="w-[140px]"
-              />
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <FilterSelect
+                        label="Category"
+                        value={categoryCut}
+                        options={CATEGORY_OPTIONS}
+                        onChange={setCategoryCut}
+                        multiple
+                        isOpen={openDropdown === 'category'}
+                        onToggle={() => toggleDropdown('category')}
+                        width="w-[160px]"
+                      />
 
-              <FilterSelect
-                label="Status"
-                value={statusFilter}
-                options={STATUS_OPTIONS}
-                onChange={setStatusFilter}
-                multiple
-                isOpen={openDropdown === 'status'}
-                onToggle={() => toggleDropdown('status')}
-                width="w-[150px]"
-              />
+                      <FilterSelect
+                        label="Channel"
+                        value={marketplace}
+                        options={CHANNEL_OPTIONS}
+                        onChange={setMarketplace}
+                        multiple
+                        isOpen={openDropdown === 'channel'}
+                        onToggle={() => toggleDropdown('channel')}
+                        width="w-[140px]"
+                      />
 
-              {/* Ads-only: which ad platform the campaigns ran on. */}
-              {isAdsDomain && (
-                <FilterSelect
-                  label="Advertising"
-                  value={adPlatform}
-                  options={AD_PLATFORM_OPTIONS}
-                  onChange={(v) => { setAdPlatform(v); setOpenDropdown(null); }}
-                  isOpen={openDropdown === 'advertising'}
-                  onToggle={() => toggleDropdown('advertising')}
-                  width="w-[170px]"
-                />
-              )}
+                      <FilterSelect
+                        label="Status"
+                        value={statusFilter}
+                        options={STATUS_OPTIONS}
+                        onChange={setStatusFilter}
+                        multiple
+                        isOpen={openDropdown === 'status'}
+                        onToggle={() => toggleDropdown('status')}
+                        width="w-[150px]"
+                      />
 
-              {/* Inventory-only filters */}
-              {isInventoryDomain && (
-                <>
-                  <FilterSelect
-                    label="Fulfillment Type"
-                    value={fulfillmentType}
-                    options={FULFILLMENT_OPTIONS}
-                    onChange={(v) => { setFulfillmentType(v); setOpenDropdown(null); }}
-                    isOpen={openDropdown === 'fulfillment'}
-                    onToggle={() => toggleDropdown('fulfillment')}
-                    width="w-[170px]"
+                      {/* Ads-only: which ad platform the campaigns ran on. */}
+                      {isAdsDomain && (
+                        <FilterSelect
+                          label="Advertising"
+                          value={adPlatform}
+                          options={AD_PLATFORM_OPTIONS}
+                          onChange={(v) => { setAdPlatform(v); setOpenDropdown(null); }}
+                          isOpen={openDropdown === 'advertising'}
+                          onToggle={() => toggleDropdown('advertising')}
+                          width="w-[170px]"
+                        />
+                      )}
+
+                      {/* Inventory-only filters */}
+                      {isInventoryDomain && (
+                        <>
+                          <FilterSelect
+                            label="Fulfillment Type"
+                            value={fulfillmentType}
+                            options={FULFILLMENT_OPTIONS}
+                            onChange={(v) => { setFulfillmentType(v); setOpenDropdown(null); }}
+                            isOpen={openDropdown === 'fulfillment'}
+                            onToggle={() => toggleDropdown('fulfillment')}
+                            width="w-[170px]"
+                          />
+                          <FilterSelect
+                            label="Stockout Time"
+                            value={stockoutTime}
+                            options={STOCKOUT_OPTIONS}
+                            onChange={(v) => { setStockoutTime(v); setOpenDropdown(null); }}
+                            isOpen={openDropdown === 'stockout'}
+                            onToggle={() => toggleDropdown('stockout')}
+                            width="w-[160px]"
+                          />
+                          <FilterSelect
+                            label="Confidence"
+                            value={confidence}
+                            options={CONFIDENCE_OPTIONS}
+                            onChange={(v) => { setConfidence(v); setOpenDropdown(null); }}
+                            isOpen={openDropdown === 'confidence'}
+                            onToggle={() => toggleDropdown('confidence')}
+                            width="w-[140px]"
+                          />
+                        </>
+                      )}
+
+                      {/* Cash-only filters */}
+                      {isCashDomain && (
+                        <>
+                          <FilterSelect
+                            label="Urgency"
+                            value={urgency}
+                            options={URGENCY_OPTIONS}
+                            onChange={(v) => { setUrgency(v); setOpenDropdown(null); }}
+                            isOpen={openDropdown === 'urgency'}
+                            onToggle={() => toggleDropdown('urgency')}
+                            width="w-[140px]"
+                          />
+                          <FilterSelect
+                            label="Cash Direction"
+                            value={cashDirection}
+                            options={CASH_DIRECTION_OPTIONS}
+                            onChange={(v) => { setCashDirection(v); setOpenDropdown(null); }}
+                            isOpen={openDropdown === 'cashDirection'}
+                            onToggle={() => toggleDropdown('cashDirection')}
+                            width="w-[180px]"
+                          />
+                        </>
+                      )}
+
+                      {/* SKU Filter (Custom Popover) */}
+                      <SkuFilterPopover
+                        value={skuFilter}
+                        actionOptions={actionOptions}
+                        onApply={setSkuFilter}
+                        isOpen={openDropdown === 'sku'}
+                        onToggle={() => toggleDropdown('sku')}
+                        onClose={() => setOpenDropdown(null)}
+                      />
+
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap ml-auto">
+                      {/* Time Range Selector (Custom Popover) */}
+                      <DateFilterSelect
+                        timeRange={timeRange}
+                        setTimeRange={setTimeRange}
+                        isOpen={openDropdown === 'date'}
+                        onToggle={() => toggleDropdown('date')}
+                        onClose={() => setOpenDropdown(null)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Flat Actions Table */}
+                <div className="overflow-hidden">
+                  <SignalsTable
+                    signals={sortedSignals}
+                    selectedId={expandedInsight?.id}
+                    onSelect={(sig) => {
+                      setExpandedInsight(expandedInsight?.id === sig.id ? null : sig);
+                      setPanelTab('reasons');
+                    }}
+                    onSimulate={handleSimulateClick}
+                    onTakeAction={handleTakeAction}
+                    isCollapsed={isExpanded}
+                    isFiltered={isAnyFilterActive}
+                    onClearFilters={clearAllFilters}
+                    executedSignalIds={executedSignalIds}
+                    /* Must match the key the rows came from, or Ads rows render
+                       against another domain's columns. */
+                    activeDomain={currentDomainKey}
                   />
-                  <FilterSelect
-                    label="Stockout Time"
-                    value={stockoutTime}
-                    options={STOCKOUT_OPTIONS}
-                    onChange={(v) => { setStockoutTime(v); setOpenDropdown(null); }}
-                    isOpen={openDropdown === 'stockout'}
-                    onToggle={() => toggleDropdown('stockout')}
-                    width="w-[160px]"
-                  />
-                  <FilterSelect
-                    label="Confidence"
-                    value={confidence}
-                    options={CONFIDENCE_OPTIONS}
-                    onChange={(v) => { setConfidence(v); setOpenDropdown(null); }}
-                    isOpen={openDropdown === 'confidence'}
-                    onToggle={() => toggleDropdown('confidence')}
-                    width="w-[140px]"
-                  />
-                </>
-              )}
-
-              {/* Cash-only filters */}
-              {isCashDomain && (
-                <>
-                  <FilterSelect
-                    label="Urgency"
-                    value={urgency}
-                    options={URGENCY_OPTIONS}
-                    onChange={(v) => { setUrgency(v); setOpenDropdown(null); }}
-                    isOpen={openDropdown === 'urgency'}
-                    onToggle={() => toggleDropdown('urgency')}
-                    width="w-[140px]"
-                  />
-                  <FilterSelect
-                    label="Cash Direction"
-                    value={cashDirection}
-                    options={CASH_DIRECTION_OPTIONS}
-                    onChange={(v) => { setCashDirection(v); setOpenDropdown(null); }}
-                    isOpen={openDropdown === 'cashDirection'}
-                    onToggle={() => toggleDropdown('cashDirection')}
-                    width="w-[180px]"
-                  />
-                </>
-              )}
-
-              {/* SKU Filter (Custom Popover) */}
-              <SkuFilterPopover
-                value={skuFilter}
-                actionOptions={actionOptions}
-                onApply={setSkuFilter}
-                isOpen={openDropdown === 'sku'}
-                onToggle={() => toggleDropdown('sku')}
-                onClose={() => setOpenDropdown(null)}
-              />
-
+                </div>
               </div>
+              {/* ── end left column ── */}
 
-              <div className="flex items-center gap-2 flex-wrap ml-auto">
-              {/* Time Range Selector (Custom Popover) */}
-              <DateFilterSelect
-                timeRange={timeRange}
-                setTimeRange={setTimeRange}
-                isOpen={openDropdown === 'date'}
-                onToggle={() => toggleDropdown('date')}
-                onClose={() => setOpenDropdown(null)}
-              />
-              </div>
+              {isExpanded && (
+                /*
+                 * The panel already scrolls internally (h-full > flex-1 min-h-0 >
+                 * overflow-y-auto), but that only engages against a definite
+                 * height — in an auto-height grid row it just stretched and the
+                 * whole page scrolled instead.
+                 *
+                 * Bounding it to the viewport turns the internal scroll on, and
+                 * sticky keeps it in place while the Actions table scrolls beside
+                 * it. The subtraction covers the app header, the sticky offset and
+                 * the fixed AI prompt bar at the bottom. Only from `lg`, where the
+                 * split view exists — stacked below that, page scroll is right.
+                 */
+                <div className="overflow-hidden animate-in fade-in slide-in-from-right-4 duration-300">
+                  <InsightDetailsPanel
+                    insight={expandedInsight}
+                    activePanelTab={panelTab}
+                    onTabChange={setPanelTab}
+                    onClose={() => setExpandedInsight(null)}
+                  />
+                </div>
+              )}
             </div>
-          </div>
-
-            {/* Flat Actions Table */}
-            <div className="overflow-hidden">
-              <SignalsTable
-                signals={sortedSignals}
-                selectedId={expandedInsight?.id}
-                onSelect={(sig) => {
-                  setExpandedInsight(expandedInsight?.id === sig.id ? null : sig);
-                  setPanelTab('reasons');
-                }}
-                onSimulate={handleSimulateClick}
-                onTakeAction={handleTakeAction}
-                isCollapsed={isExpanded}
-                isFiltered={isAnyFilterActive}
-                onClearFilters={clearAllFilters}
-                executedSignalIds={executedSignalIds}
-                /* Must match the key the rows came from, or Ads rows render
-                   against another domain's columns. */
-                activeDomain={currentDomainKey}
-              />
-            </div>
-          </div>
-          {/* ── end left column ── */}
-
-            {isExpanded && (
-              /*
-               * The panel already scrolls internally (h-full > flex-1 min-h-0 >
-               * overflow-y-auto), but that only engages against a definite
-               * height — in an auto-height grid row it just stretched and the
-               * whole page scrolled instead.
-               *
-               * Bounding it to the viewport turns the internal scroll on, and
-               * sticky keeps it in place while the Actions table scrolls beside
-               * it. The subtraction covers the app header, the sticky offset and
-               * the fixed AI prompt bar at the bottom. Only from `lg`, where the
-               * split view exists — stacked below that, page scroll is right.
-               */
-              <div className="overflow-hidden animate-in fade-in slide-in-from-right-4 duration-300">
-                <InsightDetailsPanel
-                  insight={expandedInsight}
-                  activePanelTab={panelTab}
-                  onTabChange={setPanelTab}
-                  onClose={() => setExpandedInsight(null)}
-                />
-              </div>
-            )}
-          </div>
           </div>
         </div>
       </div>

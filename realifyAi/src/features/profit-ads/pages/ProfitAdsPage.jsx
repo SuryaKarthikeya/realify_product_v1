@@ -9,7 +9,7 @@ import { downloadProfitAdsReport } from '@/services/exportService';
 import { useExplainStore } from '@/store/useExplainStore';
 
 export const ProfitAdsContent = () => {
-  const briefData = REALIFY_BRIEF;
+  const _briefData = REALIFY_BRIEF;
   const summary = PROFIT_ADS_SUMMARY;
   const { explainMode, setExplainMode: _setExplainMode } = useExplainStore();
   const [selectedCategory, setSelectedCategory] = useState('FIX ADS');

@@ -21,7 +21,7 @@ const TabContent = ({
   const tabKey = toDomainKey(activeTab);
   const rawSignals = SIGNALS_BY_TAB[tabKey] || SIGNALS_BY_TAB.sales;
   const sortedSignals = [...rawSignals].sort((a, b) => (b.score || 0) - (a.score || 0));
-  const top1Signal = sortedSignals[0] || null;
+  const _top1Signal = sortedSignals[0] || null;
 
   // Reset selection if active tab changes and selected insight is from a different tab
   useEffect(() => {

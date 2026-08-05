@@ -142,6 +142,8 @@ const SkuFilterPopover = ({
       {isOpen && (
         <FloatingPortal>
           <div
+            // floating-ui's setFloating is a stable callback ref, not a ref-value read during render
+            // eslint-disable-next-line react-hooks/refs
             ref={refs.setFloating}
             style={{ ...floatingStyles, display: 'flex', flexDirection: 'column' }}
             className="z-50 outline-none"

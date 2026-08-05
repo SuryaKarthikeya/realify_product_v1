@@ -18,7 +18,7 @@ import { PRODUCT_CATEGORIES } from '@/constants/filterOptions';
  * single-choice, so they read the first selection and write a one-item array.
  */
 const FilterBar = ({ isCollapsed }) => {
-  const [isInlineExpanded, setIsInlineExpanded] = useState(false);
+  const [_isInlineExpanded, _setIsInlineExpanded] = useState(false);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
   // Clicking anywhere outside the date popover closes it.
@@ -44,7 +44,7 @@ const FilterBar = ({ isCollapsed }) => {
     setPriority,
     setPerformanceTier,
     setSubCategory,
-    resetAdvancedFilters,
+    resetAdvancedFilters: _resetAdvancedFilters,
   } = useWorkspaceFilterStore();
 
   const [tempTimeRange, setTempTimeRange] = useState(timeRange || '30D');

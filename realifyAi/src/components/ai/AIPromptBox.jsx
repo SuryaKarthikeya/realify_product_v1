@@ -38,8 +38,8 @@ const AIPromptBox = ({ placeholder = "Ask Realify...", sidebarActive = true, ful
         // width (200 / 56 collapsed) + <main> padding (10px); right = <main>
         // padding (10px). Same max-w + inner px as the sections below the brief,
         // so the box lines up with them at every viewport width.
-        left: isMobile ? 8 : (!sidebarActive ? 10 : (isSidebarCollapsed ? 66 : 210)),
-        right: isMobile ? 8 : 10,
+        left: isMobile ? 8 : (!sidebarActive ? 10 : (isSidebarCollapsed ? 79 : 223)),
+        right: isMobile ? 8 : 23,
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="fixed bottom-0 z-50 pb-2 pointer-events-none"

@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
 import { useOnboardingStore } from "@/features/onboarding/store/useOnboardingStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import Sidebar from "@/features/onboarding/components/Sidebar";
@@ -11,7 +10,6 @@ import Step5Connect from "@/features/onboarding/components/steps/Step5Connect";
 import ConnectionModal from "@/features/onboarding/components/modals/ConnectionModal";
 import SigninModal from "@/features/onboarding/components/modals/SigninModal";
 import { motion, AnimatePresence } from "framer-motion";
-import fullLogoDark from "@/assets/fulllogo_Dark.png";
 import { ROUTES } from '@/constants/routes';
 import { ONBOARDING_FAQS } from "@/features/onboarding/data/faqData";
 

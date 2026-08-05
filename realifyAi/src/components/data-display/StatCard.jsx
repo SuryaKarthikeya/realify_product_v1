@@ -25,13 +25,13 @@ const StatCard = ({
   const addAiReference = useAIStore(s => s.addAiReference);
 
   // Draw the sparkline in on mount/refresh instead of popping in static.
-  const [sparkDrawn, setSparkDrawn] = useState(false);
+  const [_sparkDrawn, setSparkDrawn] = useState(false);
   useEffect(() => {
     const id = requestAnimationFrame(() => requestAnimationFrame(() => setSparkDrawn(true)));
     return () => cancelAnimationFrame(id);
   }, []);
 
-  const handleRefClick = (e) => {
+  const _handleRefClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
     addAiReference({ title, value });

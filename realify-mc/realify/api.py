@@ -302,12 +302,6 @@ def kpis(tenant_id, window=30):
     sf = StockoutForecaster()
     oos_risk_ct = sum(1 for a in SellerRepository(con).asins(tenant_id)
                       if (sf.predict(con, tenant_id, a).get("value") or 999) < 7)
-    # Days of Cover = sum, across SKUs, of (that SKU's inventory count / that SKU's sell velocity
-    # per day) — each SKU's own days_of_cover (already stock_on_hand/velocity_day, computed at
-    # ingest in report_writer.py) summed rather than averaged.
-    days_cover_vals = [r["days_of_cover"] for r in SellerRepository(con).select_columns(tenant_id, ["days_of_cover"])
-                       if r["days_of_cover"] is not None]
-    days_cover_avg = round(sum(days_cover_vals), 1) if days_cover_vals else None
     on_hand_by_sku = {}
     for r in inv:
         on_hand_by_sku[r["sku"]] = on_hand_by_sku.get(r["sku"], 0) + (r["on_hand"] or 0)
@@ -326,6 +320,12 @@ def kpis(tenant_id, window=30):
     dead_inv_ct = (sum(1 for r in vel_soh if (r["velocity_day"] or 0) < 0.01 and (r["stock_on_hand"] or 0) > 0)
                   if has_stock_data else None)
     stock_note = None if has_stock_data else "add inventory report"
+    # Days of Cover (tenant-wide) = total inventory ÷ total sell velocity — one meaningful
+    # day-count regardless of catalog size, rather than summing (or averaging) each SKU's own
+    # days_of_cover, which scales with SKU count.
+    total_stock = sum((r["stock_on_hand"] or 0) for r in vel_soh)
+    total_velocity = sum((r["velocity_day"] or 0) for r in vel_soh)
+    days_cover_avg = round(total_stock / total_velocity, 1) if total_velocity else None
     # Sell Velocity = units sold in the window ÷ window length — units/day, tenant-wide. Reuses
     # order_agg (already fetched above for the Revenue substats' Units Sold card), so no new
     # query. window is always > 0 (validated at the top of this function); 0 units in the window

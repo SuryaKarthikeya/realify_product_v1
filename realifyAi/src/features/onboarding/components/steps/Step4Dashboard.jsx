@@ -6,7 +6,7 @@ import { useOnboardingStore } from "@/features/onboarding/store/useOnboardingSto
 
 function Step4Dashboard() {
   const _navigate = useNavigate();
-  const { setStep } = useOnboardingStore();
+  const { setStep: _setStep } = useOnboardingStore();
   const [showToast, setShowToast] = useState(true);
   const [showForgot, setShowForgot] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);

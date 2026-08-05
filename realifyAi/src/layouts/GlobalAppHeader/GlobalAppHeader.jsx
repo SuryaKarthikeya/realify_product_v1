@@ -43,15 +43,15 @@ const GlobalAppHeader = ({
 }) => {
   const [profileDrawerOpen, setProfileDrawerOpen] = useState(false);
 
-  const getGreeting = () => {
+  const _getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';
     if (hour < 17) return 'Good afternoon';
     return 'Good evening';
   };
 
-  const username = localStorage.getItem('username') || 'anurag101';
-  const activeShop = localStorage.getItem('active_shop') || shopProfile?.shop_name || 'sdfsdf';
+  const _username = localStorage.getItem('username') || 'anurag101';
+  const _activeShop = localStorage.getItem('active_shop') || shopProfile?.shop_name || 'sdfsdf';
   const platformDomain = localStorage.getItem('active_platform_domain') || 'amazon.in';
   const currentDateFormatted = new Date().toLocaleDateString('en-US', {
     weekday: 'short',
@@ -462,8 +462,6 @@ const GlobalAppHeader = ({
               </div>
             </div>
           )}
-
-          {rulesButton}
 
           {customRightElement}
 

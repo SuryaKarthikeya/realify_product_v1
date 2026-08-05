@@ -13,7 +13,7 @@ export const SimulateContent = ({ insight, onClose, isModal = false }) => {
   const [capturePct, setCapturePct] = useState(baseInputs.capturePct);
   const [marginPct, setMarginPct] = useState(baseInputs.marginPct);
   const [rampDays, setRampDays] = useState(baseInputs.rampDays);
-  const [activePreset, setActivePreset] = useState('expected');
+  const [_activePreset, setActivePreset] = useState('expected');
 
   // Which formula panel (if any) is open. null = closed.
   const [activeFormula, setActiveFormula] = useState(null);
@@ -24,7 +24,7 @@ export const SimulateContent = ({ insight, onClose, isModal = false }) => {
     [baseInputs, capturePct, marginPct, rampDays]
   );
 
-  const applyPreset = (key) => {
+  const _applyPreset = (key) => {
     const preset = ASSUMPTION_PRESETS[key];
     if (!preset) return;
     setActivePreset(key);
@@ -36,7 +36,7 @@ export const SimulateContent = ({ insight, onClose, isModal = false }) => {
 
   const openFormula = (key) => setActiveFormula((prev) => (prev === key ? null : key));
 
-  const renderInfoButton = (formulaKey) => (
+  const _renderInfoButton = (formulaKey) => (
     <button
       type="button"
       onClick={() => openFormula(formulaKey)}
@@ -47,7 +47,7 @@ export const SimulateContent = ({ insight, onClose, isModal = false }) => {
     </button>
   );
 
-  const formula = activeFormula ? sim.formulas[activeFormula] : null;
+  const _formula = activeFormula ? sim.formulas[activeFormula] : null;
 
   return (
     <div className={`relative w-full ${isModal ? 'max-w-[1280px] max-h-[96vh] rounded-[18px] shadow-2xl bg-white dark:bg-slate-900' : 'h-full bg-transparent overflow-y-auto custom-scrollbar'} flex flex-col p-4`} onClick={isModal ? (e) => e.stopPropagation() : undefined}>

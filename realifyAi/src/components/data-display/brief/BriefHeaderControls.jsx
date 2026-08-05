@@ -131,7 +131,7 @@ const CalendarPicker = ({ selectedDate, onSelectDate, onClose, alignRight = fals
   );
 };
 
-const BriefHeaderControls = ({ onDashboardToggle, isDashboardViewActive, isKpiVisible, onKpiToggle }) => {
+const BriefHeaderControls = ({ onDashboardToggle, isDashboardViewActive, _isKpiVisible, _onKpiToggle }) => {
   // Channel state
   const [channelOpen, setChannelOpen] = useState(false);
   const [selectedChannels, setSelectedChannels] = useState(['shopify', 'amazon']);

@@ -49,7 +49,7 @@ const AppSidebar = ({ darkMode, _setDarkMode, inline = false, mobileOpen = false
   const activeSettingsTab = new URLSearchParams(location.search).get('tab') || 'account';
 
   const _isHistoryActive = location.pathname === ROUTES.HISTORY;
-  const isScreenerActive = location.pathname.startsWith(ROUTES.SCREENER);
+  const _isScreenerActive = location.pathname.startsWith(ROUTES.SCREENER);
   const isNewAnalysisActive = location.pathname === ROUTES.NEW_ANALYSIS;
   const isSettingsActive = location.pathname === ROUTES.SETTINGS;
   const isWorkspaceActive = isWorkspacePath(location.pathname);
@@ -60,12 +60,12 @@ const AppSidebar = ({ darkMode, _setDarkMode, inline = false, mobileOpen = false
   // Role permissions are checked against the base path, not the tab-specific one.
   const workspacePermissionKey = ROUTES.WORKSPACE;
 
-  const isCatalogueActive = location.pathname === '/catalogue' || location.pathname === '/products';
+  const _isCatalogueActive = location.pathname === '/catalogue' || location.pathname === '/products';
   const isAgentsActive = location.pathname === '/agents';
   /* Prefix, not equality: a connector's own page (/integrations/amazon-sp-api)
      is still inside Integrations, and left the nav item unhighlighted. */
   const isIntegrationsActive = location.pathname.startsWith('/integrations');
-  const isProfitAdsActive = location.pathname === '/profit-ads';
+  const _isProfitAdsActive = location.pathname === '/profit-ads';
 
   const navItems = [
     { name: 'New', icon: 'fa-plus', href: ROUTES.NEW_ANALYSIS, active: isNewAnalysisActive },
@@ -78,7 +78,7 @@ const AppSidebar = ({ darkMode, _setDarkMode, inline = false, mobileOpen = false
   const filteredNavItems = navItems.filter(item => allowedRoutes.includes(item.permissionKey || item.href));
   const _isProductsActive = location.pathname === '/products' || location.pathname === '/catalogue';
   const _isActionLogActive = location.pathname === '/action-log';
-  const isActionsActive = location.pathname === ROUTES.ACTIONS;
+  const _isActionsActive = location.pathname === ROUTES.ACTIONS;
   const settingsItem = { name: 'Settings', icon: 'fa-gear', href: ROUTES.SETTINGS, active: isSettingsActive };
 
   /* ── Mobile drawer (ss2 layout) — opened via the header hamburger button ── */
