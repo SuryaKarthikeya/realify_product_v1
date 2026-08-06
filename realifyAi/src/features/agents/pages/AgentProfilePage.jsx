@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import DashboardLayout from '@/layouts/DashboardLayout';
-import { AGENTS_ROSTER } from '@/features/agents/data/agentsData';
+import { AGENTS_ROSTER, agentStatusLabel } from '@/features/agents/data/agentsData';
 import {
   agentProfile,
   PROFILE_TABS,
@@ -136,14 +136,15 @@ const AgentProfilePage = () => {
                 <h1 className="text-[22px] font-bold text-gray-900 dark:text-white tracking-tight">
                   {agent.name}
                 </h1>
+                {/* Same rule as the roster card — Active only once the ramp is done. */}
                 <span
                   className={`px-2 py-0.5 rounded text-[9.5px] font-bold uppercase tracking-wider ${
-                    agent.status === 'active'
+                    agentStatusLabel(agent) === 'Active'
                       ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400'
                       : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400'
                   }`}
                 >
-                  {agent.status === 'active' ? 'Active' : 'Standby'}
+                  {agentStatusLabel(agent)}
                 </span>
               </div>
               <p className="text-[12.5px] text-gray-500 dark:text-slate-400 mt-1">

@@ -1,4 +1,5 @@
 import React from 'react';
+import { agentStatusLabel } from '@/features/agents/data/agentsData';
 
 /**
  * One specialist. Two layouts off the same data:
@@ -9,7 +10,10 @@ import React from 'react';
  * baseline across a row of cards even when descriptions wrap differently.
  */
 const AgentCard = ({ agent, view = 'grid', onSelect, isSelected = false }) => {
-  const isActive = agent.status === 'active';
+  /* Derived from the ramp, not from `status` — the badge has to agree with the
+     "Day x of y" line directly beneath it. */
+  const statusLabel = agentStatusLabel(agent);
+  const isActive = statusLabel === 'Active';
 
   /* The open card keeps a visible tie to the panel beside it. */
   const selectedRing = isSelected
@@ -57,7 +61,7 @@ const AgentCard = ({ agent, view = 'grid', onSelect, isSelected = false }) => {
           : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400'
       }`}
     >
-      {isActive ? 'Active' : 'Standby'}
+      {statusLabel}
     </span>
   );
 

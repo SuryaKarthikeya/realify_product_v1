@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import SettingsInnerSidebar from '@/features/settings/components/SettingsInnerSidebar';
 import SaveBar from '@/features/settings/components/SaveBar';
+import SettingsSaveFooter from '@/features/settings/components/SettingsSaveFooter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUIStore } from '@/store/useUIStore';
 
@@ -27,6 +28,13 @@ import InviteModal from '@/features/settings/components/modals/InviteModal';
 import PaymentModal from '@/features/settings/components/modals/PaymentModal';
 import CustomRoleModal from '@/features/settings/components/modals/CustomRoleModal';
 import ConnectModal from '@/features/settings/components/modals/ConnectModal';
+
+/**
+ * Tabs whose Save / Discard is docked to the bottom of the panel instead of
+ * appearing as a floating bar plus a second copy in the page header. On these,
+ * both of those are suppressed — three places to save one form is two too many.
+ */
+const INLINE_SAVE_TABS = new Set(['business-profile', 'access', 'guardrails', 'notifications']);
 
 const SettingsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -100,9 +108,11 @@ const SettingsPage = () => {
     }
   };
 
+  const hasInlineSave = INLINE_SAVE_TABS.has(activeTab);
+
   const headerButtons = (
     <AnimatePresence>
-      {isDirty && (
+      {isDirty && !hasInlineSave && (
         <motion.div 
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -156,13 +166,23 @@ const SettingsPage = () => {
                   {renderTabContent()}
                 </motion.div>
               </AnimatePresence>
+
+              {/* Docked to the panel, so it is the last thing in the form
+                  rather than an overlay that arrives once the form is dirty. */}
+              {hasInlineSave && (
+                <SettingsSaveFooter
+                  isDirty={isDirty}
+                  onSave={handleSave}
+                  onDiscard={handleDiscard}
+                />
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Floating Save Bar */}
-      <SaveBar isVisible={isDirty} onSave={handleSave} onDiscard={handleDiscard} />
+      {/* Floating Save Bar — only for tabs that have no docked footer. */}
+      <SaveBar isVisible={isDirty && !hasInlineSave} onSave={handleSave} onDiscard={handleDiscard} />
 
       {/* Toast Notification */}
       <AnimatePresence>

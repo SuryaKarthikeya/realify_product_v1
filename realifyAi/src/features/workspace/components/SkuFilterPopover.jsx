@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { pillSurface } from '@/features/workspace/components/filterPillSurface';
 import { IMPACT_BANDS, EMPTY_SKU_FILTER } from '@/features/workspace/skuFilterOptions';
 import {
   useFloating,
@@ -69,6 +70,7 @@ const SkuFilterPopover = ({
   onToggle,
   onClose,
   actionOptions,
+  surface,
 }) => {
   const [draft, setDraft] = useState({ ...value });
   const [impactOpen, setImpactOpen] = useState(false);
@@ -129,7 +131,7 @@ const SkuFilterPopover = ({
       <button
         ref={refs.setReference}
         onClick={onToggle}
-        className={`px-3 py-1.5 bg-white dark:bg-slate-800 border rounded-xl text-xs font-semibold focus:outline-none cursor-pointer shadow-2xs flex items-center gap-1.5 transition-colors ${
+        className={`px-3 py-1.5 ${pillSurface(surface)} border rounded-xl text-xs font-semibold focus:outline-none cursor-pointer shadow-2xs flex items-center gap-1.5 transition-colors ${
           isOpen
             ? 'border-blue-600 text-blue-600'
             : 'border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700'

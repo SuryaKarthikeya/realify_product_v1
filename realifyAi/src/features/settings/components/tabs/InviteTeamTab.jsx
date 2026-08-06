@@ -205,7 +205,7 @@ const handleSendInvites = async () => {
               <select
                 value={row.role}
                 onChange={e => updateRow(row.id, 'role', e.target.value)}
-                className="w-44 px-3 py-2.5 text-sm bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 text-gray-700 dark:text-slate-300 transition-all"
+                className="w-44 pl-3.5 pr-9 py-2.5 text-sm bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 text-gray-700 dark:text-slate-300 transition-all"
               >
                 <option value="">Select role</option>
                 {ROLES.map(r => (

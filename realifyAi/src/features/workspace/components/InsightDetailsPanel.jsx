@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { useWorkspaceFilterStore } from '@/store/useWorkspaceFilterStore';
+import { useScrollIntoViewOnChange } from '@/hooks/useScrollIntoViewOnChange';
 import { getSimulation } from '@/data/simulationData';
+
+/* Clears the sticky compact KPI ribbon, which pins over the top of the scroll
+   area — scrolling the panel flush to the top would tuck its title under it. */
+const STICKY_HEADER_OFFSET = 76;
 
 /**
  * The wizard's four steps, in order. Declared once so the header stepper, the
@@ -34,6 +39,12 @@ const InsightDetailsPanel = ({
   const [isAgentTraceOpen, setIsAgentTraceOpen] = useState(false);
   const [openSimulationAccordion, setOpenSimulationAccordion] = useState(0);
   const markSignalExecuted = useWorkspaceFilterStore((state) => state.markSignalExecuted);
+
+  /* Each step is a different height, so advancing from a tall one leaves the
+     page scrolled past this panel's title — the user lands mid-step with no
+     idea which step they are on. Keyed on the tab so it re-runs per step.
+     Declared before the early return: hook order has to be stable. */
+  const panelRef = useScrollIntoViewOnChange(activePanelTab, { offset: STICKY_HEADER_OFFSET });
 
   if (!insight) return null;
 
@@ -72,7 +83,7 @@ const InsightDetailsPanel = ({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col shadow-card dark:shadow-none font-sans">
+    <div ref={panelRef} className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col shadow-card dark:shadow-none font-sans">
 
       {/* ── 1. TOP HEADER & STEPPER ── */}
       <div className="bg-white dark:bg-slate-900 flex flex-col flex-shrink-0">

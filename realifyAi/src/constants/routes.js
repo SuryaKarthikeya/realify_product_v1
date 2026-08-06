@@ -56,6 +56,7 @@ export const ROUTES = {
   AGENT_PROFILE:        "/agents/:agentId",
   INTEGRATIONS:         "/integrations",
   CONNECTOR_DETAIL:     "/integrations/:connectorId",
+  DATASET_DETAIL:       "/integrations/:connectorId/datasets/:datasetId",
   PROFIT_ADS:           "/profit-ads",
   NAVIGATION:           "/navigation",   // legacy entry point, redirects to ACTION_LOG
 };

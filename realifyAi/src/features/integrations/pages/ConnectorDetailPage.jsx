@@ -18,7 +18,7 @@ import {
   JOURNEY_STEPS,
   ACTIVITY_TYPES,
   ACTIVITY_STATUS_FILTERS,
-  DATASET_STATUS_FILTERS,
+  connectorDatasets,
 } from '@/features/integrations/data/connectorDetailData';
 import { ROUTES } from '@/constants/routes';
 import { useIntegrationsStore, useSetupComplete } from '@/store/useIntegrationsStore';
@@ -77,13 +77,11 @@ const ConnectorDetailPage = () => {
     status: ACTIVITY_STATUS_FILTERS[0],
   });
 
-  /* Data gets its own pair rather than sharing Activity's: the Type lists are
-     different (feeds vs event kinds), so one shared value would read as a filter
-     the other tab cannot honour. */
-  const [dataFilters, setDataFilters] = useState({
-    type: 'All types',
-    status: DATASET_STATUS_FILTERS[0],
-  });
+  /* Which dataset the Data tab is previewing. Held here, not in the table, so
+     the table's highlight and the rail's preview are one value rather than two
+     copies that can disagree. `null` means "the first row" — resolved below
+     against the live list so it survives switching connectors. */
+  const [selectedDatasetKey, setSelectedDatasetKey] = useState(null);
 
   const setupComplete = useSetupComplete(connectorId);
   const completeSetup = useIntegrationsStore((s) => s.completeSetup);
@@ -133,6 +131,13 @@ const ConnectorDetailPage = () => {
   const isLive = connector.status !== 'available';
   const needsAttention = connector.status === 'attention';
   const categoryLabel = CATEGORY_BY_KEY[connector.category] || connector.category;
+
+  /* Resolved rather than stored: falling back to the first row means the Data
+     tab opens already previewing something, and a key left over from another
+     connector cannot leave the rail blank. */
+  const datasets = connectorDatasets(connector);
+  const selectedDataset =
+    datasets.find((d) => d.key === selectedDatasetKey) || datasets[0] || null;
 
   const onOnboarding = tab === 'Onboarding';
   const onScopes = tab === 'Scopes & Permissions';
@@ -280,7 +285,13 @@ const ConnectorDetailPage = () => {
 
             {onActivity && <ActivityTab connector={connector} filters={activityFilters} />}
 
-            {onData && <DataTab connector={connector} filters={dataFilters} />}
+            {onData && (
+              <DataTab
+                connector={connector}
+                selectedKey={selectedDataset?.key}
+                onSelect={setSelectedDatasetKey}
+              />
+            )}
 
             {onSettings && <SettingsTab connector={connector} />}
 
@@ -299,11 +310,7 @@ const ConnectorDetailPage = () => {
                 onChange={setActivityFilters}
               />
             ) : onData ? (
-              <DataRail
-                connector={connector}
-                filters={dataFilters}
-                onChange={setDataFilters}
-              />
+              <DataRail connector={connector} dataset={selectedDataset} />
             ) : onSettings ? (
               <SettingsRail connector={connector} onViewActivity={() => setTab('Activity')} />
             ) : (
