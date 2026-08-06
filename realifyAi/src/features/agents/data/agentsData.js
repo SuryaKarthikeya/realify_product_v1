@@ -199,6 +199,31 @@ export const AGENTS_ROSTER = [
 ];
 
 /**
+ * Has this specialist finished its shadow period?
+ *
+ * `rampDay` / `rampTotal` are the steps shown on the card ("Day 9 of 14"), so
+ * this is the same question the user is answering by reading it.
+ */
+export const isRampComplete = (agent) =>
+  Number(agent?.rampTotal) > 0 && Number(agent?.rampDay) >= Number(agent?.rampTotal);
+
+/**
+ * The badge a roster card or profile shows.
+ *
+ * A specialist is Active only once its ramp is done — everyone starts in Shadow
+ * and serves `rampTotal` days before it is allowed to act on its own, so a card
+ * reading "Day 9 of 14" and "Active" in the same breath contradicts itself.
+ *
+ * `standby` keeps its own label rather than folding into Inactive: those are
+ * shelved specialists rather than ones mid-ramp, and the header tile counts
+ * them separately.
+ */
+export const agentStatusLabel = (agent) => {
+  if (agent?.status === 'standby') return 'Standby';
+  return isRampComplete(agent) ? 'Active' : 'Inactive';
+};
+
+/**
  * Header tiles, counted rather than hardcoded so they always match what is on
  * screen.
  *

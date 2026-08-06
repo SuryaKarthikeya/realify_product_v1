@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import AppSidebar from '@/layouts/AppSidebar/AppSidebar';
 import GlobalAppHeader from '@/layouts/GlobalAppHeader/GlobalAppHeader';
@@ -34,6 +34,11 @@ const DashboardLayout = ({
   searchCollapsed = false,
   headerCenterElement = null,
   hideMobileSearchIcon = false,
+  /* What counts as "a new page" for the scroll reset below. Defaults to the
+     URL, which is right almost everywhere. A page whose URL carries an in-page
+     tab (Workspace's domain segment) passes a constant instead, so switching
+     tabs does not throw the user back to the top of a page they are working in. */
+  scrollResetKey,
 }) => {
   const location = useLocation();
   const { connectedStores } = useMarketplaceStore();
@@ -43,6 +48,19 @@ const DashboardLayout = ({
 
   const [darkMode, setDarkMode] = useDarkMode();
   const shopProfile = useShopProfile();
+
+  /**
+   * Every page opens at the top.
+   *
+   * `<main>` is the scroll container and it survives a route change — the
+   * element is reused, so without this a new page inherits the previous one's
+   * scroll offset and opens part-way down. Layout effect rather than effect, so
+   * it lands before paint and the user never sees the old position flash.
+   */
+  const pageKey = scrollResetKey ?? location.pathname;
+  useLayoutEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [pageKey]);
 
   // Show "no stores" overlay on all pages except settings/onboarding/auth
   const showNoStores =

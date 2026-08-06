@@ -1,4 +1,5 @@
 import React from 'react';
+import { pillSurface } from '@/features/workspace/components/filterPillSurface';
 import { isFilterOff, multiSelectLabel } from '@/features/workspace/signalFilters';
 
 /**
@@ -21,6 +22,7 @@ const FilterSelect = ({
   onToggle,
   width = 'w-[150px]',
   multiple = false,
+  surface,        // 'table' tints the pill for a table's filter bar — see pillSurface
 }) => {
   // Single-select treats the first option as its neutral value.
   const isDefault = multiple
@@ -52,7 +54,7 @@ const FilterSelect = ({
     <div className="relative" data-filter-dropdown>
       <button
         onClick={onToggle}
-        className={`px-3 py-1.5 bg-white dark:bg-slate-800 border rounded-xl text-xs font-semibold focus:outline-none cursor-pointer shadow-2xs flex items-center gap-1.5 transition-colors ${
+        className={`px-3 py-1.5 ${pillSurface(surface)} border rounded-xl text-xs font-semibold focus:outline-none cursor-pointer shadow-2xs flex items-center gap-1.5 transition-colors ${
           isOpen
             ? 'border-blue-600 text-blue-600'
             : isDefault

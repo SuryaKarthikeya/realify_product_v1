@@ -627,8 +627,6 @@ export const DATASET_STATUS = {
   },
 };
 
-export const DATASET_STATUS_FILTERS = ['All status', 'Healthy', 'Stale', 'Degraded'];
-
 /**
  * The datasets a connector is syncing.
  *
@@ -696,12 +694,6 @@ export const formatRecords = (n) => {
   return n.toLocaleString('en-US');
 };
 
-/** Feeds present in a dataset list, for the rail's Type filter. */
-export const datasetTypes = (rows = []) => [
-  'All types',
-  ...Array.from(new Set(rows.map((r) => r.feed))).sort(),
-];
-
 /** The four tiles above the dataset table. */
 export const dataSummary = (connector, rows = []) => {
   const totals = DATA_TOTALS[connector?.id];
@@ -738,27 +730,9 @@ export const dataSummary = (connector, rows = []) => {
   ];
 };
 
-/**
- * The rail's Data health card.
- *
- * Valid is derived from the quality percentage and invalid is the remainder, so
- * the two rows always sum to the stated total instead of being three independent
- * numbers that can drift apart.
- */
-export const dataHealth = (connector, rows = []) => {
-  const totals = DATA_TOTALS[connector?.id];
-  const records = totals?.records ?? rows.reduce((sum, r) => sum + r.records, 0);
-  const quality = totals?.quality ?? (connector?.status === 'attention' ? 91.4 : 99.2);
-
-  const valid = Math.round((records * quality) / 100);
-  const invalid = records - valid;
-
-  return {
-    quality,
-    validLabel: `${formatRecords(valid)} (${quality}%)`,
-    invalidLabel: `${formatRecords(invalid)} (${(100 - quality).toFixed(1)}%)`,
-  };
-};
+/* Connector-wide `dataHealth` used to live here for the Data rail's health card.
+   That rail now previews the selected dataset instead, and quality is stated per
+   dataset — see `datasetDetail` in datasetDetailData.js. */
 
 /* ── Settings tab ── */
 

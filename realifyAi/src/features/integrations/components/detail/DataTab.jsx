@@ -1,10 +1,13 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   DATASET_STATUS,
   FEED_TAG_TONES,
   connectorDatasets,
   dataSummary,
 } from '@/features/integrations/data/connectorDetailData';
+import { datasetSlug } from '@/features/integrations/data/datasetDetailData';
+import { ROUTES } from '@/constants/routes';
 
 const Card = ({ children, className = '' }) => (
   <div className={`bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl ${className}`}>
@@ -39,30 +42,32 @@ const toRow = (d) => [d.name, d.feed, d.records, `${d.when} (${d.at})`, DATASET_
 /**
  * Every dataset one connector is syncing.
  *
- * Search lives here and Type / Status live in the rail, but all three narrow the
- * same list — so the count in the footer always describes the rows on screen.
+ * Selecting a row previews it in the rail beside the table; the eye icon opens
+ * that dataset's own screen, where the record rows live. Selection is owned by
+ * the page rather than by this table, so the rail can never preview a different
+ * dataset from the one the table has highlighted.
  */
-const DataTab = ({ connector, filters }) => {
+const DataTab = ({ connector, selectedKey, onSelect }) => {
+  const navigate = useNavigate();
   const rows = useMemo(() => connectorDatasets(connector), [connector]);
   const summary = useMemo(() => dataSummary(connector, rows), [connector, rows]);
-  const totalRecords = useMemo(() => rows.reduce((sum, r) => sum + r.records, 0), [rows]);
 
   const [query, setQuery] = useState('');
-  /* Which row has its detail strip open. One at a time: two open strips push the
-     rows being compared further apart, which is the opposite of the point. */
-  const [expanded, setExpanded] = useState(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+    if (!q) return rows;
     return rows.filter(
-      (r) =>
-        (!q || r.name.toLowerCase().includes(q) || r.feed.toLowerCase().includes(q)) &&
-        (!filters?.type || filters.type === 'All types' || r.feed === filters.type) &&
-        (!filters?.status ||
-          filters.status === 'All status' ||
-          DATASET_STATUS[r.status].label === filters.status)
+      (r) => r.name.toLowerCase().includes(q) || r.feed.toLowerCase().includes(q)
     );
-  }, [rows, query, filters]);
+  }, [rows, query]);
+
+  const openDataset = (dataset) =>
+    navigate(
+      ROUTES.DATASET_DETAIL
+        .replace(':connectorId', connector.id)
+        .replace(':datasetId', datasetSlug(dataset.name))
+    );
 
   if (rows.length === 0) {
     return (
@@ -153,10 +158,24 @@ const DataTab = ({ connector, filters }) => {
 
         {filtered.map((d) => {
           const status = DATASET_STATUS[d.status];
-          const isOpen = expanded === d.key;
+          const isSelected = d.key === selectedKey;
           return (
-            <div key={d.key} className="border-b border-gray-100 dark:border-slate-800 last:border-0">
-              <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1.4fr)_90px_minmax(0,0.8fr)_minmax(0,1.1fr)_100px_74px] gap-2 sm:gap-3 px-4 py-3 items-center">
+            <div
+              key={d.key}
+              onClick={() => onSelect(d.key)}
+              className={`border-b border-gray-100 dark:border-slate-800 last:border-0 cursor-pointer transition-colors ${
+                isSelected
+                  ? 'bg-indigo-50/50 dark:bg-indigo-950/20'
+                  : 'hover:bg-gray-50/70 dark:hover:bg-slate-800/40'
+              }`}
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1.4fr)_90px_minmax(0,0.8fr)_minmax(0,1.1fr)_100px_74px] gap-2 sm:gap-3 px-4 py-3 items-center relative">
+                {/* Marks the previewed row without moving anything: a left rule
+                    rather than a border that would shift the row by a pixel. */}
+                {isSelected && (
+                  <span className="absolute left-0 top-0 bottom-0 w-[2.5px] bg-indigo-500 dark:bg-indigo-400" />
+                )}
+
                 <p className="text-[12.5px] font-semibold text-gray-900 dark:text-white truncate">
                   {d.name}
                 </p>
@@ -185,49 +204,27 @@ const DataTab = ({ connector, filters }) => {
 
                 <div className="flex items-center gap-1.5 sm:justify-end">
                   <button
-                    onClick={() => downloadCsv(`${connector.id}-${d.key.toLowerCase().replace(/\s+/g, '-')}.csv`, HEAD, [toRow(d)])}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      downloadCsv(`${connector.id}-${datasetSlug(d.name)}.csv`, HEAD, [toRow(d)]);
+                    }}
                     aria-label={`Download ${d.name}`}
                     className={iconButton}
                   >
                     <i className="fa-solid fa-download text-[10px]" />
                   </button>
                   <button
-                    onClick={() => setExpanded(isOpen ? null : d.key)}
-                    aria-label={`${isOpen ? 'Hide' : 'Preview'} ${d.name}`}
-                    aria-expanded={isOpen}
-                    className={`${iconButton} ${isOpen ? 'bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-slate-200' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openDataset(d);
+                    }}
+                    aria-label={`Open ${d.name}`}
+                    className={iconButton}
                   >
-                    <i className={`fa-solid ${isOpen ? 'fa-eye-slash' : 'fa-eye'} text-[10px]`} />
+                    <i className="fa-solid fa-eye text-[10px]" />
                   </button>
                 </div>
               </div>
-
-              {/* Preview strip — only the facts we actually hold for this dataset,
-                  so nothing here is invented to fill a panel. */}
-              {isOpen && (
-                <div className="px-4 pb-3.5 -mt-0.5">
-                  <div className="rounded-xl bg-gray-50/70 dark:bg-slate-800/40 border border-gray-100 dark:border-slate-800 px-3.5 py-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {[
-                      { label: 'Records', value: d.records.toLocaleString('en-US') },
-                      {
-                        label: 'Share of synced rows',
-                        value: totalRecords ? `${((d.records / totalRecords) * 100).toFixed(1)}%` : '—',
-                      },
-                      { label: 'Last updated', value: d.at },
-                      { label: 'Status', value: status.label },
-                    ].map((f) => (
-                      <div key={f.label} className="min-w-0">
-                        <p className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">
-                          {f.label}
-                        </p>
-                        <p className="text-[12px] font-semibold text-gray-800 dark:text-slate-200 mt-0.5 truncate">
-                          {f.value}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           );
         })}
@@ -235,7 +232,7 @@ const DataTab = ({ connector, filters }) => {
         {filtered.length === 0 && (
           <div className="px-4 py-10 text-center">
             <p className="text-[12.5px] text-gray-500 dark:text-slate-400">
-              No datasets match {query ? `“${query.trim()}”` : 'these filters'}.
+              No datasets match “{query.trim()}”.
             </p>
           </div>
         )}

@@ -42,6 +42,12 @@ const NewAnalysisPage = () => {
   const scrollRef = useRef(null);
   const thinkingTimer = useRef(null);
 
+  /* Monotonic, never derived from the array length: editing rewinds the
+     transcript, so a length-based id would hand two different messages the same
+     key and leave React unable to tell them apart. */
+  const messageSeq = useRef(0);
+  const nextId = (role) => `${role}-${messageSeq.current++}`;
+
   // Keep the newest message in view as the transcript grows.
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -49,23 +55,44 @@ const NewAnalysisPage = () => {
 
   useEffect(() => () => clearTimeout(thinkingTimer.current), []);
 
-  const handleSend = () => {
-    const text = prompt.trim();
-    if (!text || isThinking) return;
-
-    setMessages((m) => [...m, { id: `u-${m.length}`, role: 'user', text }]);
-    setPrompt('');
-    setActiveSuggestion(null);
+  /** Mock analysis latency, then answer from the canned replies. */
+  const answer = (text) => {
     setIsThinking(true);
-
-    // Mock analysis latency, then answer from the canned replies.
+    clearTimeout(thinkingTimer.current);
     thinkingTimer.current = setTimeout(() => {
       setIsThinking(false);
       setMessages((m) => [
         ...m,
-        { id: `a-${m.length}`, role: 'assistant', reply: getAnalysisReply(text) },
+        { id: nextId('a'), role: 'assistant', reply: getAnalysisReply(text) },
       ]);
     }, 2000);
+  };
+
+  const handleSend = () => {
+    const text = prompt.trim();
+    if (!text || isThinking) return;
+
+    setMessages((m) => [...m, { id: nextId('u'), role: 'user', text }]);
+    setPrompt('');
+    setActiveSuggestion(null);
+    answer(text);
+  };
+
+  /**
+   * Re-ask an earlier question with the user's edits.
+   *
+   * Everything after that turn is dropped before the new answer arrives — the
+   * replies below it were answers to the old wording, so leaving them would
+   * present a conversation that never happened. The edited question keeps its
+   * own id so React re-uses the bubble rather than remounting it.
+   */
+  const handleEditMessage = (id, text) => {
+    if (isThinking) return;
+    const index = messages.findIndex((m) => m.id === id);
+    if (index === -1) return;
+
+    setMessages([...messages.slice(0, index), { ...messages[index], text }]);
+    answer(text);
   };
 
   const { user } = useAuthStore();
@@ -100,7 +127,12 @@ const NewAnalysisPage = () => {
 
   return (
     <DashboardLayout showTabs={false} showAIPrompt={false} noPadding contentClassName="!p-0 overflow-hidden">
-      <div className="flex flex-1 min-h-0 overflow-hidden">
+      {/* h-full, not flex-1: `<main>` is a block, so `flex-1` here resolved to
+          nothing and the column sized to its content — which left the composer
+          sitting directly under the answer instead of docked at the bottom.
+          `<main>` has a definite height (flex-1 inside the h-screen column), so
+          h-full fills it and the transcript below can take the leftover space. */}
+      <div className="flex h-full min-h-0 overflow-hidden">
         {/* Main Content */}
         <div className={`flex-1 flex flex-col min-h-0 px-4 sm:px-6 lg:px-8 ${hasConversation ? '' : 'items-center overflow-y-auto hide-scroll py-3 md:py-4 mt-6'}`}>
 
@@ -123,13 +155,28 @@ const NewAnalysisPage = () => {
           {hasConversation && (
             <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto hide-scroll pt-6">
               <div className="w-full max-w-3xl mx-auto flex flex-col gap-5 pb-6">
-                {messages.map((m) => <AnalysisMessage key={m.id} message={m} />)}
+                {messages.map((m) => (
+                  <AnalysisMessage
+                    key={m.id}
+                    message={m}
+                    isBusy={isThinking}
+                    onEdit={(text) => handleEditMessage(m.id, text)}
+                  />
+                ))}
                 {isThinking && <AnalysisThinking />}
               </div>
             </div>
           )}
 
-          <div className={`w-full max-w-3xl flex flex-col gap-6 ${hasConversation ? 'mx-auto flex-shrink-0 pb-3 pt-1' : ''}`}>
+          {/* Docked composer. In conversation mode this is the flex column's last
+              child, so it stays pinned to the bottom while the transcript above
+              scrolls — and the gradient lets content fade out under it rather
+              than ending on a hard edge. */}
+          <div className={`w-full max-w-3xl flex flex-col gap-6 ${hasConversation ? 'mx-auto flex-shrink-0 pb-3 pt-1 relative bg-white dark:bg-[#030712]' : ''}`}>
+            {hasConversation && (
+              <div className="pointer-events-none absolute -top-6 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-[#030712] to-transparent" />
+            )}
+
             {/* Prompt Box */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-slate-500/20 focus-within:border-slate-500 transition-all">
               <div className="p-3 sm:p-4">

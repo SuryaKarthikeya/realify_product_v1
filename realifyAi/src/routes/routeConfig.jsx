@@ -42,6 +42,7 @@ const AgentsPage                = lazy(() => import('@/features/agents/pages/Age
 const AgentProfilePage          = lazy(() => import('@/features/agents/pages/AgentProfilePage'));
 const IntegrationsPage          = lazy(() => import('@/features/integrations/pages/IntegrationsPage'));
 const ConnectorDetailPage       = lazy(() => import('@/features/integrations/pages/ConnectorDetailPage'));
+const DatasetDetailPage         = lazy(() => import('@/features/integrations/pages/DatasetDetailPage'));
 const NotificationsPage         = lazy(() => import('@/features/notifications/pages/NotificationsPage'));
 const ActionLogPage             = lazy(() => import('@/features/action-log/pages/ActionLogPage'));
 const ProfitAdsPage             = lazy(() => import('@/features/profit-ads/pages/ProfitAdsPage'));
@@ -122,6 +123,7 @@ export const routes = [
   { path: ROUTES.AGENTS,            element: <AgentsPage /> },
   { path: ROUTES.AGENT_PROFILE,     element: <AgentProfilePage /> },
   { path: ROUTES.INTEGRATIONS,      element: <IntegrationsPage /> },
+  { path: ROUTES.DATASET_DETAIL,    element: <DatasetDetailPage /> },
   { path: ROUTES.CONNECTOR_DETAIL,  element: <ConnectorDetailPage /> },
   { path: ROUTES.ACTION_LOG,        element: <ActionLogPage /> },
   { path: ROUTES.NAVIGATION,        element: <Navigate to={ROUTES.ACTION_LOG} replace /> },

@@ -8,8 +8,9 @@ import {
   size,
   FloatingPortal,
 } from '@floating-ui/react';
+import { pillSurface } from '@/features/workspace/components/filterPillSurface';
 
-const DateFilterSelect = ({ timeRange, setTimeRange, isOpen, onToggle, onClose }) => {
+const DateFilterSelect = ({ timeRange, setTimeRange, isOpen, onToggle, onClose, surface }) => {
   /**
    * Same floating setup as SkuFilterPopover.
    *
@@ -61,7 +62,7 @@ const DateFilterSelect = ({ timeRange, setTimeRange, isOpen, onToggle, onClose }
       <button
         ref={setReference}
         onClick={onToggle}
-        className={`px-3 py-1.5 bg-white dark:bg-slate-800 border rounded-xl text-xs font-semibold focus:outline-none cursor-pointer shadow-2xs flex items-center gap-1.5 transition-colors ${
+        className={`px-3 py-1.5 ${pillSurface(surface)} border rounded-xl text-xs font-semibold focus:outline-none cursor-pointer shadow-2xs flex items-center gap-1.5 transition-colors ${
           isOpen
             ? 'border-blue-600 text-blue-600'
             : 'border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700'

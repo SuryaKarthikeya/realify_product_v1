@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import AgentCard from '@/features/agents/components/AgentCard';
@@ -21,6 +21,7 @@ import {
 import { useAgentsStore } from '@/store/useAgentsStore';
 import { ROUTES } from '@/constants/routes';
 import { AGENTS_ROSTER, AGENT_GROUPS, agentSummary } from '@/features/agents/data/agentsData';
+import { scrollDashboardToTop } from '@/hooks/useScrollIntoViewOnChange';
 
 const TONES = {
   indigo: 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400',
@@ -46,6 +47,14 @@ const AgentsPage = () => {
   const isHiring = searchParams.get('view') === 'hire';
   const [stage, setStage] = useState('prompt');
   const [selectedAgent, setSelectedAgent] = useState(null);
+
+  /* The wizard swaps the whole page for a new screen without changing route, so
+     nothing resets the scroll position — a user who advanced from the footer
+     button lands part-way down the next step. Runs on entering the flow and on
+     every screen change within it. */
+  useEffect(() => {
+    if (isHiring) scrollDashboardToTop();
+  }, [isHiring, stage]);
 
   /** Everything the wizard collects, carried across its three steps. */
   const [draft, setDraft] = useState({

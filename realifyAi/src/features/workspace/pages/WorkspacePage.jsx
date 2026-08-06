@@ -551,6 +551,10 @@ const WorkspacePage = () => {
       showTabs={false}
       showAIPrompt={true}
       aiPromptFullWidth={true}
+      /* The domain lives in the URL but reads as a tab, so switching Revenue →
+         Margin must not scroll the user back to the top of the page they are
+         working in. Arriving from anywhere else still resets. */
+      scrollResetKey={ROUTES.WORKSPACE}
     >
       {/* ── STICKY COMPACT KPI HEADER ── */}
       <CompactKpiStrip
@@ -700,6 +704,7 @@ const WorkspacePage = () => {
                         multiple
                         isOpen={openDropdown === 'category'}
                         onToggle={() => toggleDropdown('category')}
+                        surface="table"
                         width="w-[160px]"
                       />
 
@@ -711,6 +716,7 @@ const WorkspacePage = () => {
                         multiple
                         isOpen={openDropdown === 'channel'}
                         onToggle={() => toggleDropdown('channel')}
+                        surface="table"
                         width="w-[140px]"
                       />
 
@@ -722,6 +728,7 @@ const WorkspacePage = () => {
                         multiple
                         isOpen={openDropdown === 'status'}
                         onToggle={() => toggleDropdown('status')}
+                        surface="table"
                         width="w-[150px]"
                       />
 
@@ -734,6 +741,7 @@ const WorkspacePage = () => {
                           onChange={(v) => { setAdPlatform(v); setOpenDropdown(null); }}
                           isOpen={openDropdown === 'advertising'}
                           onToggle={() => toggleDropdown('advertising')}
+                          surface="table"
                           width="w-[170px]"
                         />
                       )}
@@ -748,6 +756,7 @@ const WorkspacePage = () => {
                             onChange={(v) => { setFulfillmentType(v); setOpenDropdown(null); }}
                             isOpen={openDropdown === 'fulfillment'}
                             onToggle={() => toggleDropdown('fulfillment')}
+                            surface="table"
                             width="w-[170px]"
                           />
                           <FilterSelect
@@ -757,6 +766,7 @@ const WorkspacePage = () => {
                             onChange={(v) => { setStockoutTime(v); setOpenDropdown(null); }}
                             isOpen={openDropdown === 'stockout'}
                             onToggle={() => toggleDropdown('stockout')}
+                            surface="table"
                             width="w-[160px]"
                           />
                           <FilterSelect
@@ -766,6 +776,7 @@ const WorkspacePage = () => {
                             onChange={(v) => { setConfidence(v); setOpenDropdown(null); }}
                             isOpen={openDropdown === 'confidence'}
                             onToggle={() => toggleDropdown('confidence')}
+                            surface="table"
                             width="w-[140px]"
                           />
                         </>
@@ -781,6 +792,7 @@ const WorkspacePage = () => {
                             onChange={(v) => { setUrgency(v); setOpenDropdown(null); }}
                             isOpen={openDropdown === 'urgency'}
                             onToggle={() => toggleDropdown('urgency')}
+                            surface="table"
                             width="w-[140px]"
                           />
                           <FilterSelect
@@ -790,6 +802,7 @@ const WorkspacePage = () => {
                             onChange={(v) => { setCashDirection(v); setOpenDropdown(null); }}
                             isOpen={openDropdown === 'cashDirection'}
                             onToggle={() => toggleDropdown('cashDirection')}
+                            surface="table"
                             width="w-[180px]"
                           />
                         </>
@@ -802,6 +815,7 @@ const WorkspacePage = () => {
                         onApply={setSkuFilter}
                         isOpen={openDropdown === 'sku'}
                         onToggle={() => toggleDropdown('sku')}
+                        surface="table"
                         onClose={() => setOpenDropdown(null)}
                       />
 
@@ -814,6 +828,7 @@ const WorkspacePage = () => {
                         setTimeRange={setTimeRange}
                         isOpen={openDropdown === 'date'}
                         onToggle={() => toggleDropdown('date')}
+                        surface="table"
                         onClose={() => setOpenDropdown(null)}
                       />
                     </div>

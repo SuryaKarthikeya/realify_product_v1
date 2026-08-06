@@ -1,6 +1,14 @@
 import React from 'react';
 
 /**
+ * The ribbon is one row, always. It pins over the page while the user works the
+ * table below, so a second row does not read as more information — it covers the
+ * content they scrolled down to reach. Enforced here rather than trusting every
+ * caller to slice.
+ */
+const MAX_KPIS = 5;
+
+/**
  * Condensed KPI ribbon that pins to the top of the scroll area once the full KPI
  * grid has scrolled out of view, so the numbers stay readable while working the
  * Actions table.
@@ -28,9 +36,17 @@ const CompactKpiStrip = ({ visible, kpis, onKpiClick, onDashboardClick }) => {
         <div className="mx-auto max-w-[1600px] px-3 sm:px-4">
           <div className="flex items-center gap-2 rounded-2xl border border-[#e2e8f0] dark:border-slate-700 bg-gray-100 dark:bg-slate-800 p-1.5 shadow-sm">
             <div className="grid flex-1 min-w-0 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5">
-              {kpis.map((kpi, i) => (
+              {kpis.slice(0, MAX_KPIS).map((kpi, i) => (
                 <Card
-                  key={kpi.key || kpi.title || i}
+                  /* Index, never the title. Sub-stat cards carry no `key` field,
+                     so a title-derived key made all five loading placeholders
+                     key on '…' at once. React's reconciler maps children by key,
+                     duplicates collapse to one entry, and the four it loses are
+                     never unmounted — they stay in the DOM as dead '…' cards,
+                     four more on every tab switch. The ribbon is a fixed row of
+                     positional slots that never reorder, so the index is the
+                     correct identity (same as the expanded grid below it). */
+                  key={i}
                   {...(onKpiClick ? { type: 'button', onClick: () => onKpiClick(kpi) } : {})}
                   className={`min-w-0 rounded-xl bg-white dark:bg-slate-900 px-3 py-1.5 flex flex-col items-center justify-center shadow-2xs ${
                     onKpiClick

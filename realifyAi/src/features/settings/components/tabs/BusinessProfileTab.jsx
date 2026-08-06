@@ -1,7 +1,43 @@
-import React from 'react';
-import { Input, Select } from '@/components/ui/Input';
+import React, { useState } from 'react';
+import { Input } from '@/components/ui/Input';
+import SelectMenu from '@/components/ui/SelectMenu';
+
+const BUSINESS_TYPES = [
+  { id: '', label: 'Select Business Type' },
+  { id: 'sole-proprietorship', label: 'Sole Proprietorship' },
+  { id: 'llc', label: 'LLC' },
+  { id: 'corporation', label: 'Corporation' },
+  { id: 'partnership', label: 'Partnership' },
+];
+
+const GMV_RANGES = [
+  { id: '', label: 'Select Range' },
+  { id: 'under-100k', label: 'Under $100K' },
+  { id: '100k-500k', label: '$100K – $500K' },
+  { id: '500k-1m', label: '$500K – $1M' },
+  { id: '1m-5m', label: '$1M – $5M' },
+  { id: '5m-plus', label: '$5M+' },
+];
+
+const DIAL_CODES = ['+1', '+44', '+91'];
+
+/* Matches the text inputs beside them. `!` because SelectMenu's own trigger
+   classes would otherwise win on CSS order, not on where they sit in the
+   class string. */
+const FIELD_TRIGGER = '!bg-gray-50 dark:!bg-slate-800/50 !py-2.5 !text-sm !font-normal';
 
 const BusinessProfileTab = ({ onInputChange }) => {
+  /* Controlled, unlike the native selects these replaced — SelectMenu renders
+     its own list, so it needs to be told what is chosen. */
+  const [businessType, setBusinessType] = useState('');
+  const [gmvRange, setGmvRange] = useState('');
+  const [dialCode, setDialCode] = useState('+1');
+
+  const pick = (setter) => (next) => {
+    setter(next);
+    onInputChange?.();
+  };
+
   return (
     <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl shadow-sm">
       <div className="p-6 border-b border-gray-100 dark:border-slate-800">
@@ -35,13 +71,13 @@ const BusinessProfileTab = ({ onInputChange }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Business Type</label>
-              <Select onChange={onInputChange}>
-                <option value="" disabled>Select Business Type</option>
-                <option>Sole Proprietorship</option>
-                <option>LLC</option>
-                <option>Corporation</option>
-                <option>Partnership</option>
-              </Select>
+              <SelectMenu
+                value={businessType}
+                options={BUSINESS_TYPES}
+                onChange={pick(setBusinessType)}
+                ariaLabel="Business type"
+                buttonClassName={FIELD_TRIGGER}
+              />
             </div>
           </div>
         </div>
@@ -67,23 +103,25 @@ const BusinessProfileTab = ({ onInputChange }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-100 dark:border-slate-800">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Annual GMV Range</label>
-            <Select onChange={onInputChange}>
-              <option value="" disabled>Select Range</option>
-              <option>Under $100K</option>
-              <option>$100K – $500K</option>
-              <option>$500K – $1M</option>
-              <option>$1M – $5M</option>
-              <option>$5M+</option>
-            </Select>
+            <SelectMenu
+              value={gmvRange}
+              options={GMV_RANGES}
+              onChange={pick(setGmvRange)}
+              ariaLabel="Annual GMV range"
+              buttonClassName={FIELD_TRIGGER}
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Business Phone</label>
             <div className="flex gap-2">
-              <select className="w-24 px-3 py-2.5 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl text-sm outline-none dark:text-slate-300">
-                <option>+1</option>
-                <option>+44</option>
-                <option>+91</option>
-              </select>
+              <SelectMenu
+                value={dialCode}
+                options={DIAL_CODES}
+                onChange={pick(setDialCode)}
+                ariaLabel="Country dialling code"
+                className="w-24 flex-shrink-0"
+                buttonClassName={FIELD_TRIGGER}
+              />
               <Input type="tel" placeholder="(555) 000-0000" onChange={onInputChange} className="flex-1 w-auto" />
             </div>
           </div>
